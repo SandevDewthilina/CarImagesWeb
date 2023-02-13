@@ -43,8 +43,7 @@ namespace CarImagesWeb
                 })
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>()
-                        .UseUrls("http://0.0.0.0:80");
+                    webBuilder.UseStartup<Startup>();
                 }); 
     }
 }
