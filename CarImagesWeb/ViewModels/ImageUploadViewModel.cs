@@ -6,11 +6,6 @@ namespace CarImagesWeb.ViewModels
 {
     public class ImageUploadViewModel
     {
-        public ImageUploadViewModel(IEnumerable<string> tags, IEnumerable<string> vehicleTypes)
-        {
-            Tags = tags;
-            VehicleTypes = vehicleTypes;
-        }
 
         public ImageUploadViewModel()
         {
@@ -18,24 +13,33 @@ namespace CarImagesWeb.ViewModels
         }
 
         //default singleton instance
-        public static ImageUploadViewModel DefaultInstance { get; } = new ImageUploadViewModel(
-            new List<string>()
+        public static ImageUploadViewModel DefaultInstance { get; } = new ImageUploadViewModel()
+        {
+            VehicleTags = new List<string>()
             {
                 "Front", "Rear", "Side"
             },
-            new List<string>()
+            Vehicles = new List<string>(){
+                "Vehicle/0000", "Vehicle/1111", "Vehicle/2222"
+            },
+            ContainerTags = new List<string>()
             {
-                "Car", "Truck", "SUV"
-            });
+                "Front", "Rear", "Side"
+            },
+            Containers = new List<string>(){
+                "Container/0000", "Container/1111", "Container/2222"
+            }
+        };
+        
 
-        public string ContainerId { get; set; }
         public string ImageCategory { get; set; }
-        public IEnumerable<string> VehicleTypes { get; }
-        public string VehicleType { get; set; }
-        public string VehicleNumber { get; set; }
-        public string ChassisNumber { get; set; }
+        public IEnumerable<string> Vehicles { get; set; }
+        public string Vehicle { get; set; }
+        public IEnumerable<string> Containers { get; set; }
+        public string Container { get; set; }
         public string Tag { get; set; }
-        public IEnumerable<string> Tags { get; }
+        public IEnumerable<string> VehicleTags { get; set; }
+        public IEnumerable<string> ContainerTags { get; set; }
         public IFormFile[] Files { get; set; }
     }
 }

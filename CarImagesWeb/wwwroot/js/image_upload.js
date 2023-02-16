@@ -1,5 +1,9 @@
 $(document).ready(function () {
+
+    //Initialize Select2 Elements
+    $('.select2').select2()
     
+    //Initialize Uppy
     let uppy = new Uppy.Uppy({
         id: 'uppy',
         target: '#uppy',
@@ -24,7 +28,7 @@ $(document).ready(function () {
     // Allow dropping files on any element or the whole document
     uppy.use(Uppy.Compressor)
     uppy.use(Uppy.XHRUpload, {
-        endpoint: '/Home/Index',
+        endpoint: '/Images/Upload',
         formData: true,
         fieldName: 'files[]',
     })
@@ -33,23 +37,24 @@ $(document).ready(function () {
         console.log('failed files:', result.failed)
     })
 
+    // Form Behavior
     let vehicleInputs = $("#vehicle-inputs");
     let containerInputs = $("#container-inputs");
-    vehicleInputs.hide();
-    containerInputs.hide();
+    vehicleInputs.disabled();
+    containerInputs.disable();
     
     $("input[name='ImageCategory']").change(function () {
         let category = $(this).val();
         if (category === "Vehicles") {
-            vehicleInputs.show();
-            containerInputs.hide();
+            vehicleInputs.enable();
+            containerInputs.enable();
         } else if (category === "Containers") {
-            vehicleInputs.hide();
-            containerInputs.show();
+            vehicleInputs.disable();
+            containerInputs.enable();
         } else {
             //default
-            vehicleInputs.hide();
-            containerInputs.hide();
+            vehicleInputs.disable();
+            containerInputs.disable();
         }
     });
 });

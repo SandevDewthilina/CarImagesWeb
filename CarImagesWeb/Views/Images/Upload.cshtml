@@ -3,71 +3,87 @@
 @{
     ViewData["Title"] = "Upload Images";
 }
+
+@section Styles{
+    <!-- Select2 -->
+    <link rel="stylesheet" href="~/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- iCheck for checkboxes and radio inputs -->
+    <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!--Upload container css-->
+    <link href="https://releases.transloadit.com/uppy/v3.4.0/uppy.min.css" rel="stylesheet">
+}
+
 <form method="post" asp-action="Index" asp-controller="Home" id="upload-form" enctype="multipart/form-data">
     <div class="container py-5" id="uppy">
         <div class="row">
+            @* Left Side of the form *@
             <div class="col-lg-6 col-12">
                 <!-- Bind form fields to properties in the view model -->
-                <div class="form-group">
-                    <div for="ImageCategory">Select Image Category</div>
-                    <label class="btn btn-primary" for="Vehicles">
+                <h4 class="mb-3">Images Upload</h4>
+                <div class="form-group clearfix d-flex justify-content-between align-items-center">
+                    <div class="mb-3">Select Image Category</div>
+                    <div class="icheck-primary d-inline">
                         <input type="radio" id="Vehicles" name="ImageCategory" value="Vehicles" hidden>
-                        Vehicles
-                    </label>
-                    <label class="form-check btn btn-secondary" for="Containers">
+                        <label for="Vehicles">Vehicles</label>
+                    </div>
+                    <div class="icheck-primary d-inline">
                         <input type="radio" id="Containers" name="ImageCategory" value="Containers" hidden>
-                        Containers
-                    </label>
+                        <label for="Containers">Containers</label>
+                    </div>
                 </div>
-                
+
                 <div id="vehicle-inputs">
                     <!-- Show the dropdown only if Vehicles radio button is selected -->
-                    <div class="form-group" id="VehicleTypeDropdown">
-                        <label for="VehicleType">Vehicle Type</label>
-                        <select asp-for="VehicleType" id="VehicleType" class="form-control" name="VehicleType">
-                            <option value="">-- Select Vehicle Type --</option>
+                    <div class="form-group" id="VehicleDropdown">
+                        <label>Vehicle</label>
+                        <select asp-for="Vehicle" id="VehicleType" class="form-control select2" name="VehicleType" style="width: 100%;">
+                            <option selected="selected" value="">-- Select Vehicle --</option>
                             <!-- Bind options to the list of vehicle types in the view model -->
-                            @foreach (var vehicleType in Model.VehicleTypes)
+                            @foreach (var vehicleType in Model.Vehicles)
                             {
                                 <option value="@vehicleType">@vehicleType</option>
                             }
                         </select>
                     </div>
-
-                    <!-- Show the input box for Vehicle Number only if a Vehicle Type is selected -->
-                    <div class="form-group" id="VehicleNumberGroup">
-                        <label for="VehicleNumber">Vehicle Number</label>
-                        <input type="text" id="VehicleNumber" class="form-control" name="VehicleNumber" value="@Model.VehicleNumber">
-                    </div>
-
-                    <!-- Show the input box for Chassis Number only if a Vehicle Type is selected -->
-                    <div class="form-group" id="ChassisNumberGroup">
-                        <label for="ChassisNumber">Chassis Number</label>
-                        <input type="text" id="ChassisNumber" class="form-control" name="ChassisNumber" value="@Model.ChassisNumber">
+                    <div class="form-group" id="VehicleTagDropdown">
+                        <label>Select Tag</label>
+                        <select class="select2" multiple="multiple" data-placeholder="Select Vehicle Tags" style="width: 100%;">
+                            <!-- Bind options to the list of vehicle types in the view model -->
+                            @foreach (var tag in Model.VehicleTags)
+                            {
+                                <option value="@tag">@tag</option>
+                            }
+                        </select>
                     </div>
                 </div>
                 <div id="container-inputs">
-                    <!-- Show the input box for Container ID only if Containers radio button is selected -->
-                    <div class="form-group" id="ContainerIdGroup">
-                        <label for="ContainerId">Container ID</label>
-                        <input type="text" id="ContainerId" class="form-control" name="ContainerID" value="@Model.ContainerId">
+                    <div class="form-group" id="ContainerDropdown">
+                        <label>Vehicle</label>
+                        <select asp-for="Container" id="Container" class="form-control select2" name="Container" style="width: 100%;">
+                            <option selected="selected" value="">-- Select Container --</option>
+                            <!-- Bind options to the list of vehicle types in the view model -->
+                            @foreach (var vehicleType in Model.Containers)
+                            {
+                                <option value="@vehicleType">@vehicleType</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="form-group" id="ContainerTagDropdown">
+                        <label>Select Tag</label>
+                        <select class="select2" multiple="multiple" data-placeholder="Select Container Tags" style="width: 100%;">
+                            <!-- Bind options to the list of vehicle types in the view model -->
+                            @foreach (var tag in Model.ContainerTags)
+                            {
+                                <option value="@tag">@tag</option>
+                            }
+                        </select>
                     </div>
                 </div>
 
-
-                <div class="form-group" id="TagDropdown">
-                    <label for="Tag">Select Tag</label>
-                    <select asp-for="Tag" id="Tag" class="form-control" name="Tag">
-                        <option value="">-- Select Tag --</option>
-                        <!-- Bind options to the list of vehicle types in the view model -->
-                        @foreach (var tag in Model.Tags)
-                        {
-                            <option value="@tag">@tag</option>
-                        }
-                    </select>
-                </div>
             </div>
             <input type="file" name="files[]" multiple hidden>
+            @* Right Side of the form *@
             <div class="col-lg-6 col-12">
                 <div class="form-group" id="uppyDashboard"></div>
             </div>
@@ -75,3 +91,13 @@
     </div>
 
 </form>
+
+@section Scripts
+{
+    <!-- Select2 -->
+    <script src="~/plugins/select2/js/select2.full.min.js"></script>
+    <!-- Uppy -->
+    <script src="https://releases.transloadit.com/uppy/v3.4.0/uppy.min.js"></script>
+    <!--Custom scripts-->
+    <script src="~/js/image_upload.js" type="module"></script>
+}
