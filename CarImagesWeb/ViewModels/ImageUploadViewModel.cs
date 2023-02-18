@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Microsoft.AspNetCore.Http;
+using CarImagesWeb.DTOs;
 
 namespace CarImagesWeb.ViewModels
 {
@@ -28,18 +27,18 @@ namespace CarImagesWeb.ViewModels
             },
             Containers = new List<string>(){
                 "Container/0000", "Container/1111", "Container/2222"
+            },
+            CountryCodes = new List<string>()
+            {
+                "Country001", "Country002", "Country003"
             }
         };
-        
 
-        public string ImageCategory { get; set; }
         public IEnumerable<string> Vehicles { get; set; }
-        public string Vehicle { get; set; }
         public IEnumerable<string> Containers { get; set; }
-        public string Container { get; set; }
-        public string Tag { get; set; }
         public IEnumerable<string> VehicleTags { get; set; }
         public IEnumerable<string> ContainerTags { get; set; }
-        public IFormFile[] Files { get; set; }
+        public IEnumerable<string> CountryCodes { get; set; }
+        public ImageUploadDto ImageUploadDto { get; }
     }
 }
