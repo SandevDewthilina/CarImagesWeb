@@ -34,82 +34,83 @@
 }
 
 <div class="container-fluid" id="app">
-  <div class="row my-2">
-    <div class="col-12 search-form">
-      <div class="card">
-        <!--form with two inline radio buttons to select either vehicle or container
-        A drop down with a search to search for Vehicle and
-        a multi select drop down to select tags
-        and a search button-->
-        <div class="card-body">
-          <div class="row">
-            <div class="col-12 mb-2 text-gray-dark">
-              <h3>Image Gallery</h3>
-            </div>
-            <div class="col-lg-4 col-md-6 col-12 form-group clearfix d-flex justify-content-between align-items-center">
-              <div class="icheck-primary d-inline mr-3">
-                <input type="radio" id="Vehicles" v-model="imageCategory" name="ImageCategory" value="Vehicle" hidden>
-                <label for="Vehicles">Vehicles</label>
-              </div>
-              <div class="icheck-primary d-inline">
-                <input type="radio" id="Containers" v-model="imageCategory" name="ImageCategory" value="Container" hidden>
-                <label for="Containers">Containers</label>
-              </div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-5 col-12">
-              <div class="form-group">
-                <div class="form-group" id="VehicleDropdown">
-                  <label>Select {{imageCategory}}</label>
-                  <select id="AssetType"
-                          class="form-control select2" name="AssetType" style="width: 100%;">
-                    <option v-for="val in assets" v-bind:key="val" v-bind:value="val">{{val}}</option>
-                  </select>
+  <div class="card">
+    <div class="card-body">
+        <div class="row my-2">
+          <div class="col-12 search-form">
+              <!--form with two inline radio buttons to select either vehicle or container
+              A drop down with a search to search for Vehicle and
+              a multi select drop down to select tags
+              and a search button-->
+              <div class="row">
+                <div class="col-12 mb-2 text-gray-dark">
+                  <h3>Image Gallery</h3>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12 form-group clearfix d-flex justify-content-between align-items-center">
+                  <div class="icheck-primary d-inline mr-3">
+                    <input type="radio" id="Vehicles" v-model="imageCategory" name="ImageCategory" value="Vehicle" hidden>
+                    <label for="Vehicles">Vehicles</label>
+                  </div>
+                  <div class="icheck-primary d-inline">
+                    <input type="radio" id="Containers" v-model="imageCategory" name="ImageCategory" value="Container" hidden>
+                    <label for="Containers">Containers</label>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="col-lg-5 col-12">
-              <div class="form-group" id="TagDropdown">
-                <label>Select Tag</label>
-                <select id="AssetTags" class="select2" multiple="multiple" 
-                        data-placeholder="Select Tags" style="width: 100%;">
-                  <option v-for="tag in assetTags" v-bind:key="tag" v-bind:value="tag">{{tag}}</option>
-                </select>
+              <div class="row">
+                <div class="col-lg-5 col-12">
+                  <div class="form-group">
+                    <div class="form-group" id="VehicleDropdown">
+                      <label>Select {{imageCategory || 'Assets'}}</label>
+                      <select id="AssetType"
+                              class="form-control select2" name="AssetType" style="width: 100%;">
+                        <option v-for="val in assets" v-bind:key="val" v-bind:value="val">{{val}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5 col-12">
+                  <div class="form-group" id="TagDropdown">
+                    <label>Select Tags</label>
+                    <select id="AssetTags" class="select2" multiple="multiple" 
+                            data-placeholder="Select Tags" style="width: 100%;">
+                      <option v-for="tag in assetTags" v-bind:key="tag" v-bind:value="tag">{{tag}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-12 d-flex flex-column justify-content-end form-group">
+                  <button class="btn btn-primary" v-on:click="searchImages()">Search</button>
+                </div>
               </div>
+          </div>
+        </div>
+        <div class="row my-2">
+          <div class="col-12 d-flex justify-content-end">
+            <h5 class="btn btn-warning mr-2" v-on:click="deselectAll()">Deselect All <span><i class="fas fa-times-circle"></i></span></h5>
+            <h5 class="btn btn-primary mr-2" v-on:click="selectAll()">Select All <span><i class="fas fa-check-circle"></i></span></h5>
+            <h5 class="btn btn-success" v-on:click="downloadImages()">Download <span><i class="fas fa-download"></i></span></h5>
+          </div>
+        </div>
+      <div class="row my-2">
+        <div class="gallery col-12">
+          <div v-for="(image,index) in images" v-bind:key="image" class="image-container">
+            <div class="download-check-box icheck-primary">
+              <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
+                     v-bind:name="'img-'+index" alt="" hidden>
+              <label v-bind:for="'img-'+index"></label>
             </div>
-            <div class="col-lg-2 col-12 d-flex flex-column justify-content-end form-group">
-              <button class="btn btn-primary" v-on:click="searchImages()">Search</button>
+            <div class="image border border-dark">
+              <img v-bind:src="image.url" alt="">
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <div class="row my-2">
-    <div class="col-12 d-flex justify-content-end">
-      <h5 class="btn btn-warning mr-2" v-on:click="deselectAll()">Deselect All <span><i class="fas fa-times-circle"></i></span></h5>
-      <h5 class="btn btn-primary mr-2" v-on:click="selectAll()">Select All <span><i class="fas fa-check-circle"></i></span></h5>
-      <h5 class="btn btn-success" v-on:click="downloadImages()">Download <span><i class="fas fa-download"></i></span></h5>
-    </div>
-  </div>
-  <div class="row my-2">
-    <div class="gallery col-12">
-      <div v-for="(image,index) in images" v-bind:key="image" class="image-container">
-          <div class="download-check-box icheck-primary">
-            <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index" 
-                   v-bind:name="'img-'+index" alt="" hidden>
-            <label v-bind:for="'img-'+index"></label>
-          </div>
-          <div class="image border border-dark">
-            <img v-bind:src="image.url" alt="">
-          </div>
-        </div>
-    </div>
-  </div>
 </div>
 
 @section Scripts
 {
+  <script src="~/lib/axios/axios.min.js"></script>
   <script src="~/js/image_gallery.js"></script>
 }
