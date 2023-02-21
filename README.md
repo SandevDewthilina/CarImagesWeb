@@ -11,11 +11,9 @@ The gallery allows for the filtering of images based on different vehicle or con
 - Retrieval of images and their details from the database to display in the gallery
 - Filtering mechanism for vehicles and containers based on relevant data from the database
 
-## Technology Stack
-
-- Dotnet Core MVC
-- Azure Blob Storage
-- SQL database
+## Technologies Used
+![dotNet Core](https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/.NET_Core_Logo.svg/240px-.NET_Core_Logo.svg.png)
+![Azure Blob Storage](https://www.clicdata.com/wp-content/uploads/2021/01/microsoft-azure-blob-storage-logo.com_.png)
 
 ## Setup
 
