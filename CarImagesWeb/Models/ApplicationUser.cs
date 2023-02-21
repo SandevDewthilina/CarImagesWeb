@@ -11,9 +11,7 @@ namespace CarImagesWeb.Models
         public string Name { get; set; }
     }
 
-    public class UserRole 
+    public class UserRole : IdentityRole
     {
-        public int Id { get; set; }
-        public string Name { get; set; }
     }
 }

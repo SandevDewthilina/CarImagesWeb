@@ -17,6 +17,17 @@ namespace CarImagesWeb.DbContext
         public DbSet<CountryTagMapping> CountryTagMappings { get; set; }
         public DbSet<UserRoleTagMapping> UserRoleTagMappings { get; set; }
         public DbSet<ImageUpload> ImageUploads { get; set; }
+        
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<CountryTagMapping>()
+                .HasKey(c => new {c.CountryId, c.TagId});
+
+            modelBuilder.Entity<UserRoleTagMapping>()
+                .HasKey(c => new {c.UserRoleId, c.TagId});
+        }
 
     }
 }
