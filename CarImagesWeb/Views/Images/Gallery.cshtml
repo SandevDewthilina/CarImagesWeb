@@ -61,7 +61,7 @@
             <div class="col-lg-5 col-12">
               <div class="form-group">
                 <div class="form-group" id="VehicleDropdown">
-                  <label>Select {{imageCategory}}</label>
+                  <label>Select {{imageCategory || 'Assets'}}</label>
                   <select id="AssetType"
                           class="form-control select2" name="AssetType" style="width: 100%;">
                     <option v-for="val in assets" v-bind:key="val" v-bind:value="val">{{val}}</option>
@@ -71,7 +71,7 @@
             </div>
             <div class="col-lg-5 col-12">
               <div class="form-group" id="TagDropdown">
-                <label>Select Tag</label>
+                <label>Select Tags</label>
                 <select id="AssetTags" class="select2" multiple="multiple" 
                         data-placeholder="Select Tags" style="width: 100%;">
                   <option v-for="tag in assetTags" v-bind:key="tag" v-bind:value="tag">{{tag}}</option>
@@ -111,5 +111,6 @@
 
 @section Scripts
 {
+  <script src="~/lib/axios/axios.min.js"></script>
   <script src="~/js/image_gallery.js"></script>
 }
