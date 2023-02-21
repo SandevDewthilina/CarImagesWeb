@@ -8,6 +8,7 @@ namespace CarImagesWeb.Services
     public interface IImagesHandler
     {
         Task HandleUpload(ImageUploadDto dto, IFormFileCollection files);
+        Task HandleSearch();
     }
     public class ImagesHandler : IImagesHandler
     {
@@ -31,6 +32,11 @@ namespace CarImagesWeb.Services
             {
                 Console.WriteLine($"{property.Name}: {property.GetValue(dto)}");
             }
+        }
+
+        public Task HandleSearch()
+        {
+            throw new NotImplementedException();
         }
     }
 }
