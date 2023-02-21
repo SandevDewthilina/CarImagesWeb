@@ -9,7 +9,7 @@ app = Vue.createApp({
     data(){
         return{
            _images:[],
-            imageCategory:'',
+            imageCategory:'Vehicle',
             // these hardcoded arrays will be populated from the server on mounted()
             vehicles:['CID/001','CID/002','CID/003','CID/004','CID/005'], 
             containers:['CoID/001','CoID/002','CoID/003','CoID/004'], 
@@ -56,18 +56,26 @@ app = Vue.createApp({
         searchImages() {
             const SEARCH_URL = '/api/ImagesApi/Search';
             let assetType = this.imageCategory;
-            let asset = this._getSelectedAssetType();
+            let asset = this._getSelectedAsset();
             let tags = this._getSelectedAssetTags();
             let searchParams = { assetType, asset, tags };
-            this.setSearching(true);
-            this._getImages(SEARCH_URL, searchParams).then(data => {
-                this._images = [];
-                data.forEach(url => {
-                    this._images.push(new Image(url));
+            //check if the search params are valid
+            if(assetType==='' || asset==='' || asset === null){
+                // no search params, do nothing
+                return;
+            }
+            //if not already searching, set searching to true and call _getImages()
+            if(this.searching !== true){
+                this.setSearching(true);
+                this._getImages(SEARCH_URL, searchParams).then(data => {
+                    this._images = [];
+                    data.forEach(url => {
+                        this._images.push(new Image(url));
+                    });
+                }).finally(() => {
+                    this.setSearching(false)
                 });
-            }).finally(() => {
-                this.setSearching(false)
-            });
+            }
         },
         setDownloading(isDownloading){
           this.downloading = isDownloading;  
@@ -80,31 +88,39 @@ app = Vue.createApp({
                     imageUrls.push(image.url);
                 }
             });
-            this.setDownloading(true);
-            axios.post('/api/ImagesApi/Download', imageUrls, {responseType: 'arraybuffer'}).then(response => {
-                if (response.status === 200) {
-                    // Create a blob object from the response data
-                    return new Blob([response.data], {type: response.headers['content-type']});
-                } else {
-                    throw new Error('Failed to download images');
-                }
-            }).then(blob => {
-                // Create a data URI for the blob
-                const dataUri = URL.createObjectURL(blob);
-                // open a new window and navigate to the data URI
-                window.open(dataUri, '_blank');
-            })
-                .catch(error => {
-                    console.error(error);
-                }).finally(() => {
-                this.setDownloading(false)
-            });
+            //check if there are any selected images
+            if (imageUrls.length === 0) {
+                //no images selected, do nothing
+                return;
+            }
+            //if not already downloading, set downloading to true and call _downloadImages()
+            if(this.downloading !== true){
+                this.setDownloading(true);
+                axios.post('/api/ImagesApi/Download', imageUrls, {responseType: 'arraybuffer'}).then(response => {
+                    if (response.status === 200) {
+                        // Create a blob object from the response data
+                        return new Blob([response.data], {type: response.headers['content-type']});
+                    } else {
+                        throw new Error('Failed to download images');
+                    }
+                }).then(blob => {
+                    // Create a data URI for the blob
+                    const dataUri = URL.createObjectURL(blob);
+                    // open a new window and navigate to the data URI
+                    window.open(dataUri, '_blank');
+                })
+                    .catch(error => {
+                        console.error(error);
+                    }).finally(() => {
+                    this.setDownloading(false)
+                });
+            }
         },
         // Get the selected asset type from the select2 dropdown
-        _getSelectedAssetType(){
+        _getSelectedAsset(){
             let assetType = '';
-            $('#AssetType').select2('data').forEach(asset => {
-                assetType = asset.text;
+            $('#Asset').select2('data').forEach(asset => {
+                assetType = asset.id;
             });
             return assetType;
         },
@@ -112,7 +128,7 @@ app = Vue.createApp({
         _getSelectedAssetTags(){
             let assetTags = [];
             $('#AssetTags').select2('data').forEach(tag => {
-                assetTags.push(tag.text);
+                assetTags.push(tag.id);
             });
             return assetTags;
         },
@@ -164,7 +180,6 @@ app = Vue.createApp({
             this.vehicleTags = data.vehicleTags;
             this.containerTags = data.containerTags;
         });
-        
     }
 })
 
