@@ -4,6 +4,7 @@ namespace CarImagesWeb.Models
 {
     public class ImageUpload
     {
+        public int Id { get; set; }
         public int AssetId { get; set; }
         public Asset Asset { get; set; }
         public string UserId { get; set; }
