@@ -15,6 +15,8 @@ app = Vue.createApp({
             containers:['CoID/001','CoID/002','CoID/003','CoID/004'], 
             vehicleTags:['Front','Back','Left','Right','Interior','Engine','Dashboard','Wheels','Other'], 
             containerTags:['Front','Back','Left','Right','Interior','Other'], 
+            downloading:false,
+            searching:false
         }
     },
     computed:{
@@ -38,9 +40,18 @@ app = Vue.createApp({
                 return this.vehicleTags;
             }
             return this.containerTags;
+        },
+        isDownloading(){
+            return this.downloading;
+        },
+        isSearching(){
+            return this.searching;
         }
     },
     methods:{
+        setSearching(isSearching){
+            this.searching = isSearching;
+        },
         // Search images by category, asset and tags. Calls _getImages() to get the image urls from the server
         searchImages() {
             const SEARCH_URL = '/api/ImagesApi/Search';
@@ -48,23 +59,45 @@ app = Vue.createApp({
             let asset = this._getSelectedAssetType();
             let tags = this._getSelectedAssetTags();
             let searchParams = { assetType, asset, tags };
+            this.setSearching(true);
             this._getImages(SEARCH_URL, searchParams).then(data => {
                 this._images = [];
                 data.forEach(url => {
                     this._images.push(new Image(url));
                 });
+            }).finally(() => {
+                this.setSearching(false)
             });
-            
+        },
+        setDownloading(isDownloading){
+          this.downloading = isDownloading;  
         },
         // Download selected images as a zip file to the client
-        downloadImages(){
-            //TODO: send selected images to the server
-            
-            //print selected images
+        downloadImages() {
+            let imageUrls = [];
             this._images.forEach(image => {
-                if(image.isSelected){
-                    console.log(image.url);
+                if (image.isSelected) {
+                    imageUrls.push(image.url);
                 }
+            });
+            this.setDownloading(true);
+            axios.post('/api/ImagesApi/Download', imageUrls, {responseType: 'arraybuffer'}).then(response => {
+                if (response.status === 200) {
+                    // Create a blob object from the response data
+                    return new Blob([response.data], {type: response.headers['content-type']});
+                } else {
+                    throw new Error('Failed to download images');
+                }
+            }).then(blob => {
+                // Create a data URI for the blob
+                const dataUri = URL.createObjectURL(blob);
+                // open a new window and navigate to the data URI
+                window.open(dataUri, '_blank');
+            })
+                .catch(error => {
+                    console.error(error);
+                }).finally(() => {
+                this.setDownloading(false)
             });
         },
         // Get the selected asset type from the select2 dropdown
@@ -85,7 +118,6 @@ app = Vue.createApp({
         },
         //Fetch image urls from the server
         async _getImages(fromUrl, searchParams) {
-            //TODO: get image urls from the server            
             //make axios call to get images from the server
             let res = await axios.post(fromUrl, searchParams);
             return res.data.data || [];

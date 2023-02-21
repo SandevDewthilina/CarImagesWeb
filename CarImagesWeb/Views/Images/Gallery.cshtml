@@ -30,6 +30,10 @@
     width:100%;
     height: 200px;
   }
+  
+  .resize{
+    transition: all 0.5s linear;
+  }
   </style>
 }
 
@@ -79,16 +83,23 @@
                   </div>
                 </div>
                 <div class="col-lg-2 col-12 d-flex flex-column justify-content-end form-group">
-                  <button class="btn btn-primary" v-on:click="searchImages()">Search</button>
+                  <button class="btn btn-primary d-flex align-items-center resize justify-content-center" v-on:click="searchImages()">
+                    <span class="mr-2">Search</span>
+                    <span class="spinner-border spinner-border-sm" v-if="isSearching"></span>
+                  </button>
                 </div>
               </div>
           </div>
         </div>
         <div class="row my-2">
           <div class="col-12 d-flex justify-content-end">
-            <h5 class="btn btn-warning mr-2" v-on:click="deselectAll()">Deselect All <span><i class="fas fa-times-circle"></i></span></h5>
-            <h5 class="btn btn-primary mr-2" v-on:click="selectAll()">Select All <span><i class="fas fa-check-circle"></i></span></h5>
-            <h5 class="btn btn-success" v-on:click="downloadImages()">Download <span><i class="fas fa-download"></i></span></h5>
+            <button class="btn btn-warning mr-2" v-on:click="deselectAll()">Deselect All <span><i class="fas fa-times-circle"></i></span></button>
+            <button class="btn btn-primary mr-2" v-on:click="selectAll()">Select All <span><i class="fas fa-check-circle"></i></span></button>
+            <button class="btn btn-success d-flex align-items-center resize" v-on:click="downloadImages()">
+              <span class="mr-2" >Download</span> 
+              <span class="mr-2" v-if="!isDownloading"><i class="fas fa-download"></i></span>
+              <span class="spinner-border spinner-border-sm" v-if="isDownloading"></span>
+            </button>
           </div>
         </div>
       <div class="row my-2">
