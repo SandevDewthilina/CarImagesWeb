@@ -34,15 +34,17 @@ namespace CarImagesWeb.ApiControllers
 
         //TODO: add parameter model and update the api method and api call
         [HttpPost]
-        public async Task<IActionResult> Search()
+        public async Task<IActionResult> Search(ImageSearchDto dto)
         {
+            var assetType = dto.AssetType;
+            var assetId = dto.Asset;
+            var tags = dto.Tags;
+            
+            // find imageUploads by assetType and assetId and/or tags
+            var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags);
+            
             // await _imagesHandler.HandleSearch();
-            return Json(new { data = new List<string>()
-                {
-                    "http://localhost:5000/dist/img/photo1.png", 
-                    "http://localhost:5000/dist/img/photo2.png",
-                } 
-            });
+            return Json(new { data = imageUploads});
         }
         
         [HttpPost]
