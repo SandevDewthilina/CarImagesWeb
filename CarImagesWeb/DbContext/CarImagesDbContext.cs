@@ -28,6 +28,12 @@ namespace CarImagesWeb.DbContext
             modelBuilder.Entity<UserRoleTagMapping>()
                 .HasKey(c => new {c.UserRoleId, c.TagId});
         }
+        
+        //get the dbset for the entity
+        public DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class
+        {
+            return Set<TEntity>();
+        }
 
     }
 }
