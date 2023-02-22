@@ -9,6 +9,7 @@ namespace CarImagesWeb.Services
     public interface ICountryHandler
     {
         Task<IEnumerable<string>> GetCountryCodesAsync();
+        Task<Country> GetCountryFromCode(string countryCode);
     }
     
     public class CountryHandler : ICountryHandler
@@ -24,6 +25,11 @@ namespace CarImagesWeb.Services
         {
             var countries = await _repository.GetAllAsync();
             return countries.Select(country => country.Code).ToList();
+        }
+
+        public Task<Country> GetCountryFromCode(string countryCode)
+        {
+            return _repository.GetAsync(c => c.Code == countryCode);
         }
     }
 }

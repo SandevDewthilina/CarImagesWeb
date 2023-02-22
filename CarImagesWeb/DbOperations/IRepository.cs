@@ -15,7 +15,10 @@ namespace CarImagesWeb.DbOperations
     {
         /// Retrieves an entity by its unique identifier.
         Task<T> GetById(int id);
-
+        
+        /// Returns a single entity by a given predicate.
+        Task<T> GetAsync(Expression<Func<T, bool>> predicate);
+        
         /// Retrieves all entities in the repository.
         Task<List<T>> GetAllAsync();
         
@@ -45,8 +48,12 @@ namespace CarImagesWeb.DbOperations
         
         public async Task<T> GetById(int id)
         {
-            return await _dbSet.SingleOrDefaultAsync(t => t.GetType().GetProperty("Id").GetValue(t).Equals(id));
+            return await _dbSet.FindAsync(id);
+        }
 
+        public async Task<T> GetAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _dbSet.SingleOrDefaultAsync(predicate);
         }
 
         public async Task<List<T>> GetAllAsync()

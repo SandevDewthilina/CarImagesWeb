@@ -10,7 +10,7 @@ namespace CarImagesWeb.DbOperations
 {
     public interface IImagesRepository : IRepository<ImageUpload>
     {
-        Task SaveImagesAsync(IEnumerable<ImageUpload> imageUpload, IFormFileCollection files);
+        Task SaveImagesAsync(IEnumerable<ImageUpload> imageUpload, IFormFileCollection files, string assetDirectory);
     }
     
     public class ImagesRepository : Repository<ImageUpload>, IImagesRepository
@@ -22,7 +22,8 @@ namespace CarImagesWeb.DbOperations
             _blobStorageHandler = blobStorageHandler;
         }
 
-        public async Task SaveImagesAsync(IEnumerable<ImageUpload> imageUploads, IFormFileCollection files)
+        public async Task SaveImagesAsync(IEnumerable<ImageUpload> imageUploads, IFormFileCollection files,
+            string assetDirectory)
         {
             // Save the imageUploads to the database
             foreach (var imageUpload in imageUploads)
@@ -30,7 +31,7 @@ namespace CarImagesWeb.DbOperations
                 await AddAsync(imageUpload);
             }
             // Upload the images to blob storage
-            await _blobStorageHandler.UploadImagesAsync(files, "/vehicles");
+            await _blobStorageHandler.UploadImagesAsync(files, assetDirectory);
         }
     }
 }
