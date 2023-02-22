@@ -4,7 +4,10 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Threading.Tasks;
+using CarImagesWeb.DbContext;
 using CarImagesWeb.DTOs;
+using CarImagesWeb.Helpers;
+using CarImagesWeb.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,26 +21,15 @@ namespace CarImagesWeb.Services
     }
     public class ImagesHandler : IImagesHandler
     {
-        private readonly IBlobStorageHandler _blobStorageHandler;
+        private readonly IAssetsRepository _assetsRepository;
 
-        public ImagesHandler(IBlobStorageHandler blobStorageHandler)
+        public ImagesHandler(IAssetsRepository assetsRepository)
         {
-            _blobStorageHandler = blobStorageHandler;
+            _assetsRepository = assetsRepository;
         }
         public async Task HandleUpload(ImageUploadDto dto, IFormFileCollection files)
         {
-            //print file names
-            foreach (var file in files)
-            {
-                Console.WriteLine(file.FileName);
-            }
-            
-            //print out the model properties using system reflection
-            var properties = dto.GetType().GetProperties();
-            foreach (var property in properties)
-            {
-                Console.WriteLine($"{property.Name}: {property.GetValue(dto)}");
-            }
+            await _assetsRepository.SaveAssetAsync(new Asset(), files);
         }
 
         public Task HandleSearch()

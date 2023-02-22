@@ -46,6 +46,7 @@ namespace CarImagesWeb
                 // options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<CarImagesDbContext>();
 
+            services.AddScoped<IAssetsRepository, AssetsRepository>();
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
 
