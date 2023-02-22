@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarImagesWeb.Controllers
+namespace CarImagesWeb.ApiControllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
@@ -33,6 +32,7 @@ namespace CarImagesWeb.Controllers
         }
         
 
+        //TODO: add parameter model and update the api method and api call
         [HttpPost]
         public async Task<IActionResult> Search()
         {

@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using CarImagesWeb.DbContext;
+﻿using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace CarImagesWeb.Controllers
+namespace CarImagesWeb.ApiControllers
 {
     [ApiController]
     [Route("api/[controller]/[action]")]
@@ -27,8 +24,7 @@ namespace CarImagesWeb.Controllers
             {
                 data = new
                 {
-                    vehicleTags = tags,
-                    containerTags = tags
+                    tags = tags
                 }
             });
         }

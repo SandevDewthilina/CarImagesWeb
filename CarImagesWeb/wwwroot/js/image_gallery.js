@@ -177,8 +177,10 @@ app = Vue.createApp({
             this.containers = data.containers;
         });
         getTags(TAGS_URL).then(data => {
-            this.vehicleTags = data.vehicleTags;
-            this.containerTags = data.containerTags;
+            //TODO: instead of having two arrays for vehicleTags and containerTags, 
+            // use one array and populate it with the data from the server
+            this.vehicleTags = data.tags;
+            this.containerTags = data.tags; 
         });
     }
 })

@@ -52,7 +52,7 @@ namespace CarImagesWeb
             services.AddScoped<IRepository<Tag>, TagRepository>();
             services.AddScoped<IRepository<Country>, CountryRepository>();
             services.AddScoped<IRepository<ImageUpload>, ImagesRepository>();
-            
+            services.AddScoped<IImagesRepository, ImagesRepository>();
             // Add service services
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
