@@ -3,7 +3,7 @@ using CarImagesWeb.Models;
 
 namespace CarImagesWeb.DbOperations
 {
-    public interface ITagRepository
+    public interface ITagRepository : IRepository<Tag>
     {
         
     }

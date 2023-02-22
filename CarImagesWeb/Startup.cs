@@ -48,12 +48,14 @@ namespace CarImagesWeb
             }).AddEntityFrameworkStores<CarImagesDbContext>();
 
             // Add repository services
-            services.AddScoped<IRepository<Asset>, AssetRepository>();
-            services.AddScoped<IRepository<Tag>, TagRepository>();
-            services.AddScoped<IRepository<Country>, CountryRepository>();
-            services.AddScoped<IRepository<ImageUpload>, ImagesRepository>();
+            services.AddScoped<IAssetRepository, AssetRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
-            // Add service services
+            // Add handler services
+            services.AddScoped<IAssetsHandler, AssetsHandler>(); 
+            services.AddScoped<ITagsHandler, TagsHandler>();
+            services.AddScoped<ICountryHandler, CountryHandler>();
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
 

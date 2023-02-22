@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -15,6 +18,9 @@ namespace CarImagesWeb.DbOperations
 
         /// Retrieves all entities in the repository.
         Task<List<T>> GetAllAsync();
+        
+        ///Retrieves all entities in the repository based on the predicate.
+        Task<List<T> >GetAllAsync(Expression<Func<T, bool>> predicate);
 
         /// Adds a new entity to the repository.
         Task<T> AddAsync(T entity);
@@ -46,6 +52,11 @@ namespace CarImagesWeb.DbOperations
         public async Task<List<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)

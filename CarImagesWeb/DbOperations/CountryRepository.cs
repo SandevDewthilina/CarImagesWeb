@@ -3,7 +3,7 @@ using CarImagesWeb.Models;
 
 namespace CarImagesWeb.DbOperations
 {
-    public interface ICountryRepository
+    public interface ICountryRepository : IRepository<Country>
     {
         
     }

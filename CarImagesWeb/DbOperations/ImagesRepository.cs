@@ -15,7 +15,6 @@ namespace CarImagesWeb.DbOperations
     
     public class ImagesRepository : Repository<ImageUpload>, IImagesRepository
     {
-        private readonly CarImagesDbContext _context;
         private readonly IBlobStorageHandler _blobStorageHandler;
 
         public ImagesRepository(CarImagesDbContext context, IBlobStorageHandler blobStorageHandler) : base(context)
@@ -32,31 +31,6 @@ namespace CarImagesWeb.DbOperations
             }
             // Upload the images to blob storage
             await _blobStorageHandler.UploadImagesAsync(files, "/vehicles");
-        }
-
-        public async Task<IEnumerable<ImageUpload>> GetAllAsync()
-        {
-            return await _context.ImageUploads.ToListAsync();
-        }
-
-        public async Task<ImageUpload> AddAsync(ImageUpload entity)
-        {
-            await _context.ImageUploads.AddAsync(entity);
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
-        public async Task<ImageUpload> UpdateAsync(ImageUpload entity)
-        {
-            _context.ImageUploads.Update(entity);
-            await _context.SaveChangesAsync();
-            return entity;
-        }
-
-        public Task DeleteAsync(ImageUpload entity)
-        {
-            _context.ImageUploads.Remove(entity);
-            return _context.SaveChangesAsync();
         }
     }
 }
