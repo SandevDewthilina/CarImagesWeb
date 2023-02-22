@@ -38,5 +38,16 @@ namespace CarImagesWeb.Models
         /// Navigation property for the Tag table.
         /// </summary>
         public Tag Tag { get; set; }
+
+        /// <summary>
+        /// Foreign key for the Country table.
+        /// </summary>
+        public int CountryId { get; set; }
+        
+        /// <summary>
+        /// Navigation property for the Country table.
+        /// </summary>
+        public Country Country { get; set; }
+
     }
 }
