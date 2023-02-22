@@ -5,6 +5,7 @@ using System.IO.Compression;
 using System.Net;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
+using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
@@ -21,15 +22,29 @@ namespace CarImagesWeb.Services
     }
     public class ImagesHandler : IImagesHandler
     {
-        private readonly IAssetsRepository _assetsRepository;
+        private readonly IImagesRepository _imagesRepository;
 
-        public ImagesHandler(IAssetsRepository assetsRepository)
+        public ImagesHandler(IImagesRepository imagesRepository)
         {
-            _assetsRepository = assetsRepository;
+            _imagesRepository = imagesRepository;
         }
         public async Task HandleUpload(ImageUploadDto dto, IFormFileCollection files)
         {
-            await _assetsRepository.SaveAssetAsync(new Asset(), files);
+            List<ImageUpload> imageUploads = new List<ImageUpload>();
+            foreach (var file in files)
+            {
+                var imageUpload = new ImageUpload
+                {
+                    FileName = file.FileName,
+                    Asset = new Asset(), //TODO: find the asset
+                    AssetId = 0, //TODO: fill in the asset id
+                    UserId = "", //TODO: fill in the user id
+                    TagId = 0, //TODO: fill in the tag id
+                    Tag = null //TODO: find the tag
+                };
+                imageUploads.Add(imageUpload);
+            }
+            await _imagesRepository.SaveImagesAsync(imageUploads, files);
         }
 
         public Task HandleSearch()
