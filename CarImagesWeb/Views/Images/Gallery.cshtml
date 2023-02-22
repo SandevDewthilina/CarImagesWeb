@@ -69,7 +69,9 @@
                       <select id="Asset"
                               class="form-control select2" name="Asset" style="width: 100%;">
                         <option value="" selected="selected">Choose</option>
-                        <option v-for="val in assets" v-bind:key="val" v-bind:value="val">{{val}}</option>
+                        <option v-for="val in assets" v-bind:key="val.id" v-bind:value="val.id">
+                          {{ val.name+':'+val.code }}
+                        </option>
                       </select>
                     </div>
                   </div>
@@ -79,7 +81,7 @@
                     <label>Select Tags</label>
                     <select id="AssetTags" class="select2" multiple="multiple" 
                             data-placeholder="Choose" style="width: 100%;">
-                      <option v-for="tag in assetTags" v-bind:key="tag" v-bind:value="tag">{{tag}}</option>
+                      <option v-for="tag in assetTags" v-bind:key="tag.id" v-bind:value="tag.id">{{tag.name+':'+tag.code}}</option>
                     </select>
                   </div>
                 </div>

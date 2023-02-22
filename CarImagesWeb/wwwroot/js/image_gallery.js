@@ -153,8 +153,8 @@ app = Vue.createApp({
         // Initialize select2 dropdowns:
         //  Get the assets and tags from the server and 
         //  populate the vehicle, container, vehicleTags, containerTag arrays
-        const ASSETS_URL = '/api/ImagesApi/GetAssets';
-        const TAGS_URL = '/api/ImagesApi/GetTags';
+        const ASSETS_URL = '/api/AssetsApi/GetAssets';
+        const TAGS_URL = '/api/TagsApi/GetTags';
         async function getAssets(fromUrl) {
             //make axios call to get assets from the server
             let res = await axios.get(fromUrl);
@@ -177,8 +177,10 @@ app = Vue.createApp({
             this.containers = data.containers;
         });
         getTags(TAGS_URL).then(data => {
-            this.vehicleTags = data.vehicleTags;
-            this.containerTags = data.containerTags;
+            //TODO: instead of having two arrays for vehicleTags and containerTags, 
+            // use one array and populate it with the data from the server
+            this.vehicleTags = data.tags;
+            this.containerTags = data.tags; 
         });
     }
 })
