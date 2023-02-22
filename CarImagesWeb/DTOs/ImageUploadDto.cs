@@ -8,9 +8,9 @@ namespace CarImagesWeb.DTOs
     {
         public string ImageCategory { get; set; }
         public string CountryCode { get; set; }
-        public string Vehicle { get; set; }
-        public string Container { get; set; }
-        public string VehicleTag { get; set; }
-        public string ContainerTag { get; set; }
+        public string VehicleId { get; set; }
+        public string ContainerId { get; set; }
+        public string VehicleTagId { get; set; }
+        public string ContainerTagId { get; set; }
     }
 }

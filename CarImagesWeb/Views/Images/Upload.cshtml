@@ -31,16 +31,16 @@
                 <div class="form-group clearfix d-flex justify-content-between align-items-center">
                     <div class="">Select Image Category</div>
                     <div class="icheck-primary d-inline mb-0">
-                        <input type="radio" id="@nameof(Model.ImageUploadDto.Vehicle)" 
-                               name="@nameof(Model.ImageUploadDto.ImageCategory)" 
-                               value="@nameof(Model.ImageUploadDto.Vehicle)" hidden>
-                        <label for="@nameof(Model.ImageUploadDto.Vehicle)">Vehicles</label>
+                        <input type="radio" id="Vehicle"
+                               name="@nameof(Model.ImageUploadDto.ImageCategory)"
+                               value="Vehicle" hidden>
+                        <label for="Vehicle">Vehicles</label>
                     </div>
                     <div class="icheck-primary d-inline mb-0">
-                        <input type="radio" id="@nameof(Model.ImageUploadDto.Container)" 
+                        <input type="radio" id="Container" 
                                name="@nameof(Model.ImageUploadDto.ImageCategory)" 
-                               value="@nameof(Model.ImageUploadDto.Container)" hidden>
-                        <label for="@nameof(Model.ImageUploadDto.Container)">Containers</label>
+                               value="Container" hidden>
+                        <label for="Container">Containers</label>
                     </div>
                 </div>
                 <div id="vehicle-inputs"  class="hide">
@@ -48,26 +48,26 @@
                     <div class="form-group" id="VehicleDropdown">
                         <label>Vehicle</label>
                         <select id="VehicleType" class="form-control select2" 
-                                name="@nameof(Model.ImageUploadDto.Vehicle)" 
+                                name="@nameof(Model.ImageUploadDto.VehicleId)" 
                                 style="width: 100%;">
                             <option selected="selected" value="">-- Select Vehicle --</option>
                             <!-- Bind options to the list of vehicle types in the view model -->
-                            @foreach (var vehicleType in Model.Vehicles)
+                            @foreach (var vehicle in Model.Vehicles)
                             {
-                                <option value="@vehicleType">@vehicleType</option>
+                                <option value="@vehicle.Id.ToString()">@vehicle.ToString()</option>
                             }
                         </select>
                     </div>
                     <div class="form-group" id="VehicleTagDropdown">
                         <label>Select Tag</label>
                         <select id="VehicleTag" class="form-control select2" 
-                                name="@nameof(Model.ImageUploadDto.VehicleTag)"
+                                name="@nameof(Model.ImageUploadDto.VehicleTagId)"
                                 style="width: 100%;">
                             <option selected="selected" value="">-- Select Vehicle Tag --</option>
                             <!-- Bind options to the list of vehicle tags in the view model -->
-                            @foreach (var tag in Model.VehicleTags)
+                            @foreach (var tag in Model.Tags)
                             {
-                                <option value="@tag">@tag</option>
+                                <option value="@tag.Id.ToString()">@tag.ToString()</option>
                             }
                         </select>
                     </div>
@@ -76,26 +76,26 @@
                     <div class="form-group" id="ContainerDropdown">
                         <label>Container</label>
                         <select id="Container" class="form-control select2" 
-                                name="@nameof(Model.ImageUploadDto.Container)"
+                                name="@nameof(Model.ImageUploadDto.ContainerId)"
                                 style="width: 100%;">
                             <option selected="selected" value="">-- Select Container --</option>
                             <!-- Bind options to the list of vehicle types in the view model -->
-                            @foreach (var vehicleType in Model.Containers)
+                            @foreach (var container in Model.Containers)
                             {
-                                <option value="@vehicleType">@vehicleType</option>
+                                <option value="@container.Id">@container</option>
                             }
                         </select>
                     </div>
                     <div class="form-group" id="ContainerTagDropdown">
                         <label>Select Tag</label>
                         <select id="ContainerTag" class="form-control select2" 
-                                name="@nameof(Model.ImageUploadDto.ContainerTag)"
+                                name="@nameof(Model.ImageUploadDto.ContainerTagId)"
                                 style="width: 100%;">
                             <option selected="selected" value="">-- Select Container Tag --</option>
                             <!-- Bind options to the list of vehicle tags in the view model -->
-                            @foreach (var tag in Model.ContainerTags)
+                            @foreach (var tag in Model.Tags)
                             {
-                                <option value="@tag">@tag</option>
+                                <option value="@tag.Id">@tag.ToString()</option>
                             }
                         </select>
                     </div>
