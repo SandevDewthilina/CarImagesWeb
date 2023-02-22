@@ -18,6 +18,7 @@
     <!-- Theme style -->
     <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="~/css/site.css"/>
+    <script src="~/lib/vue/dist/vue.global.js"></script>
 
 </head>
 <body class="hold-transition layout-top-nav">
@@ -91,12 +92,12 @@
 <script src="~/dist/js/adminlte.min.js"></script>
 <!-- Select2 -->
 <script src="~/plugins/select2/js/select2.full.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
 <script>
 (function () {
  //Initialize Select2 Elements
      $('.select2').select2()   
 })();
 </script>
-@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

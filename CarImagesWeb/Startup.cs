@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
+using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Builder;
@@ -46,6 +47,15 @@ namespace CarImagesWeb
                 // options.Password.RequireNonAlphanumeric = false;
             }).AddEntityFrameworkStores<CarImagesDbContext>();
 
+            // Add repository services
+            services.AddScoped<IAssetRepository, AssetRepository>();
+            services.AddScoped<ITagRepository, TagRepository>();
+            services.AddScoped<ICountryRepository, CountryRepository>();
+            services.AddScoped<IImagesRepository, ImagesRepository>();
+            // Add handler services
+            services.AddScoped<IAssetsHandler, AssetsHandler>(); 
+            services.AddScoped<ITagsHandler, TagsHandler>();
+            services.AddScoped<ICountryHandler, CountryHandler>();
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
 

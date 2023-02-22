@@ -8,6 +8,10 @@ namespace CarImagesWeb.Models
 {
     public class ApplicationUser : IdentityUser
     {
-        public String Name { get; set; }
+        public string Name { get; set; }
+    }
+
+    public class UserRole : IdentityRole
+    {
     }
 }

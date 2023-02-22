@@ -1,18 +1,130 @@
-﻿@model object
-
-@{
-    Layout = null;
+﻿@section Styles
+{
+  <style>
+  /*A  gallery with max 5 columns*/
+  .gallery{
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    /* max 5 columns min 2 columns */
+  }
+  .image-container{
+  padding: 5px;
+  width: 100%;
+    position: relative;
+    height: auto;
+  }
+  .download-check-box{
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: end;
+    padding: 5px;
+    width: 100%;
+    height: auto;
+    z-index: 2;
+  }
+  .image img{
+    display: block;
+    object-fit: cover;
+    width:100%;
+    height: 200px;
+  }
+  
+  .resize{
+    transition: all 0.5s linear;
+  }
+  </style>
 }
 
-<!DOCTYPE html>
-
-<html>
-<head>
-    <title>title</title>
-</head>
-<body>
-<div>
-      
+<div class="container-fluid" id="app">
+  <div class="card">
+    <div class="card-body">
+        <div class="row my-2">
+          <div class="col-12 search-form">
+              <!--form with two inline radio buttons to select either vehicle or container
+              A drop down with a search to search for Vehicle and
+              a multi select drop down to select tags
+              and a search button-->
+              <div class="row">
+                <div class="col-12 mb-2 text-gray-dark">
+                  <h3>Image Gallery</h3>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12 form-group clearfix d-flex justify-content-between align-items-center">
+                  <div class="icheck-primary d-inline mr-3">
+                    <input type="radio" id="Vehicles" v-model="imageCategory" name="ImageCategory" value="Vehicle" checked="checked" hidden>
+                    <label for="Vehicles">Vehicles</label>
+                  </div>
+                  <div class="icheck-primary d-inline">
+                    <input type="radio" id="Containers" v-model="imageCategory" name="ImageCategory" value="Container" hidden>
+                    <label for="Containers">Containers</label>
+                  </div>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-lg-5 col-12">
+                  <div class="form-group">
+                    <div class="form-group" id="VehicleDropdown">
+                      <label>Select {{imageCategory || 'Assets'}}</label>
+                      <select id="Asset"
+                              class="form-control select2" name="Asset" style="width: 100%;">
+                        <option value="" selected="selected">Choose</option>
+                        <option v-for="val in assets" v-bind:key="val.id" v-bind:value="val.id">
+                          {{ val.name+':'+val.code }}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-lg-5 col-12">
+                  <div class="form-group" id="TagDropdown">
+                    <label>Select Tags</label>
+                    <select id="AssetTags" class="select2" multiple="multiple" 
+                            data-placeholder="Choose" style="width: 100%;">
+                      <option v-for="tag in assetTags" v-bind:key="tag.id" v-bind:value="tag.id">{{tag.name+':'+tag.code}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="col-lg-2 col-12 d-flex flex-column justify-content-end form-group">
+                  <button class="btn btn-primary d-flex align-items-center resize justify-content-center" v-on:click="searchImages()">
+                    <span class="mr-2">Search</span>
+                    <span class="spinner-border spinner-border-sm" v-if="isSearching"></span>
+                  </button>
+                </div>
+              </div>
+          </div>
+        </div>
+        <div class="row my-2">
+          <div class="col-12 d-flex justify-content-end">
+            <button class="btn btn-warning mr-2" v-on:click="deselectAll()">Deselect All <span><i class="fas fa-times-circle"></i></span></button>
+            <button class="btn btn-primary mr-2" v-on:click="selectAll()">Select All <span><i class="fas fa-check-circle"></i></span></button>
+            <button class="btn btn-success d-flex align-items-center resize" v-on:click="downloadImages()">
+              <span class="mr-2" >Download</span> 
+              <span class="mr-2" v-if="!isDownloading"><i class="fas fa-download"></i></span>
+              <span class="spinner-border spinner-border-sm" v-if="isDownloading"></span>
+            </button>
+          </div>
+        </div>
+      <div class="row my-2">
+        <div class="gallery col-12">
+          <div v-for="(image,index) in images" v-bind:key="image" class="image-container">
+            <div class="download-check-box icheck-primary">
+              <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
+                     v-bind:name="'img-'+index" alt="" hidden>
+              <label v-bind:for="'img-'+index"></label>
+            </div>
+            <div class="image border border-dark">
+              <img v-bind:src="image.url" alt="">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
-</body>
-</html>
+
+@section Scripts
+{
+  <script src="~/lib/axios/axios.min.js"></script>
+  <script src="~/js/image_gallery.js"></script>
+}
