@@ -71,7 +71,7 @@ namespace CarImagesWeb.Services
                 _ => throw new NotImplementedException()
             };
 
-            var asset = await _repository.GetById(assetId);
+            var asset = await _repository.GetAsync(a => a.Id == assetId);
             return asset;
         }
     }

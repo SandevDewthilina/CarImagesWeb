@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
 using Microsoft.EntityFrameworkCore;
@@ -13,17 +14,17 @@ namespace CarImagesWeb.DbOperations
     /// </summary>
     public interface IRepository<T>
     {
-        /// Retrieves an entity by its unique identifier.
-        Task<T> GetById(int id);
-        
         /// Returns a single entity by a given predicate.
-        Task<T> GetAsync(Expression<Func<T, bool>> predicate);
-        
+        Task<T> GetAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null);
+
+        /// Returns a multiple entities by a given predicate.
+        Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null);
+
         /// Retrieves all entities in the repository.
-        Task<List<T>> GetAllAsync();
-        
+        Task<List<T>> GetAllAsync(IEnumerable<string> includes = null);
+
         ///Retrieves all entities in the repository based on the predicate.
-        Task<List<T> >GetAllAsync(Expression<Func<T, bool>> predicate);
+        Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null);
 
         /// Adds a new entity to the repository.
         Task<T> AddAsync(T entity);
@@ -39,31 +40,50 @@ namespace CarImagesWeb.DbOperations
     {
         private readonly CarImagesDbContext _context;
         private readonly DbSet<T> _dbSet;
+        private IQueryable<T> queryable;
 
-        public Repository(CarImagesDbContext context)
+        private static IQueryable<T> BuildQueryable(IQueryable<T> queryable, IEnumerable<string> includes)
+        {
+            return includes == null
+                ? queryable
+                : includes.Aggregate(queryable, (current, include) => current.Include(include));
+        }
+        
+        private static IEnumerable<PropertyInfo> GetComplexProperties()
+        {
+            // Get all the properties of T
+            var properties = typeof(T).GetProperties();
+
+            return (from property in properties let propertyType = property.PropertyType 
+                where propertyType.IsClass && propertyType != typeof(string) select property).ToList();
+        }
+
+        protected Repository(CarImagesDbContext context)
         {
             _context = context;
             _dbSet = context.GetDbSet<T>();
+            queryable = _dbSet.AsQueryable();
+            queryable = BuildQueryable(queryable, GetComplexProperties().Select(p => p.Name));
+        }
+
+        public async Task<T> GetAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null)
+        {
+            return await queryable.SingleOrDefaultAsync(predicate);
         }
         
-        public async Task<T> GetById(int id)
+        public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null)
         {
-            return await _dbSet.FindAsync(id);
+            return await queryable.Where(predicate).ToListAsync();
         }
 
-        public async Task<T> GetAsync(Expression<Func<T, bool>> predicate)
+        public async Task<List<T>> GetAllAsync(IEnumerable<string> includes = null)
         {
-            return await _dbSet.SingleOrDefaultAsync(predicate);
+            return await queryable.ToListAsync();
         }
 
-        public async Task<List<T>> GetAllAsync()
+        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null)
         {
-            return await _dbSet.ToListAsync();
-        }
-
-        public Task<List<T>> GetAllAsync(Expression<Func<T, bool>> predicate)
-        {
-            return _dbSet.Where(predicate).ToListAsync();
+            return queryable.Where(predicate).ToListAsync();
         }
 
         public async Task<T> AddAsync(T entity)
@@ -86,5 +106,4 @@ namespace CarImagesWeb.DbOperations
             return _context.SaveChangesAsync();
         }
     }
-
 }

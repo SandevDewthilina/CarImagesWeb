@@ -58,7 +58,7 @@ namespace CarImagesWeb.Services
                 _ => throw new NotImplementedException()
             };
 
-            return await _repository.GetById(tagId);
+            return await _repository.GetAsync(t => t.Id == tagId);
         }
     }
 }

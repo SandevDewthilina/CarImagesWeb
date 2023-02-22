@@ -9,9 +9,9 @@ namespace CarImagesWeb.ApiControllers
     [Route("api/[controller]/[action]")]
     public class TagsApiController : Controller
     {
-        private readonly IRepository<Tag> _tagRepository;
+        private readonly ITagRepository _tagRepository;
 
-        public TagsApiController(IRepository<Tag> tagRepository)
+        public TagsApiController(ITagRepository tagRepository)
         {
             _tagRepository =  tagRepository;
         }

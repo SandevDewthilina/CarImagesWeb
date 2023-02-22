@@ -11,9 +11,9 @@ namespace CarImagesWeb.ApiControllers
     [Route("api/[controller]/[action]")]
     public class AssetsApiController : Controller
     {
-        private readonly IRepository<Asset> _assetRepository;
+        private readonly IAssetRepository _assetRepository;
 
-        public AssetsApiController(IRepository<Asset> assetRepository)
+        public AssetsApiController(IAssetRepository assetRepository)
         {
             _assetRepository = assetRepository;
         }
