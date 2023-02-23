@@ -1,0 +1,51 @@
+﻿@model CarImagesWeb.ViewModels.UpdateAssetsViewModel
+
+@{
+    ViewData["Title"] = "Assets";
+}
+
+<div class="container py-3">
+    <div class="card card-primary">
+        <div class="card-header">
+            <h3 class="card-title">Assets</h3>
+        </div>
+        <!-- /.card-header -->
+        <!-- form start -->
+        <form action="Index" method="post" enctype="multipart/form-data">
+            <div class="card-body">
+                <div class="form-group">
+                    <label for="sheet">File input</label>
+                    <div class="input-group">
+                        <div class="custom-file">
+                            <input asp-for="File" type="file" accept="text/*, 
+                                application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                   class="custom-file-input" id="sheet">
+                            <label asp-for="File" class="custom-file-label" for="sheet" id="sheet-name">
+                                Choose file
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        <span asp-validation-for="File" class="text-danger"></span>
+                    </div>
+                </div>
+            </div>
+            <!-- /.card-body -->
+
+            <div class="card-footer">
+                <button type="submit" class="btn btn-primary">Upload</button>
+            </div>
+        </form>
+    </div>
+    <!-- /.card -->
+</div>
+
+@section Scripts
+{
+    <script>
+        $('#sheet').change(function() {
+            let file = $('#sheet')[0].files[0].name;
+            $('#sheet-name').html(file);          
+        });
+    </script>
+}
