@@ -3,6 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using CarImagesWeb.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
@@ -11,7 +12,7 @@ namespace CarImagesWeb.Services
     public interface IBlobStorageHandler
     {
         Task UploadImageAsync(Stream imageStream, string imageName);
-        Task UploadImagesAsync(IFormFileCollection files, string directoryName);
+        Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails, string directoryName);
         Task<Stream> GetImageAsync(string imageName);
         Task DeleteImageAsync(string imageName);
         Task<List<string>> GetImagesInDirectoryAsync(string directoryName);
@@ -37,12 +38,18 @@ namespace CarImagesWeb.Services
             await blobClient.UploadAsync(imageStream);
         }
 
-        public async Task UploadImagesAsync(IFormFileCollection files, string directoryName)
+        public async Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails,
+            string directoryName)
         {
             // upload images to blob storage
             foreach (var file in files)
             {
                 await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+            }
+            // upload thumbnails to blob storage
+            foreach (var imageThumbnail in imageThumbnails)
+            {
+                await UploadImageAsync(imageThumbnail.GetStream(), directoryName + "/" + imageThumbnail.FileName);
             }
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
+using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Http;
@@ -10,7 +11,8 @@ namespace CarImagesWeb.DbOperations
 {
     public interface IImagesRepository : IRepository<ImageUpload>
     {
-        Task SaveImagesAsync(IEnumerable<ImageUpload> imageUpload, IFormFileCollection files, string assetDirectory);
+        Task SaveImagesAsync(IEnumerable<ImageUpload> imageUpload, IFormFileCollection files,
+            List<ImageThumbnail> imageThumbnails, string assetDirectory);
     }
     
     public class ImagesRepository : Repository<ImageUpload>, IImagesRepository
@@ -23,6 +25,7 @@ namespace CarImagesWeb.DbOperations
         }
 
         public async Task SaveImagesAsync(IEnumerable<ImageUpload> imageUploads, IFormFileCollection files,
+            List<ImageThumbnail> imageThumbnails,
             string assetDirectory)
         {
             // Save the imageUploads to the database
@@ -31,7 +34,7 @@ namespace CarImagesWeb.DbOperations
                 await AddAsync(imageUpload);
             }
             // Upload the images to blob storage
-            await _blobStorageHandler.UploadImagesAsync(files, assetDirectory);
+            await _blobStorageHandler.UploadImagesAsync(files, imageThumbnails, assetDirectory);
         }
     }
 }

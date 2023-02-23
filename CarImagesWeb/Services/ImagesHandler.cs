@@ -7,9 +7,14 @@ using System.Net;
 using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
+using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace CarImagesWeb.Services
 {
@@ -23,6 +28,8 @@ namespace CarImagesWeb.Services
         /// <param name="imageUrls"></param>
         /// <returns></returns>
         Task<byte[]> HandleDownload(IEnumerable<string> imageUrls);
+
+        Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
         
         /// <summary>
         /// Get the asset directory for the given asset code, country code and tag name
@@ -33,8 +40,8 @@ namespace CarImagesWeb.Services
         /// <returns>string: Path to the directory in which the asset is stored</returns>
         string GetAssetDirectory(Asset asset, Country country, Tag tag);
         string GetImageUrl(ImageUpload imageUpload);
-
-        Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
+        string GetThumbnailName(string fileName);
+        string GetImageUrlFromThumbnail(string thumbnailUrl);
     }
     public class ImagesHandler : IImagesHandler
     {
@@ -76,7 +83,21 @@ namespace CarImagesWeb.Services
                 })
                 .ToList();
             
-            await _imagesRepository.SaveImagesAsync(imageUploads, files, assetDirectory);
+            // convert files to list
+             // create thumbnails for each image
+             var thumbnails = new List<ImageThumbnail>();
+             foreach (var file in files)
+             {
+                 var thumb = await CreateThumbnailAsync(file, 200);
+                 var thumbFileName = GetThumbnailName(file.FileName);
+                    thumbnails.Add(new ImageThumbnail
+                    {
+                        FileName = thumbFileName,
+                        File = thumb
+                    });
+             }
+            
+            await _imagesRepository.SaveImagesAsync(imageUploads, files, thumbnails, assetDirectory);
         }
 
         public string GetImageUrl(ImageUpload imageUpload)
@@ -139,6 +160,57 @@ namespace CarImagesWeb.Services
             return Path.Combine(asset.Type, asset.Code, country.Code, tag.Name);
         }
 
+        private static async Task<Image> CreateThumbnailAsync(IFormFile file, int maxHeight, int quality = 100)
+        {
+            // Load the original image from the form file
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Resize the image to a thumbnail with the specified max width
+            using var image = await Image.LoadAsync(stream);
+            var divisor = (float)image.Height / maxHeight;
+            var size = new Size((int)(image.Width / divisor), (int)(image.Height / divisor));
+            image.Mutate(x => x.Resize(size));
+
+            // Convert the thumbnail image to a JPEG image with the specified quality
+            var jpegEncoder = new JpegEncoder { Quality = quality };
+            var thumbnailStream = new MemoryStream();
+            await image.SaveAsync(thumbnailStream, jpegEncoder);
+            thumbnailStream.Seek(0, SeekOrigin.Begin);
+
+            // Create a new Image<Rgba32> object from the JPEG image stream
+            var thumbnail = await Image.LoadAsync(thumbnailStream);
+            return thumbnail;
+        }
+
+        private static async Task<FormFile> CreateThumbnailFileAsync(Image image, string fileName, int quality = 80)
+        {
+            // Convert the image to a JPEG image with the specified quality
+            var jpegEncoder = new JpegEncoder { Quality = quality };
+            using var stream = new MemoryStream();
+            await image.SaveAsync(stream, jpegEncoder);
+            stream.Seek(0, SeekOrigin.Begin);
+
+            // Create a new IFormFile from the JPEG image stream
+            var formFile = new FormFile(stream, 0, stream.Length, fileName, fileName);
+            return formFile;
+        }
         
+        public string GetThumbnailName(string fileName)
+        {
+            return Path.GetFileNameWithoutExtension(fileName) + "_thumb" + Path.GetExtension(fileName);
+        }
+
+        public string GetImageUrlFromThumbnail(string thumbnailUrl)
+        {
+            //remove the final '_thumb' part of the file name
+            var fileName = Path.GetFileNameWithoutExtension(thumbnailUrl);
+            var index = fileName.LastIndexOf("_thumb", StringComparison.Ordinal);
+            fileName = fileName.Substring(0, index) + Path.GetExtension(thumbnailUrl);
+            return $"{_containerUrl}/{fileName}";
+        }
     }
+
+
 }
