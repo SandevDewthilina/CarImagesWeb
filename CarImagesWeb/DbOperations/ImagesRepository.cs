@@ -6,6 +6,7 @@ using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
 
 namespace CarImagesWeb.DbOperations
 {
@@ -13,6 +14,8 @@ namespace CarImagesWeb.DbOperations
     {
         Task SaveImagesAsync(IEnumerable<ImageUpload> imageUpload, IFormFileCollection files,
             List<ImageThumbnail> imageThumbnails, string assetDirectory);
+
+        Task SaveImageAsync(ImageUpload imageUpload, IFormFile file, ImageThumbnail thumbnail, string assetDirectory);
     }
     
     public class ImagesRepository : Repository<ImageUpload>, IImagesRepository
@@ -24,6 +27,7 @@ namespace CarImagesWeb.DbOperations
             _blobStorageHandler = blobStorageHandler;
         }
 
+        //TODO: Refactor this method
         public async Task SaveImagesAsync(IEnumerable<ImageUpload> imageUploads, IFormFileCollection files,
             List<ImageThumbnail> imageThumbnails,
             string assetDirectory)
@@ -35,6 +39,13 @@ namespace CarImagesWeb.DbOperations
             }
             // Upload the images to blob storage
             await _blobStorageHandler.UploadImagesAsync(files, imageThumbnails, assetDirectory);
+        }
+
+        public async Task SaveImageAsync(ImageUpload imageUpload, IFormFile file, ImageThumbnail thumbnail,
+            string assetDirectory)
+        {
+            await AddAsync(imageUpload);
+            await _blobStorageHandler.UploadImageAsync(file, thumbnail, assetDirectory);
         }
     }
 }

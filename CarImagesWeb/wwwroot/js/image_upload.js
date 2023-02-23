@@ -33,7 +33,6 @@ function initializeUppy(){
     uppy.use(Uppy.XHRUpload, {
         endpoint: IMAGE_UPLOAD_API_ENDPOINT,
         formData: true,
-        fieldName: 'files[]',
     })
     uppy.use(Uppy.StatusBar, {
        

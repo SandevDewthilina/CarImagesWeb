@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -15,9 +16,26 @@ namespace CarImagesWeb.ApiControllers
         {
             _imagesHandler = imagesHandler;
         }
-
+        
         [HttpPost]
         public async Task<IActionResult> Upload([FromForm]ImageUploadDto dto)
+        {
+            try
+            {
+                await _imagesHandler.HandleUpload(dto);
+            }
+            catch (Azure.RequestFailedException e)
+            {
+                Response.StatusCode = e.Status;
+                return Json(new { error = e.Message });
+            }
+            return Ok();
+        }
+        
+        // TODO: Refactor and test this method
+        [Obsolete]
+        [HttpPost]
+        public async Task<IActionResult> Uploads([FromForm]ImageUploadDto dto)
         {
             try
             {
@@ -32,7 +50,6 @@ namespace CarImagesWeb.ApiControllers
         }
         
 
-        //TODO: add parameter model and update the api method and api call
         [HttpPost]
         public async Task<IActionResult> Search(ImageSearchDto dto)
         {

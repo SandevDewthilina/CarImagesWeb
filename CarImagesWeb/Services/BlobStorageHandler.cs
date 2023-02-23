@@ -14,12 +14,12 @@ namespace CarImagesWeb.Services
 {
     public interface IBlobStorageHandler
     {
-        Task UploadImageAsync(Stream imageStream, string imageName);
-        Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails, string directoryName);
+        Task UploadImageAsync(IFormFile file, ImageThumbnail imageThumbnail, string directoryName);
         Task<Stream> GetImageAsync(string imageName);
         Task DeleteImageAsync(string imageName);
         Task<List<string>> GetImagesInDirectoryAsync(string directoryName);
 
+        Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails, string assetDirectory);
     }
 
     public class BlobStorageHandler : IBlobStorageHandler
@@ -35,42 +35,33 @@ namespace CarImagesWeb.Services
             _containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         }
 
-        public async Task UploadImageAsync(Stream imageStream, string imageName)
+        private async Task UploadImageAsync(Stream imageStream, string imageName)
         {
             var blobClient = _containerClient.GetBlobClient(imageName);
             await blobClient.UploadAsync(imageStream);
         }
 
-        public async Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails,
-            string directoryName)
+        public async Task UploadImageAsync(IFormFile file, ImageThumbnail imageThumbnail, string directoryName)
         {
-            // upload images to blob storage
-            foreach (var file in files)
+            try
             {
-                try
+                await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+            }
+            catch(Azure.RequestFailedException e)
+            {
+                if (e.ErrorCode == "BlobAlreadyExists")
                 {
-                    await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+                    throw new Azure.RequestFailedException(
+                        e.Status,
+                        "Image already exist: " + file.FileName
+                    );
                 }
-                catch(Azure.RequestFailedException e)
-                {
-                    if (e.ErrorCode == "BlobAlreadyExists")
-                    {
-                        throw new Azure.RequestFailedException(
-                            e.Status,
-                            "Image already exist: " + file.FileName
-                        );
-                    }
 
-                    throw new Exception(
-                        "An error occurred while uploading the image. Please try again later.");
-                }
+                throw new Exception(
+                    "An error occurred while uploading the image. Please try again later.");
             }
 
-            // upload thumbnails to blob storage
-            foreach (var imageThumbnail in imageThumbnails)
-            {
-                await UploadImageAsync(imageThumbnail.GetStream(), directoryName + "/" + imageThumbnail.FileName);
-            }
+            await UploadImageAsync(imageThumbnail.GetStream(), directoryName + "/" + imageThumbnail.FileName);
         }
 
         public async Task<Stream> GetImageAsync(string imageName)
@@ -97,6 +88,11 @@ namespace CarImagesWeb.Services
                 }
             }
             return imageNames;
+        }
+
+        public Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails, string assetDirectory)
+        {
+            throw new NotImplementedException();
         }
     }
     
