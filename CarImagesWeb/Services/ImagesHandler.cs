@@ -25,9 +25,9 @@ namespace CarImagesWeb.Services
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="imageUrls"></param>
+        /// <param name="thumbnailUrls"></param>
         /// <returns></returns>
-        Task<byte[]> HandleDownload(IEnumerable<string> imageUrls);
+        Task<byte[]> HandleDownload(IEnumerable<string> thumbnailUrls);
 
         Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
         
@@ -39,7 +39,7 @@ namespace CarImagesWeb.Services
         /// <param name="tag"></param>
         /// <returns>string: Path to the directory in which the asset is stored</returns>
         string GetAssetDirectory(Asset asset, Country country, Tag tag);
-        string GetImageUrl(ImageUpload imageUpload);
+        string GetImageThumbnailUrl(ImageUpload imageUpload);
         string GetThumbnailName(string fileName);
         string GetImageUrlFromThumbnail(string thumbnailUrl);
     }
@@ -100,10 +100,10 @@ namespace CarImagesWeb.Services
             await _imagesRepository.SaveImagesAsync(imageUploads, files, thumbnails, assetDirectory);
         }
 
-        public string GetImageUrl(ImageUpload imageUpload)
+        public string GetImageThumbnailUrl(ImageUpload imageUpload)
         {
             var assetDirectory = GetAssetDirectory(imageUpload.Asset, imageUpload.Country, imageUpload.Tag);
-            return $"{_containerUrl}/{assetDirectory}/{imageUpload.FileName}";
+            return $"{_containerUrl}/{assetDirectory}/{GetThumbnailName(imageUpload.FileName)}";
         }
 
         public async Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags)
@@ -128,10 +128,10 @@ namespace CarImagesWeb.Services
                     i => i.AssetId == asset && tagIds.Contains(i.TagId));
             }
             
-            return uploads.Select(GetImageUrl).ToList();
+            return uploads.Select(GetImageThumbnailUrl).ToList();
         }
 
-        public async Task<byte[]> HandleDownload(IEnumerable<string> imageUrls)
+        public async Task<byte[]> HandleDownload(IEnumerable<string> thumbnailUrls)
         {
             // Create a new memory stream for the zip file
             using var memoryStream = new MemoryStream();
@@ -139,8 +139,9 @@ namespace CarImagesWeb.Services
             using (var zipArchive = new ZipArchive(memoryStream, ZipArchiveMode.Create, true))
             {
                 // Loop through each selected image and add it to the zip archive
-                foreach (var imageUrl in imageUrls)
+                foreach (var thumbnailUrl in thumbnailUrls)
                 {
+                    var imageUrl = GetImageUrlFromThumbnail(thumbnailUrl);
                     // Download the image from the URL
                     await using var imageStream = new WebClient().OpenRead(imageUrl);
                     // Add the image to the zip archive
@@ -205,10 +206,11 @@ namespace CarImagesWeb.Services
         public string GetImageUrlFromThumbnail(string thumbnailUrl)
         {
             //remove the final '_thumb' part of the file name
-            var fileName = Path.GetFileNameWithoutExtension(thumbnailUrl);
-            var index = fileName.LastIndexOf("_thumb", StringComparison.Ordinal);
-            fileName = fileName.Substring(0, index) + Path.GetExtension(thumbnailUrl);
-            return $"{_containerUrl}/{fileName}";
+            var thumbnailFileName = Path.GetFileNameWithoutExtension(thumbnailUrl);
+            var index = thumbnailFileName.LastIndexOf("_thumb", StringComparison.Ordinal);
+            var fileName = thumbnailFileName[..index];
+            //replace the thumbnail url with the original image url
+            return thumbnailUrl.Replace(thumbnailFileName, fileName);
         }
     }
 
