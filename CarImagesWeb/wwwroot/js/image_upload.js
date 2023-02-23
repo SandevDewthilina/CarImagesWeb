@@ -1,4 +1,4 @@
-const IMAGE_UPLOAD_API_ENDPOINT = 'api/ImagesApi/Upload';
+const IMAGE_UPLOAD_API_ENDPOINT = '/api/ImagesApi/Upload';
 function initializeUppy(){
     let uppy = new Uppy.Uppy({
         id: 'uppy',
@@ -6,7 +6,10 @@ function initializeUppy(){
         inline: true,
         replaceTargetContent: true,
         showProgressDetails: true,
-        note: 'Images and Videos only'
+        note: 'Images only',
+        restrictions: {
+            allowedFileTypes: ['image/*'],
+        }
     })
 
     uppy.use(Uppy.Dashboard, {
@@ -18,6 +21,10 @@ function initializeUppy(){
             {id: 'caption', name: 'Caption', placeholder: 'add description'},
         ],
         note: 'Images only',
+        doneButtonHandler: () => {
+            window.location.href = "/Images/Upload";
+        }
+        
     })
     uppy.use(Uppy.ImageEditor, {target: Uppy.Dashboard})
     uppy.use(Uppy.Form, {target: '#upload-form'})
@@ -26,12 +33,17 @@ function initializeUppy(){
     uppy.use(Uppy.XHRUpload, {
         endpoint: IMAGE_UPLOAD_API_ENDPOINT,
         formData: true,
-        fieldName: 'files[]',
     })
-    uppy.on('complete', result => {
-        console.log('successful files:', result.successful)
-        console.log('failed files:', result.failed)
+    uppy.use(Uppy.StatusBar, {
+       
     })
+    uppy.on('upload-error', (file, error, response) => {
+        // show error message
+        if(response.body.error){
+            uppy.info(response.body.error, 'error', 10000);
+        }
+    });
+    
 }
 function initializeUploadForm(){
     // Form Behavior

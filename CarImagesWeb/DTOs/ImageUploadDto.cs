@@ -12,5 +12,7 @@ namespace CarImagesWeb.DTOs
         public string ContainerId { get; set; }
         public string VehicleTagId { get; set; }
         public string ContainerTagId { get; set; }
+        public IFormFile File { get; set; }
+        public IFormFileCollection Files { get; set; }
     }
 }
