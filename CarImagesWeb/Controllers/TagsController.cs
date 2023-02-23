@@ -14,25 +14,24 @@ namespace CarImagesWeb.Controllers
         {
             _tagRepository = tagRepository;
         }
-        
+
         public IActionResult CreateTag()
         {
             return View();
         }
-        
+
         [HttpPost]
         public async Task<IActionResult> CreateTag(CreateTagViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
-            
-            var result= await _tagRepository.AddAsync(new Tag()
+
+            var result = await _tagRepository.AddAsync(new Tag
             {
                 Name = model.Name,
                 Code = model.Code
             });
-                
-            return RedirectToAction("ListTags", "Tags");
 
+            return RedirectToAction("ListTags", "Tags");
         }
 
         public async Task<IActionResult> ListTags()

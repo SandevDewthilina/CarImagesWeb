@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
+using Azure;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
 using CarImagesWeb.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -26,7 +24,7 @@ namespace CarImagesWeb.Services
     {
         private readonly BlobServiceClient _blobServiceClient;
         private readonly BlobContainerClient _containerClient;
- 
+
         public BlobStorageHandler(IConfiguration configuration)
         {
             var connectionString = configuration.GetValue<string>("AzureStorage:ConnectionString");
@@ -35,27 +33,19 @@ namespace CarImagesWeb.Services
             _containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         }
 
-        private async Task UploadImageAsync(Stream imageStream, string imageName)
-        {
-            var blobClient = _containerClient.GetBlobClient(imageName);
-            await blobClient.UploadAsync(imageStream);
-        }
-
         public async Task UploadImageAsync(IFormFile file, ImageThumbnail imageThumbnail, string directoryName)
         {
             try
             {
                 await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
             }
-            catch(Azure.RequestFailedException e)
+            catch (RequestFailedException e)
             {
                 if (e.ErrorCode == "BlobAlreadyExists")
-                {
-                    throw new Azure.RequestFailedException(
+                    throw new RequestFailedException(
                         e.Status,
                         "Image already exist: " + file.FileName
                     );
-                }
 
                 throw new Exception(
                     "An error occurred while uploading the image. Please try again later.");
@@ -66,35 +56,37 @@ namespace CarImagesWeb.Services
 
         public async Task<Stream> GetImageAsync(string imageName)
         {
-            BlobClient blobClient = _containerClient.GetBlobClient(imageName);
+            var blobClient = _containerClient.GetBlobClient(imageName);
             var response = await blobClient.DownloadAsync();
             return response.Value.Content;
         }
 
         public async Task DeleteImageAsync(string imageName)
         {
-            BlobClient blobClient = _containerClient.GetBlobClient(imageName);
+            var blobClient = _containerClient.GetBlobClient(imageName);
             await blobClient.DeleteAsync();
         }
-        
+
         public async Task<List<string>> GetImagesInDirectoryAsync(string directoryName)
         {
-            List<string> imageNames = new List<string>();
-            await foreach (BlobHierarchyItem item in _containerClient.GetBlobsByHierarchyAsync(delimiter: "/", prefix: directoryName + "/"))
-            {
+            var imageNames = new List<string>();
+            await foreach (var item in _containerClient.GetBlobsByHierarchyAsync(delimiter: "/",
+                               prefix: directoryName + "/"))
                 if (item.IsBlob)
-                {
                     imageNames.Add(item.Blob.Name);
-                }
-            }
             return imageNames;
         }
 
-        public Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails, string assetDirectory)
+        public Task UploadImagesAsync(IFormFileCollection files, List<ImageThumbnail> imageThumbnails,
+            string assetDirectory)
         {
             throw new NotImplementedException();
         }
+
+        private async Task UploadImageAsync(Stream imageStream, string imageName)
+        {
+            var blobClient = _containerClient.GetBlobClient(imageName);
+            await blobClient.UploadAsync(imageStream);
+        }
     }
-    
-    
 }

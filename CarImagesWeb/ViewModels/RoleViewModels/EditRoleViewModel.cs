@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace CarImagesWeb.ViewModels
+namespace CarImagesWeb.ViewModels.RoleViewModels
 {
     public class EditRoleViewModel
     {
@@ -11,11 +10,11 @@ namespace CarImagesWeb.ViewModels
             Users = new List<string>();
         }
 
-        public String Id { get; set; }
+        public string Id { get; set; }
 
         [Required(ErrorMessage = "Role name is required")]
-        public String RoleName { get; set; }
+        public string RoleName { get; set; }
 
-        public List<String> Users { get; set; }
+        public List<string> Users { get; set; }
     }
 }

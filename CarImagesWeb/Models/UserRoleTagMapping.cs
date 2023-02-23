@@ -1,7 +1,7 @@
 ﻿namespace CarImagesWeb.Models
 {
     /// <summary>
-    /// A class representing a many-to-many mapping between a user role, a tag, and another entity.
+    ///     A class representing a many-to-many mapping between a user role, a tag, and another entity.
     /// </summary>
     public class UserRoleTagMapping : TagMapping
     {

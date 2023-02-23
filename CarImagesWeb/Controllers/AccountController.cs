@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CarImagesWeb.Models;
-using CarImagesWeb.ViewModels;
-using Microsoft.AspNetCore.Authorization;
+using CarImagesWeb.ViewModels.AccountViewModels;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,8 +8,8 @@ namespace CarImagesWeb.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> userManager;
         private readonly SignInManager<ApplicationUser> signInManager;
+        private readonly UserManager<ApplicationUser> userManager;
 
         public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
@@ -32,20 +28,20 @@ namespace CarImagesWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = registerViewModel.Email, Email = registerViewModel.Email, PhoneNumber = registerViewModel.PhoneNumber, Name = registerViewModel.Name };
+                var user = new ApplicationUser
+                {
+                    UserName = registerViewModel.Email, Email = registerViewModel.Email,
+                    PhoneNumber = registerViewModel.PhoneNumber, Name = registerViewModel.Name
+                };
                 var result = await userManager.CreateAsync(user, registerViewModel.Password);
 
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, isPersistent: false);
+                    await signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
 
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-
+                foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
             }
 
             return View(registerViewModel);
@@ -58,19 +54,16 @@ namespace CarImagesWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, String ReturnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
         {
             if (ModelState.IsValid)
             {
-
-                var result = await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                var result =
+                    await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(ReturnUrl))
-                    {
-                        return LocalRedirect(ReturnUrl);
-                    }
+                    if (!string.IsNullOrEmpty(ReturnUrl)) return LocalRedirect(ReturnUrl);
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -87,7 +80,7 @@ namespace CarImagesWeb.Controllers
             return RedirectToAction("Login", "Account");
         }
 
-        public IActionResult AccessDenied(String ReturnUrl)
+        public IActionResult AccessDenied(string ReturnUrl)
         {
             return View();
         }

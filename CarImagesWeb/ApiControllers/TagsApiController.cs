@@ -1,6 +1,5 @@
 ﻿using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
-using CarImagesWeb.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
@@ -13,9 +12,9 @@ namespace CarImagesWeb.ApiControllers
 
         public TagsApiController(ITagRepository tagRepository)
         {
-            _tagRepository =  tagRepository;
+            _tagRepository = tagRepository;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetTags()
         {
@@ -24,7 +23,7 @@ namespace CarImagesWeb.ApiControllers
             {
                 data = new
                 {
-                    tags = tags
+                    tags
                 }
             });
         }

@@ -1,4 +1,4 @@
-﻿@model CarImagesWeb.ViewModels.RegisterViewModel;
+﻿@model CarImagesWeb.ViewModels.AccountViewModels.RegisterViewModel;
 
 @{
     ViewData["Title"] = "Authentication Page";
@@ -7,7 +7,9 @@
 
 <div class="register-box">
     <div class="register-logo">
-        <a href="#"><b>Haritha Consultation</b></a>
+        <a href="#">
+            <b>Haritha Consultation</b>
+        </a>
     </div>
 
     <div class="card">
@@ -84,6 +86,7 @@
     </div><!-- /.card -->
 </div>
 <!-- /.register-box -->
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
 }

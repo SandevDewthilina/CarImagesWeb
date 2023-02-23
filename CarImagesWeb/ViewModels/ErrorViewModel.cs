@@ -1,5 +1,3 @@
-using System;
-
 namespace CarImagesWeb.ViewModels
 {
     public class ErrorViewModel

@@ -11,27 +11,27 @@ namespace CarImagesWeb.Services
     public interface IAssetsHandler
     {
         /// <summary>
-        /// Get all the vehicle type assets from the database.
+        ///     Get all the vehicle type assets from the database.
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Asset>> GetVehiclesAsync();
-        
+
         /// <summary>
-        /// Get all the container type assets from the database.
+        ///     Get all the container type assets from the database.
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Asset>> GetContainersAsync();
-        
+
         /// <summary>
-        /// Search the database for the asset from the image upload dto.
+        ///     Search the database for the asset from the image upload dto.
         /// </summary>
         /// <param name="imageUploadDto">
-        /// The image upload dto contains the asset type and the asset id.
+        ///     The image upload dto contains the asset type and the asset id.
         /// </param>
         /// <returns></returns>
         Task<Asset> GetAssetToUpload(ImageUploadDto imageUploadDto);
     }
-    
+
     public class AssetsHandler : IAssetsHandler
     {
         private readonly IAssetRepository _repository;
@@ -40,27 +40,27 @@ namespace CarImagesWeb.Services
         {
             _repository = repository;
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        ///     <inheritdoc />
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<Asset>> GetVehiclesAsync()
         {
             return await _repository.GetAllAsync(a => a.Type == AssetType.Vehicle.ToString());
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        ///     <inheritdoc />
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<Asset>> GetContainersAsync()
         {
             return await _repository.GetAllAsync(a => a.Type == AssetType.Container.ToString());
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        ///     <inheritdoc />
         /// </summary>
         public async Task<Asset> GetAssetToUpload(ImageUploadDto imageUploadDto)
         {

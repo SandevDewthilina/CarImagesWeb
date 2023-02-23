@@ -18,7 +18,9 @@
                 </div>
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="#">Home</a>
+                        </li>
                         <li class="breadcrumb-item active">Sub levels</li>
                     </ol>
                 </div>
@@ -31,7 +33,7 @@
 
         @if (Model.Any())
         {
-            foreach(var role in Model)
+            foreach (var role in Model)
             {
                 <div class="card mb-3">
                     <div class="card-header">
@@ -49,20 +51,19 @@
         }
         else
         {
-        <div class="card">
-            <div class="card-header">
-                No roles created yet
-            </div>
-            <div class="row">
-                <div class="col-8">
-                    <a class="btn btn-primary" style="margin: 25px" asp-controller="Administration" asp-action="CreateRole">Create role</a>
+            <div class="card">
+                <div class="card-header">
+                    No roles created yet
+                </div>
+                <div class="row">
+                    <div class="col-8">
+                        <a class="btn btn-primary" style="margin: 25px" asp-controller="Administration" asp-action="CreateRole">Create role</a>
+                    </div>
                 </div>
             </div>
-        </div>
         }
 
     </section>
     <!-- /.content -->
 </div>
 <!-- /.content-wrapper -->
-

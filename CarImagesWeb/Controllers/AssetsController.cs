@@ -1,7 +1,6 @@
 ﻿using System.Globalization;
 using System.IO;
 using System.Linq;
-using CarImagesWeb.Models;
 using CarImagesWeb.ViewModels;
 using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
@@ -15,16 +14,13 @@ namespace CarImagesWeb.Controllers
         {
             return View();
         }
-        
-       
+
+
         [HttpPost]
         public IActionResult Index(UpdateAssetsViewModel model)
         {
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            
+            if (!ModelState.IsValid) return View(model);
+
             var fileInput = model.File;
 
             // Get the file extension
@@ -54,7 +50,6 @@ namespace CarImagesWeb.Controllers
             // Return a success response
             return Ok();
         }
-
     }
 
     public class AssetRecord

@@ -1,4 +1,4 @@
-﻿@model CarImagesWeb.ViewModels.LoginViewModel
+﻿@model CarImagesWeb.ViewModels.AccountViewModels.LoginViewModel
 
 @{
     ViewData["Title"] = "Authentication Page";
@@ -15,7 +15,7 @@
     <div class="card">
         <div class="card-body login-card-body">
             <p class="login-box-msg">Sign in to start your session</p>
-            <img src="~/struct.png" style="width: 250px; height: 50px;"  class="m-3"/>
+            <img src="~/struct.png" style="width: 250px; height: 50px;" class="m-3"/>
             <form asp-action="Login" asp-controller="Account">
                 <div asp-validation-summary="All" class="text-danger"></div>
                 <div class="input-group mb-3">
@@ -68,7 +68,9 @@
         <!-- /.login-card-body -->
     </div>
     <div class="login-logo" style="font-size: 25px">
-        <a href="#"><b>Powered by ECODE (Pvt).Ltd</b></a>
+        <a href="#">
+            <b>Powered by ECODE (Pvt).Ltd</b>
+        </a>
     </div>
 </div>
 <!-- /.login-box -->

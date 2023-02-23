@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -32,7 +27,7 @@ namespace CarImagesWeb
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews().AddRazorRuntimeCompilation();
-            
+
             // MySQL DB connection service
             services.AddDbContextPool<CarImagesDbContext>(options =>
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
@@ -53,12 +48,11 @@ namespace CarImagesWeb
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
             // Add handler services
-            services.AddScoped<IAssetsHandler, AssetsHandler>(); 
+            services.AddScoped<IAssetsHandler, AssetsHandler>();
             services.AddScoped<ITagsHandler, TagsHandler>();
             services.AddScoped<ICountryHandler, CountryHandler>();
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
-
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -76,7 +70,7 @@ namespace CarImagesWeb
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles(new StaticFileOptions()
+            app.UseStaticFiles(new StaticFileOptions
             {
                 FileProvider = new PhysicalFileProvider(Path.Combine(env.ContentRootPath, "node_modules")),
 
@@ -94,8 +88,8 @@ namespace CarImagesWeb
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                    name: "default",
-                    pattern: "{controller=Images}/{action=Upload}/{id?}");
+                    "default",
+                    "{controller=Images}/{action=Upload}/{id?}");
             });
         }
     }

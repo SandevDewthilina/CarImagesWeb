@@ -1,5 +1,6 @@
 const IMAGE_UPLOAD_API_ENDPOINT = '/api/ImagesApi/Upload';
-function initializeUppy(){
+
+function initializeUppy() {
     let uppy = new Uppy.Uppy({
         id: 'uppy',
         target: '#uppy',
@@ -24,7 +25,7 @@ function initializeUppy(){
         doneButtonHandler: () => {
             window.location.href = "/Images/Upload";
         }
-        
+
     })
     uppy.use(Uppy.ImageEditor, {target: Uppy.Dashboard})
     uppy.use(Uppy.Form, {target: '#upload-form'})
@@ -34,18 +35,17 @@ function initializeUppy(){
         endpoint: IMAGE_UPLOAD_API_ENDPOINT,
         formData: true,
     })
-    uppy.use(Uppy.StatusBar, {
-       
-    })
+    uppy.use(Uppy.StatusBar, {})
     uppy.on('upload-error', (file, error, response) => {
         // show error message
-        if(response.body.error){
+        if (response.body.error) {
             uppy.info(response.body.error, 'error', 10000);
         }
     });
-    
+
 }
-function initializeUploadForm(){
+
+function initializeUploadForm() {
     // Form Behavior
     let vehicleInputs = $("#vehicle-inputs");
     let containerInputs = $("#container-inputs");

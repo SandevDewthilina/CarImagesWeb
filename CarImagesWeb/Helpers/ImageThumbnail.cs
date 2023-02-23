@@ -7,7 +7,7 @@ namespace CarImagesWeb.Helpers
     {
         public string FileName { get; set; }
         public Image File { get; set; }
-        
+
         public Stream GetStream()
         {
             var stream = new MemoryStream();

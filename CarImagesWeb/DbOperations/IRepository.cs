@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 namespace CarImagesWeb.DbOperations
 {
     /// <summary>
-    /// A base interface for all repositories.
+    ///     A base interface for all repositories.
     /// </summary>
     public interface IRepository<T>
     {
@@ -40,23 +40,7 @@ namespace CarImagesWeb.DbOperations
     {
         private readonly CarImagesDbContext _context;
         private readonly DbSet<T> _dbSet;
-        private IQueryable<T> queryable;
-
-        private static IQueryable<T> BuildQueryable(IQueryable<T> queryable, IEnumerable<string> includes)
-        {
-            return includes == null
-                ? queryable
-                : includes.Aggregate(queryable, (current, include) => current.Include(include));
-        }
-        
-        private static IEnumerable<PropertyInfo> GetComplexProperties()
-        {
-            // Get all the properties of T
-            var properties = typeof(T).GetProperties();
-
-            return (from property in properties let propertyType = property.PropertyType 
-                where propertyType.IsClass && propertyType != typeof(string) select property).ToList();
-        }
+        private readonly IQueryable<T> queryable;
 
         protected Repository(CarImagesDbContext context)
         {
@@ -70,7 +54,7 @@ namespace CarImagesWeb.DbOperations
         {
             return await queryable.SingleOrDefaultAsync(predicate);
         }
-        
+
         public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null)
         {
             return await queryable.Where(predicate).ToListAsync();
@@ -104,6 +88,24 @@ namespace CarImagesWeb.DbOperations
         {
             _dbSet.Remove(entity);
             return _context.SaveChangesAsync();
+        }
+
+        private static IQueryable<T> BuildQueryable(IQueryable<T> queryable, IEnumerable<string> includes)
+        {
+            return includes == null
+                ? queryable
+                : includes.Aggregate(queryable, (current, include) => current.Include(include));
+        }
+
+        private static IEnumerable<PropertyInfo> GetComplexProperties()
+        {
+            // Get all the properties of T
+            var properties = typeof(T).GetProperties();
+
+            return (from property in properties
+                let propertyType = property.PropertyType
+                where propertyType.IsClass && propertyType != typeof(string)
+                select property).ToList();
         }
     }
 }
