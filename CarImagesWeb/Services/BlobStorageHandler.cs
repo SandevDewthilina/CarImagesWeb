@@ -1,5 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
@@ -31,10 +34,10 @@ namespace CarImagesWeb.Services
             _blobServiceClient = new BlobServiceClient(connectionString);
             _containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         }
-        
+
         public async Task UploadImageAsync(Stream imageStream, string imageName)
         {
-            BlobClient blobClient = _containerClient.GetBlobClient(imageName);
+            var blobClient = _containerClient.GetBlobClient(imageName);
             await blobClient.UploadAsync(imageStream);
         }
 
@@ -44,8 +47,25 @@ namespace CarImagesWeb.Services
             // upload images to blob storage
             foreach (var file in files)
             {
-                await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+                try
+                {
+                    await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+                }
+                catch(Azure.RequestFailedException e)
+                {
+                    if (e.ErrorCode == "BlobAlreadyExists")
+                    {
+                        throw new Azure.RequestFailedException(
+                            e.Status,
+                            "Image already exist: " + file.FileName
+                        );
+                    }
+
+                    throw new Exception(
+                        "An error occurred while uploading the image. Please try again later.");
+                }
             }
+
             // upload thumbnails to blob storage
             foreach (var imageThumbnail in imageThumbnails)
             {

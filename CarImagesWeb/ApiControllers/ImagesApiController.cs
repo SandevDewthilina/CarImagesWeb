@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -24,9 +23,10 @@ namespace CarImagesWeb.ApiControllers
             {
                 await _imagesHandler.HandleUpload(dto, Request.Form.Files);
             }
-            catch
+            catch (Azure.RequestFailedException e)
             {
-                return Problem();
+                Response.StatusCode = e.Status;
+                return Json(new { error = e.Message });
             }
             return Ok();
         }
