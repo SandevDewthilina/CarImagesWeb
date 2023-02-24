@@ -16,10 +16,14 @@ app = Vue.createApp({
             vehicleTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Engine', 'Dashboard', 'Wheels', 'Other'],
             containerTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Other'],
             downloading: false,
-            searching: false
+            searching: false,
+            _initialSearch: false
         }
     },
     computed: {
+        initialSearch(){
+            return this._initialSearch;
+        },
         images() {
             return this._images;
         },
@@ -52,13 +56,14 @@ app = Vue.createApp({
         },
         // Search images by category, asset and tags. Calls _getImages() to get the image urls from the server
         searchImages() {
+            this._initialSearch = true;
             const SEARCH_URL = '/api/ImagesApi/Search';
             let assetType = this.imageCategory;
             let asset = this._getSelectedAsset();
             let tags = this._getSelectedAssetTags();
             let searchParams = {assetType, asset, tags};
             //check if the search params are valid
-            if (assetType === '' || asset === '' || asset === null) {
+            if (assetType === '' || asset === '' && tags.length === 0) {
                 // no search params, do nothing
                 return;
             }

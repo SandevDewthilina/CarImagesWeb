@@ -147,18 +147,26 @@ namespace CarImagesWeb.Services
         public async Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags)
         {
             // Get the asset from the database
-            var asset = int.Parse(assetId);
             var tagIds = tags.Select(int.Parse).ToList();
             List<ImageUpload> uploads;
-            if (asset > 0 && tagIds.Count == 0)
+            if (assetId != string.Empty || tagIds.Count == 0)
+            {
+                var asset = int.Parse(assetId);
                 uploads = await _imagesRepository.FindAsync(
-                    i => i.AssetId == asset);
-            else if (asset == 0 && tagIds.Count > 0)
+                    i => i.AssetId == asset && i.Asset.Type == assetType);
+            }
+            else if (assetId == string.Empty && tagIds.Count > 0)
+            {
                 uploads = await _imagesRepository.FindAsync(
-                    i => tagIds.Contains(i.TagId));
+                    i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType);
+            }
             else
+            {
+                var asset = int.Parse(assetId);
                 uploads = await _imagesRepository.FindAsync(
-                    i => i.AssetId == asset && tagIds.Contains(i.TagId));
+                    i => i.AssetId == asset && tagIds.Contains(i.TagId) && i.Asset.Type == assetType);
+            }
+                
 
             return uploads.Select(GetImageThumbnailUrl).ToList();
         }

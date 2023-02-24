@@ -129,6 +129,9 @@
                             <img v-bind:src="image.url" alt="">
                         </div>
                     </div>
+                    <div v-if="images.length === 0 && initialSearch">
+                        <h5 class="text-secondary">No images found</h5>
+                    </div>
                 </div>
             </div>
         </div>
