@@ -14,10 +14,10 @@ namespace CarImagesWeb.Controllers
     public class AdministrationController : Controller
     {
         private readonly ITagsHandler _tagsHandler;
-        private readonly RoleManager<IdentityRole> _roleManager;
+        private readonly RoleManager<UserRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager,
+        public AdministrationController(RoleManager<UserRole> roleManager, UserManager<ApplicationUser> userManager,
             ITagsHandler tagsHandler)
         {
             _roleManager = roleManager;
@@ -35,8 +35,8 @@ namespace CarImagesWeb.Controllers
         {
             if (!ModelState.IsValid) return View(model);
             
-            var identityRole = new IdentityRole {Name = model.RoleName};
-            var result = await _roleManager.CreateAsync(identityRole);
+            var userRole = new UserRole {Name = model.RoleName};
+            var result = await _roleManager.CreateAsync(userRole);
 
             if (result.Succeeded) return RedirectToAction("ListRoles", "Administration");
 
@@ -135,6 +135,62 @@ namespace CarImagesWeb.Controllers
                         break;
                     case false when await _userManager.IsInRoleAsync(user, role.Name):
                         await _userManager.RemoveFromRoleAsync(user, role.Name);
+                        break;
+                    default:
+                        continue;
+                }
+            }
+
+            return RedirectToAction("EditRole", new {Id = roleId});
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> EditTagsInRole(string roleId)
+        {
+            ViewBag.roleId = roleId;
+
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            if (role == null) return NotFound();
+
+            var model = new List<RoleTagViewModel>();
+
+            foreach (var tag in await _tagsHandler.GetTagsAsync())
+            {
+                var roleTagViewModel = new RoleTagViewModel
+                {
+                    Tag = tag
+                };
+
+                if (await _tagsHandler.IsTagInRole(tag, role))
+                    roleTagViewModel.IsSelected = true;
+                else
+                    roleTagViewModel.IsSelected = false;
+
+                model.Add(roleTagViewModel);
+            }
+
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> EditTagsInRole(string roleId, List<RoleTagViewModel> model)
+        {
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            if (role == null) return NotFound();
+
+            foreach (var roleTagViewModel in model)
+            {
+                var tag = roleTagViewModel.Tag;
+
+                switch (roleTagViewModel.IsSelected)
+                {
+                    case true when !await _tagsHandler.IsTagInRole(tag, role):
+                        await _tagsHandler.AddTagToRoleAsync(tag, role);
+                        break;
+                    case false when await _tagsHandler.IsTagInRole(tag, role):
+                        await _tagsHandler.RemoveTagFromRoleAsync(tag, role);
                         break;
                     default:
                         continue;

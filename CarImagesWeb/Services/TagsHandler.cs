@@ -25,6 +25,10 @@ namespace CarImagesWeb.Services
         /// </param>
         /// <returns></returns>
         Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto);
+
+        Task<bool> IsTagInRole(Tag tag, UserRole role);
+        Task AddTagToRoleAsync(Tag tag, UserRole role);
+        Task RemoveTagFromRoleAsync(Tag tag, UserRole role);
     }
 
     public class TagsHandler : ITagsHandler
@@ -59,6 +63,21 @@ namespace CarImagesWeb.Services
             };
 
             return await _repository.GetAsync(t => t.Id == tagId);
+        }
+
+        public Task<bool> IsTagInRole(Tag tag, UserRole role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task AddTagToRoleAsync(Tag tag, UserRole role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task RemoveTagFromRoleAsync(Tag tag, UserRole role)
+        {
+            throw new NotImplementedException();
         }
     }
 }

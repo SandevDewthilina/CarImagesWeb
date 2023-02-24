@@ -33,7 +33,7 @@ namespace CarImagesWeb
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
             // EFCore identity and set password validations  
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, UserRole>(options =>
             {
                 // options.Password.RequiredLength = 6;
                 // options.Password.RequireDigit = false;

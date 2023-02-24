@@ -9,5 +9,6 @@ namespace CarImagesWeb.Models
 
     public class UserRole : IdentityRole
     {
+        
     }
 }
