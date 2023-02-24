@@ -53,6 +53,7 @@ namespace CarImagesWeb
             services.AddScoped<ICountryHandler, CountryHandler>();
             services.AddScoped<IImagesHandler, ImagesHandler>();
             services.AddScoped<IBlobStorageHandler, BlobStorageHandler>();
+            services.AddScoped<ICsvHandler, CsvHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

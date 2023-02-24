@@ -12,7 +12,6 @@ using CarImagesWeb.Models;
 using CsvHelper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore.Internal;
-using OfficeOpenXml;
 
 namespace CarImagesWeb.Services
 {
@@ -41,6 +40,7 @@ namespace CarImagesWeb.Services
         
         Task ResetAssetsAsync(IFormFile sheet, Action<Exception> errorHandleCallback);
         Task DeleteAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback);
+        Task<List<Asset>> GetAllAssets();
     }
 
     public class AssetsHandler : IAssetsHandler
@@ -121,7 +121,12 @@ namespace CarImagesWeb.Services
             
             await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation);
         }
-        
+
+        public async Task<List<Asset>> GetAllAssets()
+        {
+            return await _repository.GetAllAsync();
+        }
+
         private static async Task ManageAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback, 
             Func<List<Asset>, Task> dbOperation)
         {

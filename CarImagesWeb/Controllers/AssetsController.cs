@@ -1,7 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.Controllers
@@ -9,10 +11,12 @@ namespace CarImagesWeb.Controllers
     public class AssetsController : Controller
     {
         private readonly IAssetsHandler _assetsHandler;
+        private readonly ICsvHandler _csvHandler;
 
-        public AssetsController(IAssetsHandler assetsHandler)
+        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler)
         {
             _assetsHandler = assetsHandler;
+            _csvHandler = csvHandler;
         }
         
         public IActionResult Manage()
@@ -68,9 +72,35 @@ namespace CarImagesWeb.Controllers
             return RedirectToAction("List", "Assets");
         }
         
-        public IActionResult List()
+        public async Task<IActionResult> List()
         {
-            throw new NotImplementedException();
+            // Get the assets from the database
+            var assets = await _assetsHandler.GetAllAssets();
+            return View(assets);
+        }
+        
+        [Obsolete("This method is incomplete and is intended for testing purposes only.")]
+        public async Task<FileStreamResult> Export()
+        {
+            // Get the assets from the database
+            var assets = await _assetsHandler.GetAllAssets();
+            // assets to asset records
+            var assetRecords = assets.ConvertAll(a => new AssetRecord
+            {
+                Name = a.Name,
+                Code = a.Code,
+                Type = a.Type
+            });
+            // asset records to csv
+            
+            var memoryStream = new MemoryStream(await _csvHandler.WriteCsvAsync(assetRecords));
+            
+            var file = new FormFile(memoryStream, 0, memoryStream.Length, null, "data.csv");
+            
+            return new FileStreamResult(file.OpenReadStream(), "text/csv")
+            {
+                FileDownloadName = "export.csv"
+            };
         }
     }
 
