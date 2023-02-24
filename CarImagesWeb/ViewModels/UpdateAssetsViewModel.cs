@@ -6,18 +6,22 @@ namespace CarImagesWeb.ViewModels
 {
     public class UpdateAssetsViewModel
     {
-        [Required]
-        [Display(Name = "Sheet")]
         [SheetFile]
         public IFormFile File { get; set; }
+
+        public bool IsReset { get; set; }
+        
+        [SheetFile]
+        public IFormFile DeleteFile { get; set; }
     }
 
     public class SheetFile : ValidationAttribute
     {
         protected override ValidationResult IsValid(object value, ValidationContext validationContext)
         {
-            // Check if the file is null
-            if (!(value is IFormFile file)) return new ValidationResult("A file is required.");
+            if (!(value is IFormFile file)) 
+                //If the file is null continue the validation to be successful
+                return ValidationResult.Success;
             // Check if the file extension is .xlsx or .csv
             var fileExtension = Path.GetExtension(file.FileName);
             return fileExtension == ".csv"

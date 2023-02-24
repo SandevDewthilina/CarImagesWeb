@@ -1,54 +1,76 @@
-﻿using System.Globalization;
-using System.IO;
-using System.Linq;
+﻿using System;
+using System.Threading.Tasks;
+using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
-using CsvHelper;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
 
 namespace CarImagesWeb.Controllers
 {
     public class AssetsController : Controller
     {
-        public IActionResult Index()
+        private readonly IAssetsHandler _assetsHandler;
+
+        public AssetsController(IAssetsHandler assetsHandler)
+        {
+            _assetsHandler = assetsHandler;
+        }
+        
+        public IActionResult Manage()
         {
             return View();
         }
 
-
         [HttpPost]
-        public IActionResult Index(UpdateAssetsViewModel model)
+        public async Task<IActionResult> Manage(UpdateAssetsViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
-            var fileInput = model.File;
-
-            // Get the file extension
-            var fileExtension = Path.GetExtension(fileInput.FileName);
-
-            switch (fileExtension)
+            if (model.IsReset)
             {
-                case ".xlsx":
+                if (model.File == null)
                 {
-                    using var package = new ExcelPackage(fileInput.OpenReadStream());
-                    // Get the first worksheet
-                    var worksheet = package.Workbook.Worksheets.FirstOrDefault();
-                    // Process the data in the worksheet
-                    break;
+                    ModelState.AddModelError("Reset", "Please upload a file.");
+                    return View(model);
                 }
-                case ".csv":
+
+                var fileInput = model.File;
+
+                void ErrorHandleCallback(Exception e)
                 {
-                    using var reader = new StreamReader(fileInput.OpenReadStream());
-                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                    // Read the CSV data into a list of Asset objects
-                    var assets = csv.GetRecords<AssetRecord>().ToList();
-                    // Process the data in the list
-                    break;
+                    // Handle the exception
+                    ModelState.AddModelError("Reset", e.Message);
                 }
+
+                await _assetsHandler.ResetAssetsAsync(fileInput, ErrorHandleCallback);
+            }
+            else
+            {
+                if (model.DeleteFile == null)
+                {
+                    ModelState.AddModelError("Delete", "Please upload a file.");
+                    return View(model);
+                }
+
+                var fileInput = model.DeleteFile;
+
+                void ErrorHandleCallback(Exception e)
+                {
+                    // Handle the exception
+                    ModelState.AddModelError("Delete", e.Message);
+                }
+
+                await _assetsHandler.DeleteAssetsAsync(fileInput, ErrorHandleCallback);
             }
 
+            if (ModelState.ErrorCount > 0) return View(model);
+
             // Return a success response
-            return Ok();
+            return RedirectToAction("List", "Assets");
+        }
+        
+        public IActionResult List()
+        {
+            throw new NotImplementedException();
         }
     }
 
