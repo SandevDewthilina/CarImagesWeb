@@ -1,0 +1,63 @@
+﻿@model List<CarImagesWeb.ViewModels.RoleViewModels.RoleTagViewModel>
+
+@{
+    ViewBag.Title = "Edit Tags In Role";
+    var roleId = ViewBag.roleId;
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-sm-6">
+                    <h1>Edit role</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a href="#">Home</a>
+                        </li>
+                        <li class="breadcrumb-item active">Sub levels</li>
+                    </ol>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <form asp-action="EditTagsInRole" method="post">
+            <div class="card mb-3">
+                <div class="card-header">
+                    <h2>Add or remove tags used by this role</h2>
+                </div>
+                <div class="card-body">
+                    @foreach (var tag in Model)
+                    {
+                        <div class="form-check m-1">
+                            <input asp-for="@tag.TagId" type="hidden">
+                            <input asp-for="@tag.IsSelected" class="form-check-input">
+                            <label class="form-check-label" asp-for="@tag.IsSelected">
+                                @tag.ToString()
+                            </label>
+                        </div>
+                    }
+                </div>
+                <div class="card-footer">
+
+                </div>
+            </div>
+            <div asp-validation-summary="All" class="text-danger"></div>
+            <div class="form-group">
+                <input type="submit" value="Update" class="btn btn-primary" asp-route-roleId="@roleId"/>
+                <a asp-action="EditRole" asp-route-id="@roleId" class="btn btn-primary">Cancel</a>
+            </div>
+        </form>
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->

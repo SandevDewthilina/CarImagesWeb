@@ -49,27 +49,58 @@
             </div>
         </form>
 
-        <div class="card mb-3">
-            <div class="card-header">
-                <h3>Users in this role</h3>
-            </div>
-            <div class="card-body">
-                <ol>
-                    @if (Model.Users.Any())
-                    {
-                        foreach (var user in Model.Users)
-                        {
-                            <li>@user</li>
-                        }
-                    }
-                    else
-                    {
-                        <li>None at the moment</li>
-                    }
-                </ol>
-            </div>
-            <div class="card-footer">
-                <a asp-controller="Administration" asp-action="EditUsersInRole" asp-route-roleId="@Model.Id" class="btn btn-info float-sm-right">Add or remove user</a>
+        <div class="container">
+            <div class="row">
+                <div class="col-12 col-lg-6">
+                    <div class="card mb-3">
+                        <div class="card-header">
+                            <h3>Users in this role</h3>
+                        </div>
+                        <div class="card-body">
+                            <ol>
+                                @if (Model.Users.Any())
+                                {
+                                    foreach (var user in Model.Users)
+                                    {
+                                        <li>@user</li>
+                                    }
+                                }
+                                else
+                                {
+                                    <li>None at the moment</li>
+                                }
+                            </ol>
+                        </div>
+                        <div class="card-footer">
+                            <a asp-controller="Administration" asp-action="EditUsersInRole" asp-route-roleId="@Model.Id" class="btn btn-info float-sm-right">Add or remove user</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-12 col-lg-6">
+                    <div class="card mb-3">
+                                <div class="card-header">
+                                    <h3>Tags used by this Role</h3>
+                                </div>
+                                <div class="card-body">
+                                    <ol>
+                                        @if (Model.Tags.Any())
+                                        {
+                                            foreach (var tag in Model.Tags)
+                                            {
+                                                <li>@tag.ToString()</li>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <li>None at the moment</li>
+                                        }
+                                    </ol>
+                                </div>
+                                <div class="card-footer">
+                                    <a asp-controller="Administration" asp-action="EditUsersInRole" asp-route-roleId="@Model.Id" class="btn btn-info float-sm-right">Add or remove user</a>
+                                </div>
+                            </div>
+                </div>
             </div>
         </div>
 

@@ -29,6 +29,7 @@ namespace CarImagesWeb.Services
         Task<bool> IsTagInRole(Tag tag, UserRole role);
         Task AddTagToRoleAsync(Tag tag, UserRole role);
         Task RemoveTagFromRoleAsync(Tag tag, UserRole role);
+        Task<List<Tag>> TagsInRole(UserRole role);
     }
 
     public class TagsHandler : ITagsHandler
@@ -76,6 +77,11 @@ namespace CarImagesWeb.Services
         }
 
         public Task RemoveTagFromRoleAsync(Tag tag, UserRole role)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<Tag>> TagsInRole(UserRole role)
         {
             throw new NotImplementedException();
         }

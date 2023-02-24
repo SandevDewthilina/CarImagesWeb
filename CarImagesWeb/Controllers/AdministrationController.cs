@@ -67,6 +67,8 @@ namespace CarImagesWeb.Controllers
                 if (await _userManager.IsInRoleAsync(user, role.Name))
                     model.Users.Add(user.UserName);
 
+            model.Tags = await _tagsHandler.TagsInRole(role);
+
             return View(model);
         }
 
@@ -157,10 +159,7 @@ namespace CarImagesWeb.Controllers
 
             foreach (var tag in await _tagsHandler.GetTagsAsync())
             {
-                var roleTagViewModel = new RoleTagViewModel
-                {
-                    Tag = tag
-                };
+                var roleTagViewModel = new RoleTagViewModel(tag);
 
                 if (await _tagsHandler.IsTagInRole(tag, role))
                     roleTagViewModel.IsSelected = true;

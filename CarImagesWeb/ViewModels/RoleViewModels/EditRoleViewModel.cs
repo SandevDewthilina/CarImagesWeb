@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using CarImagesWeb.Models;
 
 namespace CarImagesWeb.ViewModels.RoleViewModels
 {
@@ -8,6 +9,7 @@ namespace CarImagesWeb.ViewModels.RoleViewModels
         public EditRoleViewModel()
         {
             Users = new List<string>();
+            Tags = new List<Tag>();
         }
 
         public string Id { get; set; }
@@ -16,5 +18,7 @@ namespace CarImagesWeb.ViewModels.RoleViewModels
         public string RoleName { get; set; }
 
         public List<string> Users { get; set; }
+        
+        public List<Tag> Tags { get; set; }
     }
 }
