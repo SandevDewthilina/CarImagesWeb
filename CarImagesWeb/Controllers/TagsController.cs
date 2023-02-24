@@ -2,10 +2,12 @@
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.Controllers
 {
+    [Authorize]
     public class TagsController : Controller
     {
         private readonly ITagRepository _tagRepository;

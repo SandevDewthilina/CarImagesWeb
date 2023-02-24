@@ -8,16 +8,15 @@ namespace CarImagesWeb.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly SignInManager<ApplicationUser> signInManager;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager)
         {
-            this.userManager = userManager;
-            this.signInManager = signInManager;
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
-
-
+        
         public IActionResult Register()
         {
             return View();
@@ -33,11 +32,11 @@ namespace CarImagesWeb.Controllers
                     UserName = registerViewModel.Email, Email = registerViewModel.Email,
                     PhoneNumber = registerViewModel.PhoneNumber, Name = registerViewModel.Name
                 };
-                var result = await userManager.CreateAsync(user, registerViewModel.Password);
+                var result = await _userManager.CreateAsync(user, registerViewModel.Password);
 
                 if (result.Succeeded)
                 {
-                    await signInManager.SignInAsync(user, false);
+                    await _signInManager.SignInAsync(user, false);
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -54,16 +53,16 @@ namespace CarImagesWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string ReturnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             if (ModelState.IsValid)
             {
                 var result =
-                    await signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
+                    await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, false);
 
                 if (result.Succeeded)
                 {
-                    if (!string.IsNullOrEmpty(ReturnUrl)) return LocalRedirect(ReturnUrl);
+                    if (!string.IsNullOrEmpty(returnUrl)) return LocalRedirect(returnUrl);
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -76,11 +75,11 @@ namespace CarImagesWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
-            await signInManager.SignOutAsync();
+            await _signInManager.SignOutAsync();
             return RedirectToAction("Login", "Account");
         }
 
-        public IActionResult AccessDenied(string ReturnUrl)
+        public IActionResult AccessDenied(string returnUrl)
         {
             return View();
         }

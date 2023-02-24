@@ -3,11 +3,13 @@ using System.IO;
 using System.Threading.Tasks;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.Controllers
 {
+    [Authorize]
     public class AssetsController : Controller
     {
         private readonly IAssetsHandler _assetsHandler;

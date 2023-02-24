@@ -1,10 +1,12 @@
 ﻿using System.Threading.Tasks;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.Controllers
 {
+    [Authorize]
     public class ImagesController : Controller
     {
         private readonly IAssetsHandler _assetsHandler;
