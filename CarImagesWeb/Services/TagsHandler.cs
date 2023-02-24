@@ -11,22 +11,22 @@ namespace CarImagesWeb.Services
     public interface ITagsHandler
     {
         /// <summary>
-        /// Get all tags from the database
+        ///     Get all tags from the database
         /// </summary>
         /// <returns></returns>
         Task<IEnumerable<Tag>> GetTagsAsync();
-        
+
         /// <summary>
-        /// Search the database for the tag from the image upload dto.
-        /// Throws an exception if the tag type is not implemented.
+        ///     Search the database for the tag from the image upload dto.
+        ///     Throws an exception if the tag type is not implemented.
         /// </summary>
         /// <param name="imageUploadDto">
-        /// The image upload dto contains the asset type and tag id.
+        ///     The image upload dto contains the asset type and tag id.
         /// </param>
         /// <returns></returns>
         Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto);
     }
-    
+
     public class TagsHandler : ITagsHandler
     {
         private readonly ITagRepository _repository;
@@ -35,18 +35,18 @@ namespace CarImagesWeb.Services
         {
             _repository = repository;
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        ///     <inheritdoc />
         /// </summary>
         /// <returns></returns>
         public async Task<IEnumerable<Tag>> GetTagsAsync()
         {
             return await _repository.GetAllAsync();
         }
-        
+
         /// <summary>
-        /// <inheritdoc/>
+        ///     <inheritdoc />
         /// </summary>
         public async Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto)
         {

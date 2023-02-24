@@ -1,7 +1,7 @@
 ﻿namespace CarImagesWeb.Models
 {
     /// <summary>
-    /// A class that extends Entity and adds a property for asset type.
+    ///     A class that extends Entity and adds a property for asset type.
     /// </summary>
     public class Asset : Entity
     {

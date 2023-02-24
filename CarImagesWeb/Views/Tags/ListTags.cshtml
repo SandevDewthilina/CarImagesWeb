@@ -1,5 +1,4 @@
-﻿@using SixLabors.ImageSharp.Memory
-@model System.Collections.Generic.List<CarImagesWeb.Models.Tag>
+﻿@model List<Tag>
 
 @{
     ViewBag.Title = "All Tags";
@@ -11,11 +10,9 @@
     <section class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
-                <div class="col-sm-6">
-                    <div class="row">
-                        <h1>All Tags</h1>
-                        <a asp-action="CreateTag" class="btn btn-primary" style="margin-left: 10px">Create Tag</a>
-                    </div>
+                <div class="col-12 d-flex justify-content-between">
+                    <h1>All Tags</h1>
+                    <a asp-action="CreateTag" class="btn btn-primary" style="margin-left: 10px">Create Tag</a>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -31,39 +28,38 @@
                     foreach (var tag in Model)
                     {
                         <div class="col-3">
-                             <div class="card  mb-3">
-                                                        <div class="card-header">
-                                                            Tag Id: @tag.Id
-                                                        </div>
-                                                        <div class="card-body">
-                                                            <h5 class="card-title">@tag.Name</h5>
-                                                            <h5 class="card-text">@tag.Code</h5>
-                                                        </div>
-                                                        <div class="card-footer">
-                                                            <a asp-route-id="@tag.Id" class="btn btn-warning">Edit</a>
-                                                            <a href="#" class="btn btn-danger">Delete</a>
-                                                        </div>
-                                                    </div>
+                            <div class="card  mb-3">
+                                <div class="card-header">
+                                    Tag Id: @tag.Id
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@tag.Name</h5>
+                                    <h5 class="card-text">@tag.Code</h5>
+                                </div>
+                                <div class="card-footer">
+                                    <a asp-route-id="@tag.Id" class="btn btn-warning">Edit</a>
+                                    <a href="#" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
                         </div>
                     }
                 }
                 else
-                        {
-                        <div class="card">
-                            <div class="card-header">
-                                No tags created yet
-                            </div>
-                            <div class="row">
-                                <div class="col-8">
-                                    <a class="btn btn-primary" style="margin: 25px" asp-action="CreateTag">Create Tag</a>
-                                </div>
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            No tags created yet
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                                <a class="btn btn-primary" style="margin: 25px" asp-action="CreateTag">Create Tag</a>
                             </div>
                         </div>
-                        }
+                    </div>
+                }
             </div>
         </div>
 
-        
 
     </section>
     <!-- /.content -->

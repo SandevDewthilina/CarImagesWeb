@@ -8,7 +8,6 @@ namespace CarImagesWeb.DbContext
     {
         public CarImagesDbContext(DbContextOptions<CarImagesDbContext> options) : base(options)
         {
-            
         }
 
         public DbSet<Asset> Assets { get; set; }
@@ -17,7 +16,7 @@ namespace CarImagesWeb.DbContext
         public DbSet<CountryTagMapping> CountryTagMappings { get; set; }
         public DbSet<UserRoleTagMapping> UserRoleTagMappings { get; set; }
         public DbSet<ImageUpload> ImageUploads { get; set; }
-        
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -28,12 +27,11 @@ namespace CarImagesWeb.DbContext
             modelBuilder.Entity<UserRoleTagMapping>()
                 .HasKey(c => new {c.UserRoleId, c.TagId});
         }
-        
+
         //get the dbset for the entity
         public DbSet<TEntity> GetDbSet<TEntity>() where TEntity : class
         {
             return Set<TEntity>();
         }
-
     }
 }

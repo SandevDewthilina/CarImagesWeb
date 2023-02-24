@@ -1,0 +1,91 @@
+﻿@model List<Asset>
+
+@{
+    ViewBag.Title = "All Assets";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12 d-flex justify-content-between">
+                    <h1>All Assets</h1>
+                    <a asp-action="Manage" class="btn btn-primary" style="margin-left: 10px">Manage Assets</a>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        @* <div class="card-header"> *@
+                        @*     <form action="Export"> *@
+                        @*         <input class="btn btn-success" type="submit" value="Export"/> *@
+                        @*     </form> *@
+                        @* </div> *@
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            @if (Model.Any())
+                            {
+                                <table id="example2" class="table table-bordered table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Type</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (var asset in Model)
+                                    {
+                                        <tr>
+                                            @* looping through the properties of the Asset class *@
+                                            <td>@asset.Name</td>
+                                            <td>@asset.Code</td>
+                                            <td>@asset.Type</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                    <tfoot>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Code</th>
+                                        <th>Type</th>
+                                    </tr>
+                                    </tfoot>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        No assets found in the database
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-8">
+                                            <a class="btn btn-primary" style="margin: 25px" asp-action="Manage">Manage Assets</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->

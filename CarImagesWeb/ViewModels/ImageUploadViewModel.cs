@@ -6,12 +6,6 @@ namespace CarImagesWeb.ViewModels
 {
     public class ImageUploadViewModel
     {
-
-        public ImageUploadViewModel()
-        {
-            
-        }
-
         public IEnumerable<Asset> Vehicles { get; set; }
         public IEnumerable<Asset> Containers { get; set; }
         public IEnumerable<Tag> Tags { get; set; }

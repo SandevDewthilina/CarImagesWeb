@@ -1,4 +1,4 @@
-﻿@model CarImagesWeb.ViewModels.CreateRoleViewModel
+﻿@model CarImagesWeb.ViewModels.RoleViewModels.CreateRoleViewModel
 
 @{
     ViewData["Title"] = "Create role";
@@ -15,7 +15,9 @@
                 </div><!-- /.col -->
                 <div class="col-sm-6">
                     <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
+                        <li class="breadcrumb-item">
+                            <a href="#">Home</a>
+                        </li>
                         <li class="breadcrumb-item active">Dashboard v2</li>
                     </ol>
                 </div><!-- /.col -->
@@ -31,13 +33,13 @@
                     <div class="col-md-10">
                         <div class="form-group">
                             <label asp-for="RoleName" class="control-label"></label>
-                            <input asp-for="RoleName" class="form-control" />
+                            <input asp-for="RoleName" class="form-control"/>
                             <span asp-validation-for="RoleName" class="text-danger"></span>
                         </div>
                     </div>
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Create Role" class="btn btn-primary" />
+                    <input type="submit" value="Create Role" class="btn btn-primary"/>
                 </div>
             </form>
         </div>
