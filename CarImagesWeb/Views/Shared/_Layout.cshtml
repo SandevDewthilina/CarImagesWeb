@@ -26,13 +26,13 @@
 
     <!-- Navbar -->
     <nav class="main-header navbar navbar-expand-md navbar-light navbar-white">
-        <div class="container">
+        <div class="container-fluid">
             <a href="#" class="navbar-brand">
-                <img src="~/dist/img/AdminLTELogo.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
-                     style="opacity: .8">
-                <span class="brand-text font-weight-light">AdminLTE 3</span>
+                <img src="~/logo_evision.png" alt="AdminLTE Logo" class="brand-image">
+                <span class="brand-text font-weight-light">Assets Manager</span>
             </a>
-            <button class="navbar-toggler order-1" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler order-1" type="button" data-toggle="collapse" 
+                    data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse order-3" id="navbarCollapse">
@@ -49,6 +49,17 @@
                     </li>
                     <li class="nav-item">
                         <a asp-action="ListTags" asp-controller="Tags" class="nav-link">Tags</a>
+                    </li>
+                    @if(User.IsInRole("Admin"))
+                    {
+                        <li class="nav-item">
+                            <a asp-action="ListRoles" asp-controller="Administration" class="nav-link">Roles</a>
+                        </li>
+                    }
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a asp-action="Logout" asp-controller="Account" class="btn btn-info">Logout</a>
                     </li>
                 </ul>
             </div>
