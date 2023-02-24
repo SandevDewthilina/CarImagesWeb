@@ -1,9 +1,11 @@
 ﻿using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class TagsApiController : Controller

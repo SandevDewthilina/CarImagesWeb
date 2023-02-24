@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using Azure;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
 {
+    [Authorize]
     [Route("api/[controller]/[action]")]
     [ApiController]
     public class ImagesApiController : Controller
@@ -18,6 +20,12 @@ namespace CarImagesWeb.ApiControllers
             _imagesHandler = imagesHandler;
         }
 
+        /// <summary>
+        /// This endpoint is used to upload a single image.
+        /// </summary>
+        /// <param name="dto">Contains the asset and tags associated with the image.</param>
+        /// <returns></returns>
+        [AllowAnonymous]
         [HttpPost]
         public async Task<IActionResult> Upload([FromForm] ImageUploadDto dto)
         {
@@ -34,8 +42,12 @@ namespace CarImagesWeb.ApiControllers
             return Ok();
         }
 
-        // TODO: Refactor and test this method
-        [Obsolete]
+        /// <summary>
+        /// This endpoint is used to upload multiple images.
+        /// </summary>
+        /// <param name="dto">Contains the asset and tag associated with the image.</param>
+        /// <returns></returns>
+        [Obsolete("This method is still to be developed, please use Upload instead.")]
         [HttpPost]
         public async Task<IActionResult> Uploads([FromForm] ImageUploadDto dto)
         {
@@ -53,6 +65,11 @@ namespace CarImagesWeb.ApiControllers
         }
 
 
+        /// <summary>
+        /// This endpoint is used to search for images.
+        /// </summary>
+        /// <param name="dto">Contain the asset type, asset and tags from which the search is to be done.</param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<IActionResult> Search(ImageSearchDto dto)
         {
@@ -67,11 +84,15 @@ namespace CarImagesWeb.ApiControllers
             return Json(new {data = imageUploads});
         }
 
+        /// <summary>
+        /// This endpoint is used to download images from the associated thumbnails.
+        /// </summary>
+        /// <param name="thumbnailUrls">This array contain the thumbnail urls.</param>
         [HttpPost]
-        public async Task Download([FromBody] string[] imageUrls)
+        public async Task Download([FromBody] string[] thumbnailUrls)
         {
             //wait for 10 seconds
-            var fileBytes = await _imagesHandler.HandleDownload(imageUrls);
+            var fileBytes = await _imagesHandler.HandleDownloadFromThumbnails(thumbnailUrls);
             //response
             Response.ContentType = "application/zip";
             Response.Headers.Add("Content-Disposition", "attachment; filename='images.zip'");
