@@ -14,7 +14,7 @@ namespace CarImagesWeb.Services
         ///     Get all tags from the database
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Tag>> GetTagsAsync();
+        Task<List<Tag>> GetTagsAsync();
 
         /// <summary>
         ///     Search the database for the tag from the image upload dto.
@@ -40,7 +40,7 @@ namespace CarImagesWeb.Services
         ///     <inheritdoc />
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<Tag>> GetTagsAsync()
+        public async Task<List<Tag>> GetTagsAsync()
         {
             return await _repository.GetAllAsync();
         }
