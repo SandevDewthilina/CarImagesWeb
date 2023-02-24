@@ -1,71 +1,74 @@
-class Image{
-    constructor(url){
-        this.url=url;
-        this.isSelected=false;
+class Image {
+    constructor(url) {
+        this.url = url;
+        this.isSelected = false;
     }
 }
 
 app = Vue.createApp({
-    data(){
-        return{
-           _images:[],
-            imageCategory:'Vehicle',
+    data() {
+        return {
+            _images: [],
+            imageCategory: 'Vehicle',
             // these hardcoded arrays will be populated from the server on mounted()
-            vehicles:['CID/001','CID/002','CID/003','CID/004','CID/005'], 
-            containers:['CoID/001','CoID/002','CoID/003','CoID/004'], 
-            vehicleTags:['Front','Back','Left','Right','Interior','Engine','Dashboard','Wheels','Other'], 
-            containerTags:['Front','Back','Left','Right','Interior','Other'], 
-            downloading:false,
-            searching:false
+            vehicles: ['CID/001', 'CID/002', 'CID/003', 'CID/004', 'CID/005'],
+            containers: ['CoID/001', 'CoID/002', 'CoID/003', 'CoID/004'],
+            vehicleTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Engine', 'Dashboard', 'Wheels', 'Other'],
+            containerTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Other'],
+            downloading: false,
+            searching: false,
+            _initialSearch: false
         }
     },
-    computed:{
-        images(){
+    computed: {
+        initialSearch(){
+            return this._initialSearch;
+        },
+        images() {
             return this._images;
         },
-        assets(){
-            if(this.imageCategory===''){
+        assets() {
+            if (this.imageCategory === '') {
                 return [];
-            }
-            else if(this.imageCategory==='Vehicle'){
+            } else if (this.imageCategory === 'Vehicle') {
                 return this.vehicles;
             }
             return this.containers;
         },
-        assetTags(){
-            if(this.imageCategory===''){
+        assetTags() {
+            if (this.imageCategory === '') {
                 return [];
-            }
-            else if(this.imageCategory==='Vehicle'){
+            } else if (this.imageCategory === 'Vehicle') {
                 return this.vehicleTags;
             }
             return this.containerTags;
         },
-        isDownloading(){
+        isDownloading() {
             return this.downloading;
         },
-        isSearching(){
+        isSearching() {
             return this.searching;
         }
     },
-    methods:{
-        setSearching(isSearching){
+    methods: {
+        setSearching(isSearching) {
             this.searching = isSearching;
         },
         // Search images by category, asset and tags. Calls _getImages() to get the image urls from the server
         searchImages() {
+            this._initialSearch = true;
             const SEARCH_URL = '/api/ImagesApi/Search';
             let assetType = this.imageCategory;
             let asset = this._getSelectedAsset();
             let tags = this._getSelectedAssetTags();
-            let searchParams = { assetType, asset, tags };
+            let searchParams = {assetType, asset, tags};
             //check if the search params are valid
-            if(assetType==='' || asset==='' || asset === null){
+            if (assetType === '' || asset === '' && tags.length === 0) {
                 // no search params, do nothing
                 return;
             }
             //if not already searching, set searching to true and call _getImages()
-            if(this.searching !== true){
+            if (this.searching !== true) {
                 this.setSearching(true);
                 this._getImages(SEARCH_URL, searchParams).then(data => {
                     this._images = [];
@@ -77,8 +80,8 @@ app = Vue.createApp({
                 });
             }
         },
-        setDownloading(isDownloading){
-          this.downloading = isDownloading;  
+        setDownloading(isDownloading) {
+            this.downloading = isDownloading;
         },
         // Download selected images as a zip file to the client
         downloadImages() {
@@ -94,7 +97,7 @@ app = Vue.createApp({
                 return;
             }
             //if not already downloading, set downloading to true and call _downloadImages()
-            if(this.downloading !== true){
+            if (this.downloading !== true) {
                 this.setDownloading(true);
                 axios.post('/api/ImagesApi/Download', imageUrls, {responseType: 'arraybuffer'}).then(response => {
                     if (response.status === 200) {
@@ -117,7 +120,7 @@ app = Vue.createApp({
             }
         },
         // Get the selected asset type from the select2 dropdown
-        _getSelectedAsset(){
+        _getSelectedAsset() {
             let assetType = '';
             $('#Asset').select2('data').forEach(asset => {
                 assetType = asset.id;
@@ -125,7 +128,7 @@ app = Vue.createApp({
             return assetType;
         },
         // Get the selected asset tags from the select2 dropdown (multiple select)
-        _getSelectedAssetTags(){
+        _getSelectedAssetTags() {
             let assetTags = [];
             $('#AssetTags').select2('data').forEach(tag => {
                 assetTags.push(tag.id);
@@ -139,13 +142,13 @@ app = Vue.createApp({
             return res.data.data || [];
         },
         //Select or deselect all images
-        selectAll(select=true){
+        selectAll(select = true) {
             this._images.forEach(image => {
-                image.isSelected=select;
+                image.isSelected = select;
             });
         },
         //Deselect all images
-        deselectAll(){
+        deselectAll() {
             this.selectAll(false);
         }
     },
@@ -155,6 +158,7 @@ app = Vue.createApp({
         //  populate the vehicle, container, vehicleTags, containerTag arrays
         const ASSETS_URL = '/api/AssetsApi/GetAssets';
         const TAGS_URL = '/api/TagsApi/GetTags';
+
         async function getAssets(fromUrl) {
             //make axios call to get assets from the server
             let res = await axios.get(fromUrl);
@@ -163,6 +167,7 @@ app = Vue.createApp({
                 containers: []
             };
         }
+
         async function getTags(fromUrl) {
             //make axios call to get tags from the server
             let res = await axios.get(fromUrl);
@@ -171,6 +176,7 @@ app = Vue.createApp({
                 containerTags: []
             };
         }
+
         //get assets and tags from the server
         getAssets(ASSETS_URL).then(data => {
             this.vehicles = data.vehicles;
@@ -180,7 +186,7 @@ app = Vue.createApp({
             //TODO: instead of having two arrays for vehicleTags and containerTags, 
             // use one array and populate it with the data from the server
             this.vehicleTags = data.tags;
-            this.containerTags = data.tags; 
+            this.containerTags = data.tags;
         });
     }
 })

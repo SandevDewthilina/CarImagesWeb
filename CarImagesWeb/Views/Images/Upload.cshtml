@@ -17,101 +17,101 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                                    @* Left Side of the form *@
-                                    <div class="col-lg-6 col-12">
-                                        <!-- Bind form fields to properties in the view model -->
-                                        <div class="form-group">
-                                            <label>Country code</label>
-                                            <select id="CountryCode" class="form-control select2" name="@nameof(Model.ImageUploadDto.CountryCode)"
-                                                    style="width: 100%;">
-                                                <option selected="selected" value="">-- Select Country code --</option>
-                                                <!-- Bind options to the list of vehicle types in the view model -->
-                                                @foreach (var countryCode in Model.CountryCodes)
-                                                {
-                                                    <option value="@countryCode">@countryCode</option>
-                                                }
-                                            </select>
-                                        </div>
-                                        <div class="form-group clearfix d-flex justify-content-between align-items-center">
-                                            <div class="">Select Image Category</div>
-                                            <div class="icheck-primary d-inline mb-0">
-                                                <input type="radio" id="Vehicle"
-                                                       name="@nameof(Model.ImageUploadDto.ImageCategory)"
-                                                       value="Vehicle" hidden>
-                                                <label for="Vehicle">Vehicles</label>
-                                            </div>
-                                            <div class="icheck-primary d-inline mb-0">
-                                                <input type="radio" id="Container"
-                                                       name="@nameof(Model.ImageUploadDto.ImageCategory)"
-                                                       value="Container" hidden>
-                                                <label for="Container">Containers</label>
-                                            </div>
-                                        </div>
-                                        <div id="vehicle-inputs" class="hide">
-                                            <!-- Show the dropdown only if Vehicles radio button is selected -->
-                                            <div class="form-group" id="VehicleDropdown">
-                                                <label>Vehicle</label>
-                                                <select id="VehicleType" class="form-control select2"
-                                                        name="@nameof(Model.ImageUploadDto.VehicleId)"
-                                                        style="width: 100%;">
-                                                    <option selected="selected" value="">-- Select Vehicle --</option>
-                                                    <!-- Bind options to the list of vehicle types in the view model -->
-                                                    @foreach (var vehicle in Model.Vehicles)
-                                                    {
-                                                        <option value="@vehicle.Id.ToString()">@vehicle.ToString()</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div class="form-group" id="VehicleTagDropdown">
-                                                <label>Select Tag</label>
-                                                <select id="VehicleTag" class="form-control select2"
-                                                        name="@nameof(Model.ImageUploadDto.VehicleTagId)"
-                                                        style="width: 100%;">
-                                                    <option selected="selected" value="">-- Select Vehicle Tag --</option>
-                                                    <!-- Bind options to the list of vehicle tags in the view model -->
-                                                    @foreach (var tag in Model.Tags)
-                                                    {
-                                                        <option value="@tag.Id.ToString()">@tag.ToString()</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div id="container-inputs" class="hide">
-                                            <div class="form-group" id="ContainerDropdown">
-                                                <label>Container</label>
-                                                <select id="Container" class="form-control select2"
-                                                        name="@nameof(Model.ImageUploadDto.ContainerId)"
-                                                        style="width: 100%;">
-                                                    <option selected="selected" value="">-- Select Container --</option>
-                                                    <!-- Bind options to the list of vehicle types in the view model -->
-                                                    @foreach (var container in Model.Containers)
-                                                    {
-                                                        <option value="@container.Id">@container</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div class="form-group" id="ContainerTagDropdown">
-                                                <label>Select Tag</label>
-                                                <select id="ContainerTag" class="form-control select2"
-                                                        name="@nameof(Model.ImageUploadDto.ContainerTagId)"
-                                                        style="width: 100%;">
-                                                    <option selected="selected" value="">-- Select Container Tag --</option>
-                                                    <!-- Bind options to the list of vehicle tags in the view model -->
-                                                    @foreach (var tag in Model.Tags)
-                                                    {
-                                                        <option value="@tag.Id">@tag.ToString()</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
-                
-                                    </div>
-                                    <input type="file" name="files[]" multiple hidden>
-                                    @* Right Side of the form *@
-                                    <div class="col-lg-6 col-12">
-                                        <div class="form-group" id="uppyDashboard"></div>
-                                    </div>
-                                </div>
+                    @* Left Side of the form *@
+                    <div class="col-lg-6 col-12">
+                        <!-- Bind form fields to properties in the view model -->
+                        <div class="form-group">
+                            <label>Country code</label>
+                            <select id="CountryCode" class="form-control select2" name="@nameof(Model.ImageUploadDto.CountryCode)"
+                                    style="width: 100%;">
+                                <option selected="selected" value="">-- Select Country code --</option>
+                                <!-- Bind options to the list of vehicle types in the view model -->
+                                @foreach (var countryCode in Model.CountryCodes)
+                                {
+                                    <option value="@countryCode">@countryCode</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="form-group clearfix d-flex justify-content-between align-items-center">
+                            <div class="">Select Image Category</div>
+                            <div class="icheck-primary d-inline mb-0">
+                                <input type="radio" id="Vehicle"
+                                       name="@nameof(Model.ImageUploadDto.ImageCategory)"
+                                       value="Vehicle" hidden>
+                                <label for="Vehicle">Vehicles</label>
+                            </div>
+                            <div class="icheck-primary d-inline mb-0">
+                                <input type="radio" id="Container"
+                                       name="@nameof(Model.ImageUploadDto.ImageCategory)"
+                                       value="Container" hidden>
+                                <label for="Container">Containers</label>
+                            </div>
+                        </div>
+                        <div id="vehicle-inputs" class="hide">
+                            <!-- Show the dropdown only if Vehicles radio button is selected -->
+                            <div class="form-group" id="VehicleDropdown">
+                                <label>Vehicle</label>
+                                <select id="VehicleType" class="form-control select2"
+                                        name="@nameof(Model.ImageUploadDto.VehicleId)"
+                                        style="width: 100%;">
+                                    <option selected="selected" value="">-- Select Vehicle --</option>
+                                    <!-- Bind options to the list of vehicle types in the view model -->
+                                    @foreach (var vehicle in Model.Vehicles)
+                                    {
+                                        <option value="@vehicle.Id.ToString()">@vehicle.ToString()</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group" id="VehicleTagDropdown">
+                                <label>Select Tag</label>
+                                <select id="VehicleTag" class="form-control select2"
+                                        name="@nameof(Model.ImageUploadDto.VehicleTagId)"
+                                        style="width: 100%;">
+                                    <option selected="selected" value="">-- Select Vehicle Tag --</option>
+                                    <!-- Bind options to the list of vehicle tags in the view model -->
+                                    @foreach (var tag in Model.Tags)
+                                    {
+                                        <option value="@tag.Id.ToString()">@tag.ToString()</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div id="container-inputs" class="hide">
+                            <div class="form-group" id="ContainerDropdown">
+                                <label>Container</label>
+                                <select id="Container" class="form-control select2"
+                                        name="@nameof(Model.ImageUploadDto.ContainerId)"
+                                        style="width: 100%;">
+                                    <option selected="selected" value="">-- Select Container --</option>
+                                    <!-- Bind options to the list of vehicle types in the view model -->
+                                    @foreach (var container in Model.Containers)
+                                    {
+                                        <option value="@container.Id">@container</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="form-group" id="ContainerTagDropdown">
+                                <label>Select Tag</label>
+                                <select id="ContainerTag" class="form-control select2"
+                                        name="@nameof(Model.ImageUploadDto.ContainerTagId)"
+                                        style="width: 100%;">
+                                    <option selected="selected" value="">-- Select Container Tag --</option>
+                                    <!-- Bind options to the list of vehicle tags in the view model -->
+                                    @foreach (var tag in Model.Tags)
+                                    {
+                                        <option value="@tag.Id">@tag.ToString()</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+                    <input type="file" name="files[]" multiple hidden>
+                    @* Right Side of the form *@
+                    <div class="col-lg-6 col-12">
+                        <div class="form-group" id="uppyDashboard"></div>
+                    </div>
+                </div>
             </div>
             <!-- /.card-body -->
         </div>

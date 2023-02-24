@@ -1,60 +1,109 @@
-﻿using System.Globalization;
+﻿using System;
 using System.IO;
-using System.Linq;
-using CarImagesWeb.Models;
+using System.Threading.Tasks;
+using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
-using CsvHelper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
 
 namespace CarImagesWeb.Controllers
 {
+    [Authorize]
     public class AssetsController : Controller
     {
-        public IActionResult Index()
+        private readonly IAssetsHandler _assetsHandler;
+        private readonly ICsvHandler _csvHandler;
+
+        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler)
+        {
+            _assetsHandler = assetsHandler;
+            _csvHandler = csvHandler;
+        }
+        
+        public IActionResult Manage()
         {
             return View();
         }
-        
-       
+
         [HttpPost]
-        public IActionResult Index(UpdateAssetsViewModel model)
+        public async Task<IActionResult> Manage(UpdateAssetsViewModel model)
         {
-            if(!ModelState.IsValid)
-            {
-                return View(model);
-            }
-            
-            var fileInput = model.File;
+            if (!ModelState.IsValid) return View(model);
 
-            // Get the file extension
-            var fileExtension = Path.GetExtension(fileInput.FileName);
-
-            switch (fileExtension)
+            if (model.IsReset)
             {
-                case ".xlsx":
+                if (model.File == null)
                 {
-                    using var package = new ExcelPackage(fileInput.OpenReadStream());
-                    // Get the first worksheet
-                    var worksheet = package.Workbook.Worksheets.FirstOrDefault();
-                    // Process the data in the worksheet
-                    break;
+                    ModelState.AddModelError("Reset", "Please upload a file.");
+                    return View(model);
                 }
-                case ".csv":
+
+                var fileInput = model.File;
+
+                void ErrorHandleCallback(Exception e)
                 {
-                    using var reader = new StreamReader(fileInput.OpenReadStream());
-                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-                    // Read the CSV data into a list of Asset objects
-                    var assets = csv.GetRecords<AssetRecord>().ToList();
-                    // Process the data in the list
-                    break;
+                    // Handle the exception
+                    ModelState.AddModelError("Reset", e.Message);
                 }
+
+                await _assetsHandler.ResetAssetsAsync(fileInput, ErrorHandleCallback);
             }
+            else
+            {
+                if (model.DeleteFile == null)
+                {
+                    ModelState.AddModelError("Delete", "Please upload a file.");
+                    return View(model);
+                }
+
+                var fileInput = model.DeleteFile;
+
+                void ErrorHandleCallback(Exception e)
+                {
+                    // Handle the exception
+                    ModelState.AddModelError("Delete", e.Message);
+                }
+
+                await _assetsHandler.DeleteAssetsAsync(fileInput, ErrorHandleCallback);
+            }
+
+            if (ModelState.ErrorCount > 0) return View(model);
 
             // Return a success response
-            return Ok();
+            return RedirectToAction("List", "Assets");
         }
-
+        
+        public async Task<IActionResult> List()
+        {
+            // Get the assets from the database
+            var assets = await _assetsHandler.GetAllAssets();
+            return View(assets);
+        }
+        
+        [Obsolete("This method is incomplete and is intended for testing purposes only.")]
+        public async Task<FileStreamResult> Export()
+        {
+            // Get the assets from the database
+            var assets = await _assetsHandler.GetAllAssets();
+            // assets to asset records
+            var assetRecords = assets.ConvertAll(a => new AssetRecord
+            {
+                Name = a.Name,
+                Code = a.Code,
+                Type = a.Type
+            });
+            // asset records to csv
+            
+            var memoryStream = new MemoryStream(await _csvHandler.WriteCsvAsync(assetRecords));
+            
+            var file = new FormFile(memoryStream, 0, memoryStream.Length, null, "data.csv");
+            
+            return new FileStreamResult(file.OpenReadStream(), "text/csv")
+            {
+                FileDownloadName = "export.csv"
+            };
+        }
     }
 
     public class AssetRecord

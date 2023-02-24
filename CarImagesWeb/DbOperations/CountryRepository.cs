@@ -5,9 +5,8 @@ namespace CarImagesWeb.DbOperations
 {
     public interface ICountryRepository : IRepository<Country>
     {
-        
     }
-    
+
     public class CountryRepository : Repository<Country>, ICountryRepository
     {
         private readonly CarImagesDbContext _context;

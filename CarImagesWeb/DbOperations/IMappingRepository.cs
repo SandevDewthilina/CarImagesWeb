@@ -5,9 +5,8 @@ namespace CarImagesWeb.DbOperations
 {
     public interface IMappingRepository<T1, T2>
     {
-        
     }
-    
+
     public class MappingRepository<T1, T2> : IMappingRepository<T1, T2> where T1 : class where T2 : class
     {
         private readonly CarImagesDbContext _context;

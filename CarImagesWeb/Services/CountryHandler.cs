@@ -11,7 +11,7 @@ namespace CarImagesWeb.Services
         Task<IEnumerable<string>> GetCountryCodesAsync();
         Task<Country> GetCountryFromCode(string countryCode);
     }
-    
+
     public class CountryHandler : ICountryHandler
     {
         private readonly ICountryRepository _repository;
@@ -20,7 +20,7 @@ namespace CarImagesWeb.Services
         {
             _repository = repository;
         }
-        
+
         public async Task<IEnumerable<string>> GetCountryCodesAsync()
         {
             var countries = await _repository.GetAllAsync();

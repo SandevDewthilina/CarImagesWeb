@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using CarImagesWeb.Models;
-using CarImagesWeb.Models;
-using CarImagesWeb.ViewModels;
+using CarImagesWeb.ViewModels.RoleViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,11 +14,12 @@ namespace CarImagesWeb.Controllers
     [Authorize(Roles = "Admin")]
     public class AdministrationController : Controller
     {
+        private readonly IHostApplicationLifetime appLifetime;
         private readonly RoleManager<IdentityRole> roleManager;
         private readonly UserManager<ApplicationUser> userManager;
-        private readonly IHostApplicationLifetime appLifetime;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager, IHostApplicationLifetime appLifetime)
+        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager,
+            IHostApplicationLifetime appLifetime)
         {
             this.roleManager = roleManager;
             this.userManager = userManager;
@@ -44,14 +40,14 @@ namespace CarImagesWeb.Controllers
             //}
         }
 
-        private String runCron()
+        private string runCron()
         {
-            ProcessStartInfo ps = new ProcessStartInfo();
+            var ps = new ProcessStartInfo();
             ps.FileName = "/root/pub/start.sh";
             ps.UseShellExecute = false;
             ps.RedirectStandardOutput = true;
 
-            Process process = Process.Start(ps);
+            var process = Process.Start(ps);
             process.WaitForExit();
             return "Success";
         }
@@ -61,20 +57,14 @@ namespace CarImagesWeb.Controllers
         {
             if (ModelState.IsValid)
             {
-                IdentityRole identityRole = new IdentityRole { Name = model.RoleName };
-                IdentityResult result = await roleManager.CreateAsync(identityRole);
+                var identityRole = new IdentityRole {Name = model.RoleName};
+                var result = await roleManager.CreateAsync(identityRole);
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListRoles", "Administration");
-                }
+                if (result.Succeeded) return RedirectToAction("ListRoles", "Administration");
 
-                foreach (IdentityError error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
-
+                foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
             }
+
             return View(model);
         }
 
@@ -84,14 +74,11 @@ namespace CarImagesWeb.Controllers
             return View(roles);
         }
 
-        public async Task<IActionResult> EditRole(String id)
+        public async Task<IActionResult> EditRole(string id)
         {
             var role = await roleManager.FindByIdAsync(id);
 
-            if (role == null)
-            {
-                return NotFound();
-            }
+            if (role == null) return NotFound();
 
             var model = new EditRoleViewModel
             {
@@ -100,13 +87,8 @@ namespace CarImagesWeb.Controllers
             };
 
             foreach (var user in await userManager.Users.ToListAsync())
-            {
-
                 if (await userManager.IsInRoleAsync(user, role.Name))
-                {
                     model.Users.Add(user.UserName);
-                }
-            }
 
             return View(model);
         }
@@ -116,41 +98,26 @@ namespace CarImagesWeb.Controllers
         {
             var role = await roleManager.FindByIdAsync(model.Id);
 
-            if (role == null)
-            {
-                return NotFound();
-            }
-            else
-            {
-                role.Name = model.RoleName;
-                var result = await roleManager.UpdateAsync(role);
+            if (role == null) return NotFound();
 
-                if (result.Succeeded)
-                {
-                    return RedirectToAction("ListRoles");
-                }
+            role.Name = model.RoleName;
+            var result = await roleManager.UpdateAsync(role);
 
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
-                }
+            if (result.Succeeded) return RedirectToAction("ListRoles");
 
-                return View(model);
+            foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
 
-            }
+            return View(model);
         }
 
         [HttpGet]
-        public async Task<IActionResult> EditUsersInRole(String roleId)
+        public async Task<IActionResult> EditUsersInRole(string roleId)
         {
             ViewBag.roleId = roleId;
 
             var role = await roleManager.FindByIdAsync(roleId);
 
-            if (role == null)
-            {
-                return NotFound();
-            }
+            if (role == null) return NotFound();
 
             var model = new List<UserRoleViewModel>();
 
@@ -159,72 +126,49 @@ namespace CarImagesWeb.Controllers
                 var userroleviewmodel = new UserRoleViewModel
                 {
                     UserId = user.Id,
-                    Username = user.UserName,
+                    Username = user.UserName
                 };
 
                 if (await userManager.IsInRoleAsync(user, role.Name))
-                {
                     userroleviewmodel.IsSelected = true;
-                }
                 else
-                {
                     userroleviewmodel.IsSelected = false;
-                }
 
                 model.Add(userroleviewmodel);
-
             }
 
             return View(model);
-
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditUsersInRole(String roleId, List<UserRoleViewModel> model)
+        public async Task<IActionResult> EditUsersInRole(string roleId, List<UserRoleViewModel> model)
         {
-
             var role = await roleManager.FindByIdAsync(roleId);
 
-            if(role == null)
-            {
-                return NotFound();
-            }
+            if (role == null) return NotFound();
 
-            for(int i = 0; i < model.Count; i++)
+            for (var i = 0; i < model.Count; i++)
             {
                 var user = await userManager.FindByIdAsync(model[i].UserId);
 
                 IdentityResult results = null;
 
-                if(model[i].IsSelected && !(await userManager.IsInRoleAsync(user, role.Name)))
-                {
+                if (model[i].IsSelected && !await userManager.IsInRoleAsync(user, role.Name))
                     results = await userManager.AddToRoleAsync(user, role.Name);
-                }
-                else if(!model[i].IsSelected && await userManager.IsInRoleAsync(user, role.Name))
-                {
+                else if (!model[i].IsSelected && await userManager.IsInRoleAsync(user, role.Name))
                     results = await userManager.RemoveFromRoleAsync(user, role.Name);
-                }
                 else
-                {
                     continue;
-                }
 
-                if(results.Succeeded)
+                if (results.Succeeded)
                 {
-                    if(i < model.Count - 1)
-                    {
+                    if (i < model.Count - 1)
                         continue;
-                    } 
-                    else
-                    {
-                        return RedirectToAction("EditRole", new { Id = roleId});
-                    }
+                    return RedirectToAction("EditRole", new {Id = roleId});
                 }
-
             }
 
-            return RedirectToAction("EditRole", new { Id = roleId });
+            return RedirectToAction("EditRole", new {Id = roleId});
         }
     }
 }
-

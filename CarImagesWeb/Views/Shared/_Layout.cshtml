@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="~/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
     <!-- iCheck for checkboxes and radio inputs -->
     <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
-    @RenderSection("Styles", required: false)
+    @RenderSection("Styles", false)
     <!-- Theme style -->
     <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
     <link rel="stylesheet" href="~/css/site.css"/>
@@ -45,7 +45,7 @@
                         <a asp-action="Gallery" asp-controller="Images" class="nav-link">Gallery</a>
                     </li>
                     <li class="nav-item">
-                        <a asp-action="Index" asp-controller="Assets" class="nav-link">Assets</a>
+                        <a asp-action="List" asp-controller="Assets" class="nav-link">Assets</a>
                     </li>
                     <li class="nav-item">
                         <a asp-action="ListTags" asp-controller="Tags" class="nav-link">Tags</a>
@@ -98,7 +98,7 @@
 <script src="~/dist/js/adminlte.min.js"></script>
 <!-- Select2 -->
 <script src="~/plugins/select2/js/select2.full.min.js"></script>
-@await RenderSectionAsync("Scripts", required: false)
+@await RenderSectionAsync("Scripts", false)
 <script>
 (function () {
  //Initialize Select2 Elements

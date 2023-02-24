@@ -17,7 +17,7 @@ namespace CarImagesWeb.ApiControllers
         {
             _assetRepository = assetRepository;
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetAssets()
         {
@@ -26,23 +26,15 @@ namespace CarImagesWeb.ApiControllers
             var containers = new List<Asset>();
             // divide assets into vehicles and containers based on their type
             foreach (var asset in assets)
-            {
                 if (asset.Type == AssetType.Vehicle.ToString())
-                {
                     vehicles.Add(asset);
-                }
-                else if (asset.Type == AssetType.Container.ToString())
-                {
-                    containers.Add(asset);
-                }
-            }
-            
+                else if (asset.Type == AssetType.Container.ToString()) containers.Add(asset);
+
             return Json(new
             {
                 data = new
                 {
-                    vehicles = vehicles, 
-                    containers = containers
+                    vehicles, containers
                 }
             });
         }

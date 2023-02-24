@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
+using Azure;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -16,39 +17,41 @@ namespace CarImagesWeb.ApiControllers
         {
             _imagesHandler = imagesHandler;
         }
-        
+
         [HttpPost]
-        public async Task<IActionResult> Upload([FromForm]ImageUploadDto dto)
+        public async Task<IActionResult> Upload([FromForm] ImageUploadDto dto)
         {
             try
             {
                 await _imagesHandler.HandleUpload(dto);
             }
-            catch (Azure.RequestFailedException e)
+            catch (RequestFailedException e)
             {
                 Response.StatusCode = e.Status;
-                return Json(new { error = e.Message });
+                return Json(new {error = e.Message});
             }
+
             return Ok();
         }
-        
+
         // TODO: Refactor and test this method
         [Obsolete]
         [HttpPost]
-        public async Task<IActionResult> Uploads([FromForm]ImageUploadDto dto)
+        public async Task<IActionResult> Uploads([FromForm] ImageUploadDto dto)
         {
             try
             {
                 await _imagesHandler.HandleUpload(dto, Request.Form.Files);
             }
-            catch (Azure.RequestFailedException e)
+            catch (RequestFailedException e)
             {
                 Response.StatusCode = e.Status;
-                return Json(new { error = e.Message });
+                return Json(new {error = e.Message});
             }
+
             return Ok();
         }
-        
+
 
         [HttpPost]
         public async Task<IActionResult> Search(ImageSearchDto dto)
@@ -56,14 +59,14 @@ namespace CarImagesWeb.ApiControllers
             var assetType = dto.AssetType;
             var assetId = dto.Asset;
             var tags = dto.Tags;
-            
+
             // find imageUploads by assetType and assetId and/or tags
             var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags);
-            
+
             // await _imagesHandler.HandleSearch();
-            return Json(new { data = imageUploads});
+            return Json(new {data = imageUploads});
         }
-        
+
         [HttpPost]
         public async Task Download([FromBody] string[] imageUrls)
         {
@@ -74,7 +77,5 @@ namespace CarImagesWeb.ApiControllers
             Response.Headers.Add("Content-Disposition", "attachment; filename='images.zip'");
             await Response.Body.WriteAsync(fileBytes, 0, fileBytes.Length);
         }
-
-        
     }
 }
