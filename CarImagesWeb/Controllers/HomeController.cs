@@ -18,7 +18,7 @@ namespace CarImagesWeb.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return RedirectToAction("Upload", "Images");
         }
 
         public IActionResult Privacy()
