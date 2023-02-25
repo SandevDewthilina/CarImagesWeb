@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System.Security.Claims;
+using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
+using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,17 +12,18 @@ namespace CarImagesWeb.ApiControllers
     [Route("api/[controller]/[action]")]
     public class TagsApiController : Controller
     {
-        private readonly ITagRepository _tagRepository;
+        private readonly ITagsHandler _tagsHandler;
 
-        public TagsApiController(ITagRepository tagRepository)
+        public TagsApiController(ITagsHandler tagsHandler)
         {
-            _tagRepository = tagRepository;
+            _tagsHandler = tagsHandler;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await _tagRepository.GetAllAsync();
+            var userRole = User.FindFirstValue(ClaimTypes.Role);
+            var tags = await _tagsHandler.GetTagsForRole(userRole);
             return Json(new
             {
                 data = new

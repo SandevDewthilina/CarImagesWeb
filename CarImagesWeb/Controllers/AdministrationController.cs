@@ -159,9 +159,13 @@ namespace CarImagesWeb.Controllers
 
             foreach (var tag in await _tagsHandler.GetTagsAsync())
             {
-                var roleTagViewModel = new RoleTagViewModel(tag);
+                var roleTagViewModel = new RoleTagViewModel
+                {
+                    Tag = tag,
+                    TagId = tag.Id
+                };
 
-                if (await _tagsHandler.IsTagInRole(tag, role))
+                if (await _tagsHandler.IsTagInRole(tag.Id, role))
                     roleTagViewModel.IsSelected = true;
                 else
                     roleTagViewModel.IsSelected = false;
@@ -181,14 +185,14 @@ namespace CarImagesWeb.Controllers
 
             foreach (var roleTagViewModel in model)
             {
-                var tag = roleTagViewModel.Tag;
-
+                var tagId = roleTagViewModel.TagId;
+                var tag = await _tagsHandler.GetTagAsync(tagId);
                 switch (roleTagViewModel.IsSelected)
                 {
-                    case true when !await _tagsHandler.IsTagInRole(tag, role):
+                    case true when !await _tagsHandler.IsTagInRole(tagId, role):
                         await _tagsHandler.AddTagToRoleAsync(tag, role);
                         break;
-                    case false when await _tagsHandler.IsTagInRole(tag, role):
+                    case false when await _tagsHandler.IsTagInRole(tagId, role):
                         await _tagsHandler.RemoveTagFromRoleAsync(tag, role);
                         break;
                     default:

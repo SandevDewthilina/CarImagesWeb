@@ -130,14 +130,14 @@ namespace CarImagesWeb.DbOperations
             await _context.SaveChangesAsync();
         }
 
-        private static IQueryable<T> BuildQueryable(IQueryable<T> queryable, IEnumerable<string> includes)
+        public static IQueryable<T> BuildQueryable(IQueryable<T> queryable, IEnumerable<string> includes)
         {
             return includes == null
                 ? queryable
                 : includes.Aggregate(queryable, (current, include) => current.Include(include));
         }
 
-        private static IEnumerable<PropertyInfo> GetComplexProperties()
+        public static IEnumerable<PropertyInfo> GetComplexProperties()
         {
             // Get all the properties of T
             var properties = typeof(T).GetProperties();

@@ -47,6 +47,8 @@ namespace CarImagesWeb
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
+            services.AddScoped<IRoleTagRepository, RoleTagRepository>(); 
+            
             // Add handler services
             services.AddScoped<IAssetsHandler, AssetsHandler>();
             services.AddScoped<ITagsHandler, TagsHandler>();

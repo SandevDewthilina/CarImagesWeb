@@ -1,7 +1,6 @@
 ﻿@model List<CarImagesWeb.ViewModels.RoleViewModels.RoleTagViewModel>
 
 @{
-    ViewBag.Title = "Edit Tags In Role";
     var roleId = ViewBag.roleId;
 }
 
@@ -29,19 +28,20 @@
     <!-- Main content -->
     <section class="content">
 
-        <form asp-action="EditTagsInRole" method="post">
+        <form asp-action="EditTagsInRole">
             <div class="card mb-3">
                 <div class="card-header">
                     <h2>Add or remove tags used by this role</h2>
                 </div>
                 <div class="card-body">
-                    @foreach (var tag in Model)
+                    @for (var index = 0; index < Model.Count; index++)
                     {
+                        var tag = Model[index];
                         <div class="form-check m-1">
-                            <input asp-for="@tag.TagId" type="hidden">
-                            <input asp-for="@tag.IsSelected" class="form-check-input">
-                            <label class="form-check-label" asp-for="@tag.IsSelected">
-                                @tag.ToString()
+                            <input asp-for="@Model[index].TagId" type="hidden">
+                            <input asp-for="@Model[index].IsSelected" class="form-check-input">
+                            <label class="form-check-label" asp-for="@Model[index].IsSelected">
+                                @Model[index].Tag.ToString()
                             </label>
                         </div>
                     }

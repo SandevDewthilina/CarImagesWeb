@@ -34,14 +34,14 @@
                     <h2>Add or remove users in this role</h2>
                 </div>
                 <div class="card-body">
-                    @foreach (var user in Model)
+                    @for (var index = 0; index < Model.Count; index++)
                     {
                         <div class="form-check m-1">
-                            <input asp-for="@user.Username" type="hidden">
-                            <input asp-for="@user.UserId" type="hidden">
-                            <input asp-for="@user.IsSelected" class="form-check-input">
-                            <label class="form-check-label" asp-for="@user.IsSelected">
-                                @user.Username
+                            <input asp-for="@Model[index].Username" type="hidden">
+                            <input asp-for="@Model[index].UserId" type="hidden">
+                            <input asp-for="@Model[index].IsSelected" class="form-check-input">
+                            <label class="form-check-label" asp-for="@Model[index].IsSelected">
+                                @Model[index].Username
                             </label>
                         </div>
                     }
