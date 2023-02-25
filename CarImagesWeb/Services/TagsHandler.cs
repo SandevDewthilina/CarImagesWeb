@@ -28,11 +28,13 @@ namespace CarImagesWeb.Services
         Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto);
 
         Task<bool> IsTagInRole(int tag, UserRole role);
+        Task<bool> IsTagInRole(Tag tag, UserRole role);
         Task<UserRoleTagMapping> AddTagToRoleAsync(Tag tag, UserRole role);
         Task RemoveTagFromRoleAsync(Tag tag, UserRole role);
         Task<List<Tag>> TagsInRole(UserRole role);
         Task<Tag> GetTagAsync(int tagId);
         Task<IEnumerable<Tag>> GetTagsForRole(string userRole);
+        Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles);
     }
 
     public class TagsHandler : ITagsHandler
@@ -70,6 +72,12 @@ namespace CarImagesWeb.Services
                 rt => rt.UserRole.Id == role.Id && rt.TagId == tagId) != null;
         }
 
+        public async Task<bool> IsTagInRole(Tag tag, UserRole role)
+        {
+            return await _roleTagRepository.GetAsync(
+                rt => rt.UserRole.Id == role.Id && rt.TagId == tag.Id) != null;
+        }
+
         public async Task<UserRoleTagMapping> AddTagToRoleAsync(Tag tag, UserRole role)
         {
             var roleTag = new UserRoleTagMapping(tag, role);
@@ -100,6 +108,24 @@ namespace CarImagesWeb.Services
             var roleTags = await _roleTagRepository
                 .FindAsync(rt => rt.UserRole.Name == userRole);
             return roleTags.Select(rt => rt.Tag);
+        }
+
+        public async Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles)
+        {
+            // get all tags for each role
+            // add to the list of tags if it is not already in the list
+            var tags = new List<Tag>();
+            foreach (var userRole in userRoles)
+            {
+                var roleTags = await GetTagsForRole(userRole);
+                foreach (var roleTag in roleTags)
+                {
+                    if (!tags.Contains(roleTag))
+                        tags.Add(roleTag);
+                }
+            }
+
+            return tags;
         }
     }
 }

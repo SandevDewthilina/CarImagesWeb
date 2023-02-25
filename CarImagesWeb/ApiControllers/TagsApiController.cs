@@ -1,6 +1,5 @@
-﻿using System.Security.Claims;
-using System.Threading.Tasks;
-using CarImagesWeb.DbOperations;
+﻿using System.Threading.Tasks;
+using CarImagesWeb.Helpers;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -22,8 +21,8 @@ namespace CarImagesWeb.ApiControllers
         [HttpGet]
         public async Task<IActionResult> GetTags()
         {
-            var userRole = User.FindFirstValue(ClaimTypes.Role);
-            var tags = await _tagsHandler.GetTagsForRole(userRole);
+            var userRoles = UserHelper.GetRolesOfUser(User);
+            var tags = await _tagsHandler.GetTagsForRoles(userRoles);
             return Json(new
             {
                 data = new
