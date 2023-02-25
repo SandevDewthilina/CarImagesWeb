@@ -34,5 +34,20 @@ namespace CarImagesWeb.ApiControllers
                 }
             });
         }
+        
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> GetTagsForRoles(List<string> roles)
+        {
+            var userRoles = roles == null || !roles.Any() ? UserHelper.GetRolesOfUser(User) : roles;
+            var tags = await _tagsHandler.GetTagsForRoles(userRoles);
+            return Json(new
+            {
+                data = new
+                {
+                    tags
+                }
+            });
+        }
     }
 }
