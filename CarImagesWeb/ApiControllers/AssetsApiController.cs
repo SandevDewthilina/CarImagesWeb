@@ -20,6 +20,7 @@ namespace CarImagesWeb.ApiControllers
             _assetRepository = assetRepository;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetAssets()
         {

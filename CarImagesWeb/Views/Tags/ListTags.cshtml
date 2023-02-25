@@ -37,8 +37,8 @@
                                     <h5 class="card-text">@tag.Code</h5>
                                 </div>
                                 <div class="card-footer">
-                                    <a asp-route-id="@tag.Id" class="btn btn-warning">Edit</a>
-                                    <a href="#" class="btn btn-danger">Delete</a>
+                                    <a asp-route-id="@tag.Id" asp-action="EditTag" class="btn btn-warning">Edit</a>
+                                    <a asp-route-id="@tag.Id" asp-action="DeleteTag" class="btn btn-danger">Delete</a>
                                 </div>
                             </div>
                         </div>

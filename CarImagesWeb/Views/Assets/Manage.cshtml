@@ -1,104 +1,127 @@
 ﻿@model CarImagesWeb.ViewModels.UpdateAssetsViewModel
 
 @{
-    ViewData["Title"] = "Assets";
+    ViewData["Title"] = "Manage";
 }
 
-<div class="container py-3">
-    <div class="card card-primary">
-        <div class="card-header">
-            <h3 class="card-title">Update New Assets</h3>
-        </div>
-        <!-- /.card-header -->
-        <!-- form start -->
-        <form action="Manage" method="post" enctype="multipart/form-data">
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="sheet">File input</label>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input asp-for="File" type="file" accept="text/*, 
-                                application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                   class="custom-file-input" id="sheet">
-                            <label asp-for="File" class="custom-file-label" for="sheet" id="sheet-name">
-                                Choose file
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <div class="text-danger">
-                            <ul>
-                                @{
-                                    var errors = ViewData.ModelState["Reset"]?.Errors;
-                                    if (errors != null)
-                                    {
-                                        foreach (var error in errors)
-                                        {
-                                            <li>@error.ErrorMessage</li>
-                                        }
-                                    }
-                                }
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- /.card-body -->
-
-            <div class="card-footer">
-                <input type="checkbox" asp-for="IsReset" checked hidden/>
-                <button type="submit" class="btn btn-primary">Upload</button>
-            </div>
-        </form>
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <div class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2 justify-content-center">
+                <div class="col-12 col-md-10">
+                    <ol class="breadcrumb float-sm-right">
+                        <li class="breadcrumb-item">
+                            <a asp-action="List">Assets</a>
+                        </li>
+                        <li class="breadcrumb-item active">@ViewData["Title"]</li>
+                    </ol>
+                </div><!-- /.col -->
+            </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
     </div>
-    <!-- /.card -->
-    <div class="card card-danger">
-        <div class="card-header">
-            <h3 class="card-title">Delete Specific Assets</h3>
-        </div>
-        <!-- /.card-header -->
-        <!-- form start -->
-        <form action="Manage" method="post" enctype="multipart/form-data">
-            <div class="card-body">
-                <div class="form-group">
-                    <label for="sheet">File input</label>
-                    <div class="input-group">
-                        <div class="custom-file">
-                            <input asp-for="DeleteFile" type="file" accept="text/*, 
-                                    application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                   class="custom-file-input" id="delete-sheet">
-                            <label asp-for="DeleteFile" class="custom-file-label" for="sheet" id="delete-sheet-name">
-                                Choose file
-                            </label>
-                        </div>
-                    </div>
-                    <div class="mt-2">
-                        <div class="text-danger">
-                            <ul>
-                                @{
-                                    var errors = ViewData.ModelState["Delete"]?.Errors;
-                                    if (errors != null)
-                                    {
-                                        foreach (var error in errors)
-                                        {
-                                            <li>@error.ErrorMessage</li>
-                                        }
-                                    }
-                                }
-                            </ul>
-                        </div>
-                    </div>
+    <!-- /.content-header -->
+    <!-- Main content -->
+    <section class="content">
+        <div class="container py-3">
+            <div class="card card-primary">
+                <div class="card-header">
+                    <h3 class="card-title">Update New Assets</h3>
                 </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form action="Manage" method="post" enctype="multipart/form-data">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="sheet">File input</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input asp-for="File" type="file" accept="text/*, 
+                                        application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                           class="custom-file-input" id="sheet">
+                                    <label asp-for="File" class="custom-file-label" for="sheet" id="sheet-name">
+                                        Choose file
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="text-danger">
+                                    <ul>
+                                        @{
+                                            var errors = ViewData.ModelState["Reset"]?.Errors;
+                                            if (errors != null)
+                                            {
+                                                foreach (var error in errors)
+                                                {
+                                                    <li>@error.ErrorMessage</li>
+                                                }
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+        
+                    <div class="card-footer">
+                        <input type="checkbox" asp-for="IsReset" checked hidden/>
+                        <button type="submit" class="btn btn-primary">Upload</button>
+                    </div>
+                </form>
             </div>
-            <!-- /.card-body -->
-
-            <div class="card-footer">
-                <input type="checkbox" asp-for="IsReset" hidden/>
-                <button type="submit" class="btn btn-danger">Upload</button>
+            <!-- /.card -->
+            <div class="card card-danger">
+                <div class="card-header">
+                    <h3 class="card-title">Delete Specific Assets</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form action="Manage" method="post" enctype="multipart/form-data">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="sheet">File input</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input asp-for="DeleteFile" type="file" accept="text/*, 
+                                            application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                           class="custom-file-input" id="delete-sheet">
+                                    <label asp-for="DeleteFile" class="custom-file-label" for="sheet" id="delete-sheet-name">
+                                        Choose file
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="text-danger">
+                                    <ul>
+                                        @{
+                                            var errors = ViewData.ModelState["Delete"]?.Errors;
+                                            if (errors != null)
+                                            {
+                                                foreach (var error in errors)
+                                                {
+                                                    <li>@error.ErrorMessage</li>
+                                                }
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+        
+                    <div class="card-footer">
+                        <input type="checkbox" asp-for="IsReset" hidden/>
+                        <button type="submit" class="btn btn-danger">Upload</button>
+                    </div>
+                </form>
             </div>
-        </form>
-    </div>
-        <!-- /.card -->
+                <!-- /.card -->
+        </div>
+    </section>
+    <!-- /.content -->
 </div>
 
 @section Scripts
