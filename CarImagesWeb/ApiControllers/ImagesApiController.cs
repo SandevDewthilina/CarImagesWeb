@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Azure;
 using CarImagesWeb.DTOs;
@@ -76,12 +78,31 @@ namespace CarImagesWeb.ApiControllers
             var assetType = dto.AssetType;
             var assetId = dto.Asset;
             var tags = dto.Tags;
+            var countryCode = dto.Country;
 
             // find imageUploads by assetType and assetId and/or tags
-            var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags);
-
+            var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags, countryCode);
+            
+            // make list of anonymous objects of imageUploads and their thumbnails
+            var data = new List<object>();
+            foreach (var imageUpload in imageUploads)
+            {
+                var thumbnail = _imagesHandler.GetImageThumbnailUrl(imageUpload);
+                data.Add(new
+                {
+                    url = thumbnail,
+                    imageData = new
+                    {
+                        country = imageUpload.Country.Name,
+                        asset = imageUpload.Asset.Name,
+                        tag = imageUpload.Tag.Name,
+                    },
+                    downloadUrl = _imagesHandler.GetImageUrlFromThumbnail(thumbnail)
+                });
+            }
+            
             // await _imagesHandler.HandleSearch();
-            return Json(new {data = imageUploads});
+            return Json(new {data = data });
         }
 
         /// <summary>

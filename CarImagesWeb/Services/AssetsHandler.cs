@@ -75,6 +75,11 @@ namespace CarImagesWeb.Services
             return asset;
         }
 
+        /// <summary>
+        /// Add or update the assets from the csv file based on the asset code.
+        /// </summary>
+        /// <param name="fileInput"></param>
+        /// <param name="errorHandleCallback"></param>
         public async Task ResetAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback)
         {
             // async callback function to delete all the assets from the database and add the new assets
@@ -82,30 +87,37 @@ namespace CarImagesWeb.Services
             {
                 //find existing assets by name and code
                 var existingAssets = await _repository.FindAsync(
-                        a => assets.Select(asset => asset.Name).Contains(a.Name) 
-                             && assets.Select(asset => asset.Code).Contains(a.Code));
-                
-                if(existingAssets.Any())
+                        a => assets.Select(asset => asset.Code).Contains(a.Code));
+
+                if (existingAssets.Any())
+                {
+                    // update the existing assets from the relevant assets
+                    foreach (var asset in existingAssets)
+                    {
+                        var relevantAsset = assets.FirstOrDefault(a => a.Code == asset.Code);
+                        if (relevantAsset == null) continue;
+                        asset.Name = relevantAsset.Name;
+                        asset.Type = relevantAsset.Type;
+                    }
                     await _repository.UpdateRangeAsync(existingAssets);
+                }
                 
                 //add the rest of the assets
                 var newAssets = assets.Where(
-                    a => !existingAssets.Select(asset => asset.Id).Contains(a.Id)).ToList();
+                    a => !existingAssets.Select(asset => asset.Code).Contains(a.Code)).ToList();
                 
                 if(newAssets.Any())
                     await _repository.AddRangeAsync(newAssets);
-                
-                //delete the assets that are not in the new list
-                var assetsToDelete = existingAssets.Where(
-                    a => !assets.Select(asset => asset.Id).Contains(a.Id)).ToList();
-                
-                if(assetsToDelete.Any())
-                    await _repository.DeleteRangeAsync(assetsToDelete);
             }
             
             await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation);
         }
         
+        /// <summary>
+        /// Delete the assets with the same name and code from the database that are in the file 
+        /// </summary>
+        /// <param name="fileInput"></param>
+        /// <param name="errorHandleCallback"></param>
         public async Task DeleteAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback)
         {
             // async callback function to delete the assets from the database

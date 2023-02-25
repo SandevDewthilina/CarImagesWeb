@@ -2,6 +2,7 @@
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.ViewModels;
+using CarImagesWeb.ViewModels.TagViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,5 +42,48 @@ namespace CarImagesWeb.Controllers
             var tags = await _tagRepository.GetAllAsync();
             return View(tags);
         }
+        
+        [HttpGet]
+        public async Task<IActionResult> EditTag(int id)
+        {
+            var tag = await _tagRepository.GetAsync(t => t.Id == id);
+            if (tag is null) return NotFound();
+
+            var model = new EditTagViewModel
+            {
+                Id = tag.Id,
+                Name = tag.Name,
+                Code = tag.Code
+            };
+
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> EditTag(EditTagViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            var tag = await _tagRepository.GetAsync(t => t.Id == model.Id);
+            if (tag is null) return NotFound();
+
+            tag.Name = model.Name;
+
+            await _tagRepository.UpdateAsync(tag);
+
+            return RedirectToAction("ListTags", "Tags");
+        }
+        
+        public async Task<IActionResult> DeleteTag(int id)
+        {
+            var tag = await _tagRepository.GetAsync(t => t.Id == id);
+            if (tag is null) return NotFound();
+
+            await _tagRepository.DeleteAsync(tag);
+
+            return RedirectToAction("ListTags", "Tags");
+        }
     }
+
+    
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
@@ -25,7 +26,7 @@ namespace CarImagesWeb.Services
         /// <returns></returns>
         Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls);
 
-        Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
+        Task<List<ImageUpload>> HandleSearch(string assetType, string assetId, List<string> tags, string countryCode);
 
         /// <summary>
         ///     Get the asset directory for the given asset code, country code and tag name
@@ -144,31 +145,51 @@ namespace CarImagesWeb.Services
             return $"{_containerUrl}/{assetDirectory}/{GetThumbnailName(imageUpload.FileName)}";
         }
 
-        public async Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags)
+        public async Task<List<ImageUpload>> HandleSearch(string assetType, string assetId, List<string> tags,
+            string countryCode)
         {
             // Get the asset from the database
             var tagIds = tags.Select(int.Parse).ToList();
             List<ImageUpload> uploads;
+            Expression<Func<ImageUpload, bool>> expression;
             if (assetId != string.Empty || tagIds.Count == 0)
             {
                 var asset = int.Parse(assetId);
-                uploads = await _imagesRepository.FindAsync(
-                    i => i.AssetId == asset && i.Asset.Type == assetType);
+                expression = i => i.AssetId == asset && i.Asset.Type == assetType;
+                if(countryCode != string.Empty)
+                {
+                    // aggregate the countryCode to the expression
+                    expression = i => i.AssetId == asset && i.Asset.Type == assetType 
+                                                         && i.Country.Code == countryCode;
+                }
             }
             else if (assetId == string.Empty && tagIds.Count > 0)
             {
-                uploads = await _imagesRepository.FindAsync(
-                    i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType);
+                expression = i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType;
+                if(countryCode != string.Empty)
+                {
+                    // aggregate the countryCode to the expression
+                    expression = i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType 
+                                                               && i.Country.Code == countryCode;
+                }
             }
             else
             {
                 var asset = int.Parse(assetId);
-                uploads = await _imagesRepository.FindAsync(
-                    i => i.AssetId == asset && tagIds.Contains(i.TagId) && i.Asset.Type == assetType);
+                expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
+                                                     && i.Asset.Type == assetType;
+                if(countryCode != string.Empty)
+                {
+                    // aggregate the countryCode to the expression
+                    expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
+                                                         && i.Asset.Type == assetType && i.Country.Code == countryCode;
+                }
             }
-                
 
-            return uploads.Select(GetImageThumbnailUrl).ToList();
+            uploads = await _imagesRepository.FindAsync(
+                expression);
+
+            return uploads.ToList();
         }
 
         public async Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls)
