@@ -25,7 +25,7 @@ namespace CarImagesWeb.Services
         /// <returns></returns>
         Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls);
 
-        Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
+        Task<List<ImageUpload>> HandleSearch(string assetType, string assetId, List<string> tags);
 
         /// <summary>
         ///     Get the asset directory for the given asset code, country code and tag name
@@ -144,7 +144,7 @@ namespace CarImagesWeb.Services
             return $"{_containerUrl}/{assetDirectory}/{GetThumbnailName(imageUpload.FileName)}";
         }
 
-        public async Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags)
+        public async Task<List<ImageUpload>> HandleSearch(string assetType, string assetId, List<string> tags)
         {
             // Get the asset from the database
             var tagIds = tags.Select(int.Parse).ToList();
@@ -168,7 +168,7 @@ namespace CarImagesWeb.Services
             }
                 
 
-            return uploads.Select(GetImageThumbnailUrl).ToList();
+            return uploads.ToList();
         }
 
         public async Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls)

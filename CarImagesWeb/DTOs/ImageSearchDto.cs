@@ -12,5 +12,6 @@ namespace CarImagesWeb.DTOs
 
         //asset type (vehicle, container)  
         public string AssetType { get; set; }
+        public string Country { get; set; }
     }
 }

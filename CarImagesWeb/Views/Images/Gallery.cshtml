@@ -5,11 +5,11 @@
   .gallery{
     display: grid;
     grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
     /* max 5 columns min 2 columns */
   }
   .image-container{
-  padding: 5px;
-  width: 100%;
+    width: 100%;
     position: relative;
     height: auto;
   }
@@ -119,14 +119,35 @@
             </div>
             <div class="row my-2">
                 <div class="gallery col-12">
-                    <div v-for="(image,index) in images" v-bind:key="image" class="image-container">
-                        <div class="download-check-box icheck-primary">
-                            <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
-                                   v-bind:name="'img-'+index" alt="" hidden>
-                            <label v-bind:for="'img-'+index"></label>
+                    <div v-for="(image,index) in images" v-bind:key="image" class="image-container card">
+                        <div class="card-body p-1">
+                            <div class="download-check-box icheck-primary">
+                                <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
+                                       v-bind:name="'img-'+index" alt="" hidden>
+                                <label v-bind:for="'img-'+index"></label>
+                            </div>
+                            <div class="image border">
+                                <img v-bind:src="image.url" alt="">
+                            </div>
+                            
                         </div>
-                        <div class="image border border-dark">
-                            <img v-bind:src="image.url" alt="">
+                        <div class="card-footer p-2">
+                            <div class="image-info d-flex pr-3">
+                                <div class="col-11">
+                                    <div class="row">
+                                        <div class="badge badge-primary mr-1 mb-1">Country:{{image.country}}</div>
+                                        <div class="badge badge-info mr-1 mb-1">Asset:{{image.asset}}</div>
+                                        <div class="badge badge-warning mr-1 mb-1">Tag:{{image.tag}}</div>
+                                    </div>
+                                </div>
+                                <div class="col-1 d-flex flex-column justify-content-center">
+                                    <a v-bind:href="image.downloadUrl" target="_blank">
+                                        <span class="badge badge-success p-1">
+                                            <i class="fas fa-lg fa-arrow-alt-circle-down"></i>
+                                        </span>
+                                    </a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div v-if="images.length === 0 && initialSearch">

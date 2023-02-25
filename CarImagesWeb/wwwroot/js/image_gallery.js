@@ -1,7 +1,11 @@
 class Image {
-    constructor(url) {
-        this.url = url;
+    constructor(url, downloadUrl, imageData) {
         this.isSelected = false;
+        this.url = url;
+        this.country = imageData.country;
+        this.asset = imageData.asset ;
+        this.tag = imageData.tag;
+        this.downloadUrl = downloadUrl;
     }
 }
 
@@ -72,8 +76,9 @@ app = Vue.createApp({
                 this.setSearching(true);
                 this._getImages(SEARCH_URL, searchParams).then(data => {
                     this._images = [];
-                    data.forEach(url => {
-                        this._images.push(new Image(url));
+                    // TODO: update Image class to include assetType, asset, country , tags and imageUrl as well
+                    data.forEach(obj => {
+                        this._images.push(new Image(obj.url, obj.downloadUrl, obj.imageData));
                     });
                 }).finally(() => {
                     this.setSearching(false)
