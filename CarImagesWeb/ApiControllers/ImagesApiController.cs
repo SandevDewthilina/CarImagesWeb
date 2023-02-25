@@ -78,10 +78,10 @@ namespace CarImagesWeb.ApiControllers
             var assetType = dto.AssetType;
             var assetId = dto.Asset;
             var tags = dto.Tags;
-            var countryId = dto.Country;
+            var countryCode = dto.Country;
 
             // find imageUploads by assetType and assetId and/or tags
-            var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags);
+            var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags, countryCode);
             
             // make list of anonymous objects of imageUploads and their thumbnails
             var data = new List<object>();

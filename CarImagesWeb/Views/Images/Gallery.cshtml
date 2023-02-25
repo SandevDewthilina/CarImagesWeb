@@ -62,7 +62,21 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-lg-5 col-12">
+                        <div class="col-lg-3 col-12">
+                            <div class="form-group">
+                                <div class="form-group" id="CountryDropdown">
+                                    <label>Select Country</label>
+                                    <select id="Country"
+                                            class="form-control select2" name="Country" style="width: 100%;">
+                                        <option value="" selected="selected">Choose</option>
+                                        <option v-for="val in countries" v-bind:key="val" v-bind:value="val">
+                                            {{ val }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-12">
                             <div class="form-group">
                                 <div class="form-group" id="VehicleDropdown">
                                     <label>Select {{imageCategory || 'Assets'}}</label>
@@ -76,7 +90,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-5 col-12">
+                        <div class="col-lg-4 col-12">
                             <div class="form-group" id="TagDropdown">
                                 <label>Select Tags</label>
                                 <select id="AssetTags" class="select2" multiple="multiple"
