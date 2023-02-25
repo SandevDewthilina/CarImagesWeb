@@ -3,14 +3,16 @@ using System;
 using CarImagesWeb.DbContext;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CarImagesWeb.Migrations
 {
     [DbContext(typeof(CarImagesDbContext))]
-    partial class CarImagesDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230224161417_UseUserRole")]
+    partial class UseUserRole
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -187,15 +189,20 @@ namespace CarImagesWeb.Migrations
 
             modelBuilder.Entity("CarImagesWeb.Models.UserRoleTagMapping", b =>
                 {
-                    b.Property<string>("UserRoleId")
-                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+                    b.Property<int>("UserRoleId")
+                        .HasColumnType("int");
 
                     b.Property<int>("TagId")
                         .HasColumnType("int");
 
+                    b.Property<string>("UserRoleId1")
+                        .HasColumnType("varchar(255) CHARACTER SET utf8mb4");
+
                     b.HasKey("UserRoleId", "TagId");
 
                     b.HasIndex("TagId");
+
+                    b.HasIndex("UserRoleId1");
 
                     b.ToTable("UserRoleTagMappings");
                 });
@@ -387,9 +394,7 @@ namespace CarImagesWeb.Migrations
 
                     b.HasOne("CarImagesWeb.Models.UserRole", "UserRole")
                         .WithMany()
-                        .HasForeignKey("UserRoleId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("UserRoleId1");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

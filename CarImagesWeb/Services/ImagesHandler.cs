@@ -23,7 +23,7 @@ namespace CarImagesWeb.Services
         /// </summary>
         /// <param name="thumbnailUrls"></param>
         /// <returns></returns>
-        Task<byte[]> HandleDownload(IEnumerable<string> thumbnailUrls);
+        Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls);
 
         Task<List<string>> HandleSearch(string assetType, string assetId, List<string> tags);
 
@@ -171,7 +171,7 @@ namespace CarImagesWeb.Services
             return uploads.Select(GetImageThumbnailUrl).ToList();
         }
 
-        public async Task<byte[]> HandleDownload(IEnumerable<string> thumbnailUrls)
+        public async Task<byte[]> HandleDownloadFromThumbnails(IEnumerable<string> thumbnailUrls)
         {
             // Create a new memory stream for the zip file
             using var memoryStream = new MemoryStream();

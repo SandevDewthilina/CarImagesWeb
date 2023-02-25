@@ -33,7 +33,7 @@ namespace CarImagesWeb
                 options.UseMySql(Configuration.GetConnectionString("DefaultConnection")));
 
             // EFCore identity and set password validations  
-            services.AddIdentity<ApplicationUser, IdentityRole>(options =>
+            services.AddIdentity<ApplicationUser, UserRole>(options =>
             {
                 // options.Password.RequiredLength = 6;
                 // options.Password.RequireDigit = false;
@@ -47,6 +47,8 @@ namespace CarImagesWeb
             services.AddScoped<ITagRepository, TagRepository>();
             services.AddScoped<ICountryRepository, CountryRepository>();
             services.AddScoped<IImagesRepository, ImagesRepository>();
+            services.AddScoped<IRoleTagRepository, RoleTagRepository>(); 
+            
             // Add handler services
             services.AddScoped<IAssetsHandler, AssetsHandler>();
             services.AddScoped<ITagsHandler, TagsHandler>();

@@ -1,24 +1,28 @@
 ﻿using System.Threading.Tasks;
-using CarImagesWeb.DbOperations;
+using CarImagesWeb.Helpers;
+using CarImagesWeb.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class TagsApiController : Controller
     {
-        private readonly ITagRepository _tagRepository;
+        private readonly ITagsHandler _tagsHandler;
 
-        public TagsApiController(ITagRepository tagRepository)
+        public TagsApiController(ITagsHandler tagsHandler)
         {
-            _tagRepository = tagRepository;
+            _tagsHandler = tagsHandler;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetTags()
         {
-            var tags = await _tagRepository.GetAllAsync();
+            var userRoles = UserHelper.GetRolesOfUser(User);
+            var tags = await _tagsHandler.GetTagsForRoles(userRoles);
             return Json(new
             {
                 data = new

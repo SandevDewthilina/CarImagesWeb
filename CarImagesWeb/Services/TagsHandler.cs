@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
@@ -14,7 +15,7 @@ namespace CarImagesWeb.Services
         ///     Get all tags from the database
         /// </summary>
         /// <returns></returns>
-        Task<IEnumerable<Tag>> GetTagsAsync();
+        Task<List<Tag>> GetTagsAsync();
 
         /// <summary>
         ///     Search the database for the tag from the image upload dto.
@@ -25,29 +26,33 @@ namespace CarImagesWeb.Services
         /// </param>
         /// <returns></returns>
         Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto);
+
+        Task<bool> IsTagInRole(int tag, UserRole role);
+        Task<bool> IsTagInRole(Tag tag, UserRole role);
+        Task<UserRoleTagMapping> AddTagToRoleAsync(Tag tag, UserRole role);
+        Task RemoveTagFromRoleAsync(Tag tag, UserRole role);
+        Task<List<Tag>> TagsInRole(UserRole role);
+        Task<Tag> GetTagAsync(int tagId);
+        Task<IEnumerable<Tag>> GetTagsForRole(string userRole);
+        Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles);
     }
 
     public class TagsHandler : ITagsHandler
     {
-        private readonly ITagRepository _repository;
+        private readonly ITagRepository _tagRepository;
+        private readonly IRoleTagRepository _roleTagRepository;
 
-        public TagsHandler(ITagRepository repository)
+        public TagsHandler(ITagRepository tagRepository, IRoleTagRepository roleTagRepository)
         {
-            _repository = repository;
+            _tagRepository = tagRepository;
+            _roleTagRepository = roleTagRepository;
         }
-
-        /// <summary>
-        ///     <inheritdoc />
-        /// </summary>
-        /// <returns></returns>
-        public async Task<IEnumerable<Tag>> GetTagsAsync()
+        
+        public async Task<List<Tag>> GetTagsAsync()
         {
-            return await _repository.GetAllAsync();
+            return await _tagRepository.GetAllAsync();
         }
-
-        /// <summary>
-        ///     <inheritdoc />
-        /// </summary>
+        
         public async Task<Tag> GetTagToUpload(ImageUploadDto imageUploadDto)
         {
             //get the tag id based on the asset type
@@ -58,7 +63,69 @@ namespace CarImagesWeb.Services
                 _ => throw new NotImplementedException()
             };
 
-            return await _repository.GetAsync(t => t.Id == tagId);
+            return await _tagRepository.GetAsync(t => t.Id == tagId);
+        }
+
+        public async Task<bool> IsTagInRole(int tagId, UserRole role)
+        {
+            return await _roleTagRepository.GetAsync(
+                rt => rt.UserRole.Id == role.Id && rt.TagId == tagId) != null;
+        }
+
+        public async Task<bool> IsTagInRole(Tag tag, UserRole role)
+        {
+            return await _roleTagRepository.GetAsync(
+                rt => rt.UserRole.Id == role.Id && rt.TagId == tag.Id) != null;
+        }
+
+        public async Task<UserRoleTagMapping> AddTagToRoleAsync(Tag tag, UserRole role)
+        {
+            var roleTag = new UserRoleTagMapping(tag, role);
+            return await _roleTagRepository.AddAsync(roleTag);
+        }
+
+        public async Task RemoveTagFromRoleAsync(Tag tag, UserRole role)
+        {
+            var roleTag = await _roleTagRepository.GetAsync(
+                rt => rt.UserRoleId == role.Id && rt.TagId == tag.Id);
+            await _roleTagRepository.DeleteAsync(roleTag);
+        }
+
+        public async Task<List<Tag>> TagsInRole(UserRole role)
+        {
+            var roleTags = await _roleTagRepository.FindAsync(
+                rt => rt.UserRoleId == role.Id);
+            return roleTags.Select(r => r.Tag).ToList();
+        }
+
+        public async Task<Tag> GetTagAsync(int tagId)
+        {
+            return await _tagRepository.GetAsync(t => t.Id == tagId);
+        }
+
+        public async Task<IEnumerable<Tag>> GetTagsForRole(string userRole)
+        {
+            var roleTags = await _roleTagRepository
+                .FindAsync(rt => rt.UserRole.Name == userRole);
+            return roleTags.Select(rt => rt.Tag);
+        }
+
+        public async Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles)
+        {
+            // get all tags for each role
+            // add to the list of tags if it is not already in the list
+            var tags = new List<Tag>();
+            foreach (var userRole in userRoles)
+            {
+                var roleTags = await GetTagsForRole(userRole);
+                foreach (var roleTag in roleTags)
+                {
+                    if (!tags.Contains(roleTag))
+                        tags.Add(roleTag);
+                }
+            }
+
+            return tags;
         }
     }
 }

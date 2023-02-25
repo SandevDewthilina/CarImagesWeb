@@ -3,10 +3,12 @@ using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]/[action]")]
     public class AssetsApiController : Controller

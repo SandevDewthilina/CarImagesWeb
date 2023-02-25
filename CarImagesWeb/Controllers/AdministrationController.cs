@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.Threading.Tasks;
 using CarImagesWeb.Models;
+using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels.RoleViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Hosting;
 
 namespace CarImagesWeb.Controllers
 {
     [Authorize(Roles = "Admin")]
     public class AdministrationController : Controller
     {
-        private readonly IHostApplicationLifetime appLifetime;
-        private readonly RoleManager<IdentityRole> roleManager;
-        private readonly UserManager<ApplicationUser> userManager;
+        private readonly ITagsHandler _tagsHandler;
+        private readonly RoleManager<UserRole> _roleManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public AdministrationController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager,
-            IHostApplicationLifetime appLifetime)
+        public AdministrationController(RoleManager<UserRole> roleManager, UserManager<ApplicationUser> userManager,
+            ITagsHandler tagsHandler)
         {
-            this.roleManager = roleManager;
-            this.userManager = userManager;
-            this.appLifetime = appLifetime;
+            _roleManager = roleManager;
+            _userManager = userManager;
+            _tagsHandler = tagsHandler;
         }
 
         public IActionResult CreateRole()
@@ -31,52 +30,30 @@ namespace CarImagesWeb.Controllers
             return View();
         }
 
-        public void Kill()
-        {
-            appLifetime.StopApplication();
-            //if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            //{
-            //    runCron();
-            //}
-        }
-
-        private string runCron()
-        {
-            var ps = new ProcessStartInfo();
-            ps.FileName = "/root/pub/start.sh";
-            ps.UseShellExecute = false;
-            ps.RedirectStandardOutput = true;
-
-            var process = Process.Start(ps);
-            process.WaitForExit();
-            return "Success";
-        }
-
         [HttpPost]
         public async Task<IActionResult> CreateRole(CreateRoleViewModel model)
         {
-            if (ModelState.IsValid)
-            {
-                var identityRole = new IdentityRole {Name = model.RoleName};
-                var result = await roleManager.CreateAsync(identityRole);
+            if (!ModelState.IsValid) return View(model);
+            
+            var userRole = new UserRole {Name = model.RoleName};
+            var result = await _roleManager.CreateAsync(userRole);
 
-                if (result.Succeeded) return RedirectToAction("ListRoles", "Administration");
+            if (result.Succeeded) return RedirectToAction("ListRoles", "Administration");
 
-                foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
-            }
+            foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
 
             return View(model);
         }
 
         public IActionResult ListRoles()
         {
-            var roles = roleManager.Roles;
+            var roles = _roleManager.Roles;
             return View(roles);
         }
 
         public async Task<IActionResult> EditRole(string id)
         {
-            var role = await roleManager.FindByIdAsync(id);
+            var role = await _roleManager.FindByIdAsync(id);
 
             if (role == null) return NotFound();
 
@@ -86,9 +63,11 @@ namespace CarImagesWeb.Controllers
                 RoleName = role.Name
             };
 
-            foreach (var user in await userManager.Users.ToListAsync())
-                if (await userManager.IsInRoleAsync(user, role.Name))
+            foreach (var user in await _userManager.Users.ToListAsync())
+                if (await _userManager.IsInRoleAsync(user, role.Name))
                     model.Users.Add(user.UserName);
+
+            model.Tags = await _tagsHandler.TagsInRole(role);
 
             return View(model);
         }
@@ -96,12 +75,12 @@ namespace CarImagesWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EditRole(EditRoleViewModel model)
         {
-            var role = await roleManager.FindByIdAsync(model.Id);
+            var role = await _roleManager.FindByIdAsync(model.Id);
 
             if (role == null) return NotFound();
 
             role.Name = model.RoleName;
-            var result = await roleManager.UpdateAsync(role);
+            var result = await _roleManager.UpdateAsync(role);
 
             if (result.Succeeded) return RedirectToAction("ListRoles");
 
@@ -115,26 +94,26 @@ namespace CarImagesWeb.Controllers
         {
             ViewBag.roleId = roleId;
 
-            var role = await roleManager.FindByIdAsync(roleId);
+            var role = await _roleManager.FindByIdAsync(roleId);
 
             if (role == null) return NotFound();
 
             var model = new List<UserRoleViewModel>();
 
-            foreach (var user in await userManager.Users.ToListAsync())
+            foreach (var user in await _userManager.Users.ToListAsync())
             {
-                var userroleviewmodel = new UserRoleViewModel
+                var userRoleViewModel = new UserRoleViewModel
                 {
                     UserId = user.Id,
                     Username = user.UserName
                 };
 
-                if (await userManager.IsInRoleAsync(user, role.Name))
-                    userroleviewmodel.IsSelected = true;
+                if (await _userManager.IsInRoleAsync(user, role.Name))
+                    userRoleViewModel.IsSelected = true;
                 else
-                    userroleviewmodel.IsSelected = false;
+                    userRoleViewModel.IsSelected = false;
 
-                model.Add(userroleviewmodel);
+                model.Add(userRoleViewModel);
             }
 
             return View(model);
@@ -143,28 +122,81 @@ namespace CarImagesWeb.Controllers
         [HttpPost]
         public async Task<IActionResult> EditUsersInRole(string roleId, List<UserRoleViewModel> model)
         {
-            var role = await roleManager.FindByIdAsync(roleId);
+            var role = await _roleManager.FindByIdAsync(roleId);
 
             if (role == null) return NotFound();
 
-            for (var i = 0; i < model.Count; i++)
+            foreach (var userRoleViewModel in model)
             {
-                var user = await userManager.FindByIdAsync(model[i].UserId);
+                var user = await _userManager.FindByIdAsync(userRoleViewModel.UserId);
 
-                IdentityResult results = null;
-
-                if (model[i].IsSelected && !await userManager.IsInRoleAsync(user, role.Name))
-                    results = await userManager.AddToRoleAsync(user, role.Name);
-                else if (!model[i].IsSelected && await userManager.IsInRoleAsync(user, role.Name))
-                    results = await userManager.RemoveFromRoleAsync(user, role.Name);
-                else
-                    continue;
-
-                if (results.Succeeded)
+                switch (userRoleViewModel.IsSelected)
                 {
-                    if (i < model.Count - 1)
+                    case true when !await _userManager.IsInRoleAsync(user, role.Name):
+                        await _userManager.AddToRoleAsync(user, role.Name);
+                        break;
+                    case false when await _userManager.IsInRoleAsync(user, role.Name):
+                        await _userManager.RemoveFromRoleAsync(user, role.Name);
+                        break;
+                    default:
                         continue;
-                    return RedirectToAction("EditRole", new {Id = roleId});
+                }
+            }
+
+            return RedirectToAction("EditRole", new {Id = roleId});
+        }
+        
+        [HttpGet]
+        public async Task<IActionResult> EditTagsInRole(string roleId)
+        {
+            ViewBag.roleId = roleId;
+
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            if (role == null) return NotFound();
+
+            var model = new List<RoleTagViewModel>();
+
+            foreach (var tag in await _tagsHandler.GetTagsAsync())
+            {
+                var roleTagViewModel = new RoleTagViewModel
+                {
+                    Tag = tag,
+                    TagId = tag.Id
+                };
+
+                if (await _tagsHandler.IsTagInRole(tag.Id, role))
+                    roleTagViewModel.IsSelected = true;
+                else
+                    roleTagViewModel.IsSelected = false;
+
+                model.Add(roleTagViewModel);
+            }
+
+            return View(model);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> EditTagsInRole(string roleId, List<RoleTagViewModel> model)
+        {
+            var role = await _roleManager.FindByIdAsync(roleId);
+
+            if (role == null) return NotFound();
+
+            foreach (var roleTagViewModel in model)
+            {
+                var tagId = roleTagViewModel.TagId;
+                var tag = await _tagsHandler.GetTagAsync(tagId);
+                switch (roleTagViewModel.IsSelected)
+                {
+                    case true when !await _tagsHandler.IsTagInRole(tag, role):
+                        await _tagsHandler.AddTagToRoleAsync(tag, role);
+                        break;
+                    case false when await _tagsHandler.IsTagInRole(tag, role):
+                        await _tagsHandler.RemoveTagFromRoleAsync(tag, role);
+                        break;
+                    default:
+                        continue;
                 }
             }
 

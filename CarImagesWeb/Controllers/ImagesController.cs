@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using CarImagesWeb.Helpers;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -24,12 +25,12 @@ namespace CarImagesWeb.Controllers
         [HttpGet]
         public async Task<IActionResult> Upload()
         {
-            //TODO: optimize this
+            var userRoles = UserHelper.GetRolesOfUser(User);
             var viewModel = new ImageUploadViewModel
             {
                 Vehicles = await _assetsHandler.GetVehiclesAsync(),
                 Containers = await _assetsHandler.GetContainersAsync(),
-                Tags = await _tagsHandler.GetTagsAsync(),
+                Tags = await _tagsHandler.GetTagsForRoles(userRoles),
                 CountryCodes = await _countryHandler.GetCountryCodesAsync()
             };
             return View(viewModel);
