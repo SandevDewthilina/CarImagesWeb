@@ -189,10 +189,10 @@ namespace CarImagesWeb.Controllers
                 var tag = await _tagsHandler.GetTagAsync(tagId);
                 switch (roleTagViewModel.IsSelected)
                 {
-                    case true when !await _tagsHandler.IsTagInRole(tagId, role):
+                    case true when !await _tagsHandler.IsTagInRole(tag, role):
                         await _tagsHandler.AddTagToRoleAsync(tag, role);
                         break;
-                    case false when await _tagsHandler.IsTagInRole(tagId, role):
+                    case false when await _tagsHandler.IsTagInRole(tag, role):
                         await _tagsHandler.RemoveTagFromRoleAsync(tag, role);
                         break;
                     default:

@@ -46,7 +46,7 @@ namespace CarImagesWeb.Controllers
             return View(registerViewModel);
         }
 
-
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
@@ -72,7 +72,6 @@ namespace CarImagesWeb.Controllers
             return View(model);
         }
 
-        [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
