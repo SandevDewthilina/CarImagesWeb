@@ -11,18 +11,16 @@
     <link rel="stylesheet" href="~/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Theme style -->
     <link rel="stylesheet" href="~/dist/css/adminlte.min.css">
-    <link href="~/css/globlestyle.css" rel="stylesheet"/>
+    @RenderSection("Styles", false)
 </head>
-<body class="hold-transition login-page">
-
-@RenderBody()
-
-<!-- jQuery -->
-<script src="~/plugins/jquery/jquery.min.js"></script>
-<!-- Bootstrap 4 -->
-<script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
-<!-- AdminLTE App -->
-<script src="~/dist/js/adminlte.min.js"></script>
-@RenderSection("Scripts", false)
+<body>
+    @RenderBody()
+    <!-- jQuery -->
+    <script src="~/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap 4 -->
+    <script src="~/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+    <!-- AdminLTE App -->
+    <script src="~/dist/js/adminlte.min.js"></script>
+    @RenderSection("Scripts", false)
 </body>
 </html>
