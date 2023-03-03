@@ -2,7 +2,7 @@
 
 namespace CarImagesWeb.ViewModels
 {
-    public class CreateTagViewModel
+    public class CreateEntityViewModel
     {
         [Required] public string Code { get; set; }
 

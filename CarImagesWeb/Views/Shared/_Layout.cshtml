@@ -50,18 +50,28 @@
                     <li class="nav-item">
                         <a asp-action="ListTags" asp-controller="Tags" class="nav-link">Tags</a>
                     </li>
+                    <li class="nav-item">
+                        <a asp-action="ListCountries" asp-controller="Country" class="nav-link">Countries</a>
+                    </li>
                     @if(User.IsInRole("Admin"))
                     {
                         <li class="nav-item">
                             <a asp-action="ListRoles" asp-controller="Administration" class="nav-link">Roles</a>
                         </li>
+                        <li class="nav-item">
+                            <a asp-action="Register" asp-controller="Account" class="nav-link">Register Users</a>
+                        </li>
                     }
                 </ul>
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a asp-action="Logout" asp-controller="Account" class="btn btn-info">Logout</a>
-                    </li>
-                </ul>
+                @* if user logged in *@
+                @if (User.Identity is {IsAuthenticated: true })
+                {
+                    <ul class="navbar-nav ml-auto">
+                        <li class="nav-item">
+                            <a asp-action="Logout" asp-controller="Account" class="btn btn-info">Logout</a>
+                        </li>
+                    </ul>
+                }
             </div>
         </div>
     </nav>

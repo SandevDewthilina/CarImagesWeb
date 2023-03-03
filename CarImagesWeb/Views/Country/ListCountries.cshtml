@@ -1,0 +1,67 @@
+﻿@model List<Country>
+
+@{
+    ViewBag.Title = "All Countries";
+}
+
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+    <!-- Content Header (Page header) -->
+    <section class="content-header">
+        <div class="container-fluid">
+            <div class="row mb-2">
+                <div class="col-12 d-flex justify-content-between">
+                    <h1>All Countries</h1>
+                    <a asp-action="CreateCountry" class="btn btn-primary" style="margin-left: 10px">Create Country</a>
+                </div>
+            </div>
+        </div><!-- /.container-fluid -->
+    </section>
+
+    <!-- Main content -->
+    <section class="content">
+
+        <div class="container-fluid">
+            <div class="row">
+                @if (Model.Any())
+                {
+                    foreach (var country in Model)
+                    {
+                        <div class="col-3">
+                            <div class="card  mb-3">
+                                <div class="card-header">
+                                    Tag Id: @country.Id
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">@country.Name</h5>
+                                    <h5 class="card-text">@country.Code</h5>
+                                </div>
+                                <div class="card-footer">
+                                    <a asp-route-id="@country.Id" asp-action="EditCountry" class="btn btn-warning">Edit</a>
+                                    <a asp-route-id="@country.Id" asp-action="DeleteCountry" class="btn btn-danger">Delete</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            No countries created yet
+                        </div>
+                        <div class="row">
+                            <div class="col-8">
+                                <a class="btn btn-primary" style="margin: 25px" asp-action="CreateCountry">Create Country</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+
+    </section>
+    <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
