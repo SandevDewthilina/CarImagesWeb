@@ -1,6 +1,6 @@
 ﻿namespace CarImagesWeb.ViewModels.TagViewModels
 {
-    public class EditTagViewModel
+    public class EditEntityViewModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

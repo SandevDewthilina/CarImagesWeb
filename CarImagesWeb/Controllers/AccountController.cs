@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using CarImagesWeb.Models;
 using CarImagesWeb.ViewModels.AccountViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -17,11 +18,13 @@ namespace CarImagesWeb.Controllers
             _signInManager = signInManager;
         }
         
+        [Authorize]
         public IActionResult Register()
         {
             return View();
         }
 
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel registerViewModel)
         {
@@ -36,8 +39,7 @@ namespace CarImagesWeb.Controllers
 
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Register");
                 }
 
                 foreach (var error in result.Errors) ModelState.AddModelError("", error.Description);
@@ -53,7 +55,7 @@ namespace CarImagesWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model, [FromQuery]string returnUrl)
         {
             if (ModelState.IsValid)
             {
@@ -72,6 +74,7 @@ namespace CarImagesWeb.Controllers
             return View(model);
         }
 
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();

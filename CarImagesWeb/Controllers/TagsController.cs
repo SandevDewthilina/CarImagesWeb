@@ -24,7 +24,7 @@ namespace CarImagesWeb.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTag(CreateTagViewModel model)
+        public async Task<IActionResult> CreateTag(CreateEntityViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
@@ -49,7 +49,7 @@ namespace CarImagesWeb.Controllers
             var tag = await _tagRepository.GetAsync(t => t.Id == id);
             if (tag is null) return NotFound();
 
-            var model = new EditTagViewModel
+            var model = new EditEntityViewModel
             {
                 Id = tag.Id,
                 Name = tag.Name,
@@ -60,7 +60,7 @@ namespace CarImagesWeb.Controllers
         }
         
         [HttpPost]
-        public async Task<IActionResult> EditTag(EditTagViewModel model)
+        public async Task<IActionResult> EditTag(EditEntityViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
