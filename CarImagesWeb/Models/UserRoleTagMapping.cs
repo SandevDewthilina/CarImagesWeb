@@ -10,15 +10,17 @@
             
         }
         
-        public UserRoleTagMapping(Tag tag, UserRole role)
+        public UserRoleTagMapping(Tag tag, UserRole role, bool allowUpload, bool allowDownload)
         {
-            Tag = Tag;
-            UserRole = role;
             TagId = tag.Id;
             UserRoleId = role.Id;
+            AllowDownload = allowDownload;
+            AllowUpload = allowUpload;
         }
 
         public UserRole UserRole { get; set; }
         public string UserRoleId { get; set; }
+        public bool AllowUpload { get; set; }
+        public bool AllowDownload { get; set; }
     }
 }

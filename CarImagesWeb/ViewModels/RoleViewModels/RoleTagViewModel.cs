@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using CarImagesWeb.Models;
+using Microsoft.CodeAnalysis;
 
 namespace CarImagesWeb.ViewModels.RoleViewModels
 {
@@ -11,5 +12,7 @@ namespace CarImagesWeb.ViewModels.RoleViewModels
         public Tag Tag { get; set; }
         public bool IsSelected { get; set; }
         public int TagId { get; set; }
+        public bool AllowUpload { get; set; }
+        public bool AllowDownload { get; set; }
     }
 }

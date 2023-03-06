@@ -10,15 +10,18 @@ namespace CarImagesWeb.Services
     {
         Task<IEnumerable<string>> GetCountryCodesAsync();
         Task<Country> GetCountryFromCode(string countryCode);
+        Task<IEnumerable<Country>> GetCountryForRoles(List<string> userRoles);
     }
 
     public class CountryHandler : ICountryHandler
     {
         private readonly ICountryRepository _repository;
+        private readonly ITagsHandler _tagsHandler;
 
-        public CountryHandler(ICountryRepository repository)
+        public CountryHandler(ICountryRepository repository, ITagsHandler tagsHandler)
         {
             _repository = repository;
+            _tagsHandler = tagsHandler;
         }
 
         public async Task<IEnumerable<string>> GetCountryCodesAsync()
@@ -30,6 +33,20 @@ namespace CarImagesWeb.Services
         public Task<Country> GetCountryFromCode(string countryCode)
         {
             return _repository.GetAsync(c => c.Code == countryCode);
+        }
+
+        public async Task<IEnumerable<Country>> GetCountryForRoles(List<string> userRoles)
+        {
+            var tagForRoles = await _tagsHandler.GetTagsForRoles(userRoles);
+            var countryList = new List<Country>();
+            foreach (Tag tag in tagForRoles)
+            {
+                if (!countryList.Any(c => c.Id == tag.CountryId))
+                {
+                    countryList.Add(tag.Country);
+                }
+            }
+            return countryList;
         }
     }
 }

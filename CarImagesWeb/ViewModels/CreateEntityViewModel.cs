@@ -1,4 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using CarImagesWeb.Models;
 
 namespace CarImagesWeb.ViewModels
 {
@@ -7,5 +9,6 @@ namespace CarImagesWeb.ViewModels
         [Required] public string Code { get; set; }
 
         [Required] public string Name { get; set; }
+        
     }
 }

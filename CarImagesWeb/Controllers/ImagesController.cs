@@ -1,5 +1,8 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using CarImagesWeb.DbOperations;
 using CarImagesWeb.Helpers;
+using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -12,26 +15,35 @@ namespace CarImagesWeb.Controllers
     {
         private readonly IAssetsHandler _assetsHandler;
         private readonly ICountryHandler _countryHandler;
+        private readonly IImagesRepository _imagesRepository;
         private readonly ITagsHandler _tagsHandler;
 
         public ImagesController(IAssetsHandler assetsHandler,
-            ITagsHandler tagsHandler, ICountryHandler countryHandler)
+            ITagsHandler tagsHandler, ICountryHandler countryHandler, IImagesRepository imagesRepository)
         {
             _assetsHandler = assetsHandler;
             _tagsHandler = tagsHandler;
             _countryHandler = countryHandler;
+            _imagesRepository = imagesRepository;
         }
 
         [HttpGet]
         public async Task<IActionResult> Upload()
         {
             var userRoles = UserHelper.GetRolesOfUser(User);
+            var tagList = await _tagsHandler.GetTagsForRoles(userRoles);
+            var countries = await _countryHandler.GetCountryForRoles(userRoles);
+            foreach (Tag tag in tagList)
+            {
+                var imageUploads = await _imagesRepository.FindAsync(u => u.TagId == tag.Id);
+                tag.Name = tag.Name + $"({imageUploads.Count} Uploads)";
+            }
             var viewModel = new ImageUploadViewModel
             {
                 Vehicles = await _assetsHandler.GetVehiclesAsync(),
                 Containers = await _assetsHandler.GetContainersAsync(),
-                Tags = await _tagsHandler.GetTagsForRoles(userRoles),
-                CountryCodes = await _countryHandler.GetCountryCodesAsync()
+                Tags =tagList,
+                CountryCodes = countries.Select(c => c.Code)
             };
             return View(viewModel);
         }

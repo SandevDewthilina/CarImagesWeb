@@ -1,5 +1,7 @@
 ﻿@section Styles
 {
+    <!-- Toastr -->
+    <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
     <style>
   /*A  gallery with max 5 columns*/
   .gallery{
@@ -16,13 +18,19 @@
   .download-check-box{
     position: absolute;
     top: 0;
-    left: 0;
+    left: 10px;
     display: flex;
-    justify-content: end;
+    justify-content: start;
     padding: 5px;
     width: 100%;
     height: auto;
     z-index: 2;
+  }
+  .delete_btn {
+    position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
   }
   .image img{
     display: block;
@@ -67,8 +75,9 @@
                                 <div class="form-group" id="CountryDropdown">
                                     <label>Select Country</label>
                                     <select id="Country"
-                                            class="form-control select2" name="Country" style="width: 100%;">
-                                        <option value="" selected="selected">Choose</option>
+                                            class="form-control" name="Country" style="width: 100%;"
+                                            v-model="selectedCountryCode">
+                                        <option value="" selected="selected" id="countrychoose">Choose</option>
                                         <option v-for="val in countries" v-bind:key="val" v-bind:value="val">
                                             {{ val }}
                                         </option>
@@ -82,8 +91,8 @@
                                     <label>Select {{imageCategory || 'Assets'}}</label>
                                     <select id="Asset"
                                             class="form-control select2" name="Asset" style="width: 100%;">
-                                        <option value="" selected="selected">Choose</option>
-                                        <option v-for="val in assets" v-bind:key="val.id" v-bind:value="val.id">
+                                        <option value="" selected="selected" id="assetchoose">Choose</option>
+                                        <option v-for="val in assets" v-bind:key="val.id" v-bind:value="val.id" :id="'country_option_' + val.id">
                                             {{ val.name+':'+val.code }}
                                         </option>
                                     </select>
@@ -93,9 +102,9 @@
                         <div class="col-lg-4 col-12">
                             <div class="form-group" id="TagDropdown">
                                 <label>Select Tags</label>
-                                <select id="AssetTags" class="select2" multiple="multiple"
+                                <select id="AssetTags" class="select2" multiple
                                         data-placeholder="Choose" style="width: 100%;">
-                                    <option v-for="tag in assetTags" v-bind:key="tag.id" v-bind:value="tag.id">{{tag.name+':'+tag.code}}</option>
+                                    <option v-for="tag in assetTags" v-bind:key="tag.id" v-bind:value="tag.id" :id="'tag_option_' + tag.id">{{tag.name+':'+tag.code}}</option>
                                 </select>
                             </div>
                         </div>
@@ -135,28 +144,33 @@
                 <div class="gallery col-12">
                     <div v-for="(image,index) in images" v-bind:key="image" class="image-container card">
                         <div class="card-body p-1">
+                            <button class="btn btn-sm btn-danger delete_btn" v-on:click="deleteClick(index)">
+                                <i class="fa fa-trash"></i>
+                            </button>
                             <div class="download-check-box icheck-primary">
                                 <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
                                        v-bind:name="'img-'+index" alt="" hidden>
                                 <label v-bind:for="'img-'+index"></label>
                             </div>
                             <div class="image border">
-                                <img v-bind:src="image.url" alt="">
+                                <button class="btn bg-transparent p-0 m-0" v-on:click="moreInfo(index)">
+                                    <img v-bind:src="image.url" alt="">
+                                </button>
                             </div>
-                            
+
                         </div>
                         <div class="card-footer p-2">
                             <div class="image-info d-flex pr-3">
-                                <div class="col-11">
+                                <div class="col-10">
                                     <div class="row">
                                         <div class="badge badge-primary mr-1 mb-1">Country:{{image.country}}</div>
                                         <div class="badge badge-info mr-1 mb-1">Asset:{{image.asset}}</div>
                                         <div class="badge badge-warning mr-1 mb-1">Tag:{{image.tag}}</div>
                                     </div>
                                 </div>
-                                <div class="col-1 d-flex flex-column justify-content-center">
+                                <div class="col-2 d-flex flex-column justify-content-center">
                                     <a v-bind:href="image.downloadUrl" target="_blank">
-                                        <span class="badge badge-success p-1">
+                                        <span class="badge badge-success p-2">
                                             <i class="fas fa-lg fa-arrow-alt-circle-down"></i>
                                         </span>
                                     </a>
@@ -175,6 +189,8 @@
 
 @section Scripts
 {
+    <!-- Toastr -->
+    <script src="~/plugins/toastr/toastr.min.js"></script>
     <script src="~/lib/axios/axios.min.js"></script>
     <script src="~/js/image_gallery.js"></script>
 }

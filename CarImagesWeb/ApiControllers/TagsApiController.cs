@@ -30,7 +30,8 @@ namespace CarImagesWeb.ApiControllers
             {
                 data = new
                 {
-                    tags
+                    vehicleTags = tags.Where(t => t.Type.Equals("Vehicle")),
+                    containerTags = tags.Where(t => t.Type.Equals("Container"))
                 }
             });
         }

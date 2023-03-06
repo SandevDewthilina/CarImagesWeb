@@ -1,4 +1,4 @@
-﻿namespace CarImagesWeb.ViewModels.TagViewModels
+﻿namespace CarImagesWeb.ViewModels
 {
     public class EditEntityViewModel
     {

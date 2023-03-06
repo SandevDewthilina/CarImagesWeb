@@ -13,19 +13,20 @@ namespace CarImagesWeb.DbContext
         public DbSet<Asset> Assets { get; set; }
         public DbSet<Country> Countries { get; set; }
         public DbSet<Tag> Tags { get; set; }
-        public DbSet<CountryTagMapping> CountryTagMappings { get; set; }
         public DbSet<UserRoleTagMapping> UserRoleTagMappings { get; set; }
         public DbSet<ImageUpload> ImageUploads { get; set; }
+        public DbSet<ContainerVehicleMapping> ContainerVehicleMappings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<CountryTagMapping>()
-                .HasKey(c => new {c.CountryId, c.TagId});
-
+            // set primary key as userRoleId + TagId
             modelBuilder.Entity<UserRoleTagMapping>()
                 .HasKey(c => new {c.UserRoleId, c.TagId});
+            // set primary key as VehicleTagId + ContainerTagId
+            modelBuilder.Entity<ContainerVehicleMapping>()
+                .HasKey(c => new {c.VehicleAssetId, c.ContainerAssetId});
         }
 
         //get the dbset for the entity

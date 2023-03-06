@@ -70,7 +70,7 @@ namespace CarImagesWeb.DbOperations
 
         public async Task<List<T>> FindAsync(Expression<Func<T, bool>> predicate, IEnumerable<string> includes = null)
         {
-            return await _queryable.Where(predicate).ToListAsync();
+            return await _queryable.Include(i => includes).Where(predicate).ToListAsync();
         }
 
         public async Task<List<T>> GetAllAsync(IEnumerable<string> includes = null)

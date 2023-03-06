@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels.RoleViewModels;
@@ -14,15 +15,17 @@ namespace CarImagesWeb.Controllers
     public class AdministrationController : Controller
     {
         private readonly ITagsHandler _tagsHandler;
+        private readonly IRoleTagRepository _roleTagRepository;
         private readonly RoleManager<UserRole> _roleManager;
         private readonly UserManager<ApplicationUser> _userManager;
 
         public AdministrationController(RoleManager<UserRole> roleManager, UserManager<ApplicationUser> userManager,
-            ITagsHandler tagsHandler)
+            ITagsHandler tagsHandler, IRoleTagRepository roleTagRepository)
         {
             _roleManager = roleManager;
             _userManager = userManager;
             _tagsHandler = tagsHandler;
+            _roleTagRepository = roleTagRepository;
         }
 
         public IActionResult CreateRole()
@@ -157,7 +160,7 @@ namespace CarImagesWeb.Controllers
 
             var model = new List<RoleTagViewModel>();
 
-            foreach (var tag in await _tagsHandler.GetTagsAsync())
+            foreach (Tag tag in await _tagsHandler.GetTagsAsync())
             {
                 var roleTagViewModel = new RoleTagViewModel
                 {
@@ -170,6 +173,12 @@ namespace CarImagesWeb.Controllers
                 else
                     roleTagViewModel.IsSelected = false;
 
+                var tagRoleMapping = await _roleTagRepository.GetAsync(rt => rt.UserRoleId == role.Id && rt.TagId == tag.Id);
+                if (tagRoleMapping != null)
+                {
+                    roleTagViewModel.AllowDownload = tagRoleMapping.AllowDownload;
+                    roleTagViewModel.AllowUpload = tagRoleMapping.AllowUpload;
+                }
                 model.Add(roleTagViewModel);
             }
 
@@ -190,10 +199,13 @@ namespace CarImagesWeb.Controllers
                 switch (roleTagViewModel.IsSelected)
                 {
                     case true when !await _tagsHandler.IsTagInRole(tag, role):
-                        await _tagsHandler.AddTagToRoleAsync(tag, role);
+                        await _tagsHandler.AddTagToRoleAsync(tag, role, roleTagViewModel.AllowUpload, roleTagViewModel.AllowDownload);
                         break;
                     case false when await _tagsHandler.IsTagInRole(tag, role):
                         await _tagsHandler.RemoveTagFromRoleAsync(tag, role);
+                        break;
+                    case true when await _tagsHandler.IsTagInRole(tag, role):
+                        await _tagsHandler.UpdateTagToRole(tag, role, roleTagViewModel.AllowUpload, roleTagViewModel.AllowDownload);
                         break;
                     default:
                         continue;

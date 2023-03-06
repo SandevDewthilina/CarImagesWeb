@@ -1,4 +1,6 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using CarImagesWeb.Helpers;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +26,17 @@ namespace CarImagesWeb.ApiControllers
             return Json(new
             {
                 data = countries
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCountriesForUser()
+        {
+            var userRoles = UserHelper.GetRolesOfUser(User);
+            var countries = await _countryHandler.GetCountryForRoles(userRoles);
+            return Json(new
+            {
+                data = countries.Select(c => c.Code)
             });
         }
     }

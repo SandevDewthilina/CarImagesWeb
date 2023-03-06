@@ -1,4 +1,4 @@
-﻿@model CarImagesWeb.ViewModels.CreateEntityViewModel
+﻿@model CarImagesWeb.ViewModels.TagViewModels.CreateTagViewModel
 
 @{
     ViewData["Title"] = "Create Tag";
@@ -42,6 +42,19 @@
                                     <label asp-for="Code" class="control-label"></label>
                                     <input asp-for="Code" class="form-control"/>
                                     <span asp-validation-for="Code" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Country</label>
+                                    <select asp-for="SelectedCountryId" class="form-control" asp-items="@(new SelectList(Model.Countries, nameof(Country.Id), nameof(Country.Code)))"></select>
+                                    <span asp-validation-for="SelectedCountryId" class="text-danger"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label class="control-label">Type</label>
+                                    <select asp-for="Type" class="form-control">
+                                        <option value="Vehicle">Vehicle</option>
+                                        <option value="Container">Container</option>
+                                    </select>
+                                    <span asp-validation-for="Type" class="text-danger"></span>
                                 </div>
                                 <div class="form-group">
                                     <input type="submit" value="Create Tag" class="btn btn-primary"/>

@@ -3,9 +3,10 @@ class Image {
         this.isSelected = false;
         this.url = url;
         this.country = imageData.country;
-        this.asset = imageData.asset ;
+        this.asset = imageData.asset;
         this.tag = imageData.tag;
         this.downloadUrl = downloadUrl;
+        this.assetInfo = imageData.assetInfo
     }
 }
 
@@ -19,14 +20,15 @@ app = Vue.createApp({
             containers: ['CoID/001', 'CoID/002', 'CoID/003', 'CoID/004'],
             vehicleTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Engine', 'Dashboard', 'Wheels', 'Other'],
             containerTags: ['Front', 'Back', 'Left', 'Right', 'Interior', 'Other'],
-            countries:[],
+            countries: [],
             downloading: false,
             searching: false,
-            _initialSearch: false
+            _initialSearch: false,
+            selectedCountryCode: ''
         }
     },
     computed: {
-        initialSearch(){
+        initialSearch() {
             return this._initialSearch;
         },
         images() {
@@ -41,12 +43,19 @@ app = Vue.createApp({
             return this.containers;
         },
         assetTags() {
+            const country = this.selectedCountryCode
             if (this.imageCategory === '') {
                 return [];
             } else if (this.imageCategory === 'Vehicle') {
-                return this.vehicleTags;
+                if(country === '')
+                    return this.vehicleTags
+                else
+                    return this.vehicleTags.filter(t => t.country.code === country)
             }
-            return this.containerTags;
+            if (country === '')
+                return this.containerTags;
+            else
+                return this.containerTags.filter(t => t.country.code === country)
         },
         isDownloading() {
             return this.downloading;
@@ -56,18 +65,40 @@ app = Vue.createApp({
         }
     },
     methods: {
+        change() {
+            console.log("dfs")
+        },
+        moreInfo(index) {
+            const image = this._images[index]
+            $(document).Toasts('create', {
+                title: 'Toast Title',
+                body:
+                    `Asset: ${image.asset}<br>
+                    Tag: ${image.tag}<br>
+                    Country: ${image.country}<br>
+                    Market: ${image.assetInfo.market}<br>
+                    Sales Segment: ${image.assetInfo.salesSegment}<br>
+                    Stock: ${image.assetInfo.stock}<br>
+                    Yard In Date: ${image.assetInfo.yardInDate.substring(0, 10)}<br>
+                    Purchase Date: ${image.assetInfo.purchaseDate.substring(0, 10)}<br>
+                    `
+            })
+        },
+        deleteClick(index) {
+            console.log(index)
+        },
         setSearching(isSearching) {
             this.searching = isSearching;
         },
         // Search images by category, asset and tags. Calls _getImages() to get the image urls from the server
         searchImages() {
             const SEARCH_URL = '/api/ImagesApi/Search';
-            
+
             let assetType = this.imageCategory;
             let asset = this._getSelectedAsset();
             let tags = this._getSelectedAssetTags();
             let country = this._getSelectedCountry();
-            
+
             let searchParams = {assetType, asset, tags, country};
             //check if the search params are valid
             if (assetType === '' || asset === '' && tags.length === 0) {
@@ -147,9 +178,7 @@ app = Vue.createApp({
         // Get the selected country from the select2 dropdown
         _getSelectedCountry() {
             let country = '';
-            $('#Country').select2('data').forEach(c => {
-                country = c.id;
-            });
+            country = $('#Country').find(":selected").val();
             return country;
         },
         //Fetch image urls from the server
@@ -175,8 +204,8 @@ app = Vue.createApp({
         //  populate the vehicle, container, vehicleTags, containerTag arrays
         const ASSETS_URL = '/api/AssetsApi/GetAssets';
         const TAGS_URL = '/api/TagsApi/GetTags';
-        const COUNTRIES_URL = '/api/CountryApi/GetCountries';
-        
+        const COUNTRIES_URL = '/api/CountryApi/GetCountriesForUser';
+
         async function getAssets(fromUrl) {
             //make axios call to get assets from the server
             let res = await axios.get(fromUrl);
@@ -194,13 +223,13 @@ app = Vue.createApp({
                 containerTags: []
             };
         }
-        
+
         async function getCountries(fromUrl) {
             //make axios call to get countries from the server
             let res = await axios.get(fromUrl);
             return res.data.data || [];
         }
-        
+
 
         //get assets and tags from the server
         getAssets(ASSETS_URL).then(data => {
@@ -210,8 +239,12 @@ app = Vue.createApp({
         getTags(TAGS_URL).then(data => {
             //TODO: instead of having two arrays for vehicleTags and containerTags, 
             // use one array and populate it with the data from the server
-            this.vehicleTags = data.tags;
-            this.containerTags = data.tags;
+            this.vehicleTags = data.vehicleTags;
+            // vehicle tags must have container tags also
+            if (data.containerTags != null)
+                this.vehicleTags = this.vehicleTags.concat(data.containerTags)
+            
+            this.containerTags = data.containerTags;
         });
         getCountries(COUNTRIES_URL).then(data => {
             this.countries = data;

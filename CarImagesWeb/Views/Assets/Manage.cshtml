@@ -31,7 +31,7 @@
                 </div>
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form action="Manage" method="post" enctype="multipart/form-data">
+                <form asp-action="Manage" method="post" enctype="multipart/form-data">
                     <div class="card-body">
                         <div class="form-group">
                             <label for="sheet">File input</label>
@@ -64,7 +64,7 @@
                         </div>
                     </div>
                     <!-- /.card-body -->
-        
+
                     <div class="card-footer">
                         <input type="checkbox" asp-for="IsReset" checked hidden/>
                         <button type="submit" class="btn btn-primary">Upload</button>
@@ -78,7 +78,7 @@
                 </div>
                 <!-- /.card-header -->
                 <!-- form start -->
-                <form action="Manage" method="post" enctype="multipart/form-data">
+                <form asp-action="Manage" method="post" enctype="multipart/form-data">
                     <div class="card-body">
                         <div class="form-group">
                             <label for="sheet">File input</label>
@@ -111,14 +111,61 @@
                         </div>
                     </div>
                     <!-- /.card-body -->
-        
+
                     <div class="card-footer">
                         <input type="checkbox" asp-for="IsReset" hidden/>
                         <button type="submit" class="btn btn-danger">Upload</button>
                     </div>
                 </form>
             </div>
-                <!-- /.card -->
+            <!-- /.card -->
+            <div class="card card-secondary">
+                <div class="card-header">
+                    <h3 class="card-title">Create Vehicle Container Assignements</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form asp-action="Manage" method="post" enctype="multipart/form-data">
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="sheet">File input</label>
+                            <div class="input-group">
+                                <div class="custom-file">
+                                    <input asp-for="ContainerVehicleAssignFile" type="file" accept="text/*, 
+                                                        application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                           class="custom-file-input" id="assign-sheet">
+                                    <label asp-for="DeleteFile" class="custom-file-label" for="sheet" id="assign-sheet-name">
+                                        Choose file
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="mt-2">
+                                <div class="text-danger">
+                                    <ul>
+                                        @{
+                                            var errors = ViewData.ModelState["Assign"]?.Errors;
+                                            if (errors != null)
+                                            {
+                                                foreach (var error in errors)
+                                                {
+                                                    <li>@error.ErrorMessage</li>
+                                                }
+                                            }
+                                        }
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                        <input type="checkbox" asp-for="IsAssignment" checked hidden/>
+                        <button type="submit" class="btn btn-secondary">Upload</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.card -->
         </div>
     </section>
     <!-- /.content -->
@@ -136,6 +183,10 @@
             $('#delete-sheet').change(function() {
                 let file = $('#delete-sheet')[0].files[0].name;
                 $('#delete-sheet-name').html(file);          
+            });
+            $('#assign-sheet').change(function() {
+                let file = $('#assign-sheet')[0].files[0].name;
+                $('#assign-sheet-name').html(file);          
             });
         });
     </script>

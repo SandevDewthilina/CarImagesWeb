@@ -36,13 +36,32 @@
                 <div class="card-body">
                     @for (var index = 0; index < Model.Count; index++)
                     {
-                        var tag = Model[index];
-                        <div class="form-check m-1">
-                            <input asp-for="@Model[index].TagId" type="hidden">
-                            <input asp-for="@Model[index].IsSelected" class="form-check-input">
-                            <label class="form-check-label" asp-for="@Model[index].IsSelected">
-                                @Model[index].Tag.ToString()
-                            </label>
+                        <input asp-for="@Model[index].TagId" type="hidden">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-check m-1">
+                                    <input asp-for="@Model[index].IsSelected" class="form-check-input">
+                                    <label class="form-check-label" asp-for="@Model[index].IsSelected">
+                                        @Model[index].Tag.ToString()
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-check m-1">
+                                    <input asp-for="@Model[index].AllowDownload" class="form-check-input">
+                                    <label class="form-check-label" asp-for="@Model[index].AllowDownload">
+                                        Allow Download
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-check m-1">
+                                    <input asp-for="@Model[index].AllowUpload" class="form-check-input">
+                                    <label class="form-check-label" asp-for="@Model[index].AllowUpload">
+                                        Allow Upload
+                                    </label>
+                                </div>
+                            </div>
                         </div>
                     }
                 </div>

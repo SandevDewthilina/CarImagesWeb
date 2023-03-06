@@ -6,9 +6,9 @@
 
 @section Styles
 {
-      <!-- DataTables -->
-      <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
-      <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
 }
 
 <!-- Content Wrapper. Contains page content -->
@@ -31,17 +31,18 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-12">
-                    <div class="card">
-                        @* <div class="card-header"> *@
-                        @*     <form action="Export"> *@
-                        @*         <input class="btn btn-success" type="submit" value="Export"/> *@
-                        @*     </form> *@
-                        @* </div> *@
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            Assets List
+                            @* <form action="Export"> *@
+                            @*     <input class="btn btn-success" type="submit" value="Export"/> *@
+                            @* </form> *@
+                        </div>
                         <!-- /.card-header -->
                         <div class="card-body">
                             @if (Model.Any())
                             {
-                                <table id="example1" class="table table-bordered table-hover">
+                                <table id="example1" class="table table-bordered table-striped table-hover">
                                     <thead>
                                     <tr>
                                         <th>Name</th>
@@ -86,6 +87,51 @@
                         </div>
                         <!-- /.card-body -->
                     </div>
+
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
+                            Container Vehicle Mapping
+                            @* <form action="Export"> *@
+                            @*     <input class="btn btn-success" type="submit" value="Export"/> *@
+                            @* </form> *@
+                        </div>
+                        <!-- /.card-header -->
+                        <div class="card-body">
+                            @if (ViewBag.vehicleContainerMappings.Count > 0)
+                            {
+                                <table id="example2" class="table table-bordered table-striped table-hover">
+                                    <thead>
+                                    <tr>
+                                        <th>Container Code</th>
+                                        <th>Container Name</th>
+                                        <th>Vehicle Code</th>
+                                        <th>Vehicle Name</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach (ContainerVehicleMapping mapping in ViewBag.vehicleContainerMappings)
+                                    {
+                                        <tr>
+                                            <td>@mapping.ContainerAsset.Code</td>
+                                            <td>@mapping.ContainerAsset.Name</td>
+                                            <td>@mapping.VehicleAsset.Code</td>
+                                            <td>@mapping.VehicleAsset.Name</td>
+                                        </tr>
+                                    }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <div class="card">
+                                    <div class="card-header">
+                                        No mappings found in the database
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
                 </div>
 
             </div>
@@ -109,5 +155,9 @@
           "responsive": true,
           "autoWidth": false,
         });
+        $("#example2").DataTable({
+                  "responsive": true,
+                  "autoWidth": false,
+         });
     </script>
 }

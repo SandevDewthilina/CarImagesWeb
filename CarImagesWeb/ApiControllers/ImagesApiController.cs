@@ -96,6 +96,7 @@ namespace CarImagesWeb.ApiControllers
                         country = imageUpload.Country.Name,
                         asset = imageUpload.Asset.Name,
                         tag = imageUpload.Tag.Name,
+                        assetInfo = imageUpload.Asset
                     },
                     downloadUrl = _imagesHandler.GetImageUrlFromThumbnail(thumbnail)
                 });

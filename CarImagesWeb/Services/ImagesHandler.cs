@@ -152,24 +152,28 @@ namespace CarImagesWeb.Services
             var tagIds = tags.Select(int.Parse).ToList();
             List<ImageUpload> uploads;
             Expression<Func<ImageUpload, bool>> expression;
+            
+            // if asset type is Vehicle allow both container and vehicle results
+            bool assetTypePass = assetType.Equals("Vehicle");
+            
             if (assetId != string.Empty || tagIds.Count == 0)
             {
                 var asset = int.Parse(assetId);
-                expression = i => i.AssetId == asset && i.Asset.Type == assetType;
+                expression = i => i.AssetId == asset && (assetTypePass || i.Asset.Type == assetType);
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
-                    expression = i => i.AssetId == asset && i.Asset.Type == assetType 
+                    expression = i => i.AssetId == asset &&  (assetTypePass || i.Asset.Type == assetType)
                                                          && i.Country.Code == countryCode;
                 }
             }
             else if (assetId == string.Empty && tagIds.Count > 0)
             {
-                expression = i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType;
+                expression = i => tagIds.Contains(i.TagId) &&  (assetTypePass || i.Asset.Type == assetType);
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
-                    expression = i => tagIds.Contains(i.TagId) && i.Asset.Type == assetType 
+                    expression = i => tagIds.Contains(i.TagId) &&  (assetTypePass || i.Asset.Type == assetType)
                                                                && i.Country.Code == countryCode;
                 }
             }
@@ -177,15 +181,15 @@ namespace CarImagesWeb.Services
             {
                 var asset = int.Parse(assetId);
                 expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
-                                                     && i.Asset.Type == assetType;
+                                                     &&  (assetTypePass || i.Asset.Type == assetType);
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
                     expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
-                                                         && i.Asset.Type == assetType && i.Country.Code == countryCode;
+                                                         &&  (assetTypePass || i.Asset.Type == assetType) && i.Country.Code == countryCode;
                 }
             }
-
+            
             uploads = await _imagesRepository.FindAsync(
                 expression);
 

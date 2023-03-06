@@ -20,7 +20,7 @@ namespace CarImagesWeb.Controllers
             _assetsHandler = assetsHandler;
             _csvHandler = csvHandler;
         }
-        
+
         public IActionResult Manage()
         {
             return View();
@@ -49,6 +49,24 @@ namespace CarImagesWeb.Controllers
 
                 await _assetsHandler.ResetAssetsAsync(fileInput, ErrorHandleCallback);
             }
+            else if (model.IsAssignment)
+            {
+                if (model.ContainerVehicleAssignFile == null)
+                {
+                    ModelState.AddModelError("Assign", "Please upload a file.");
+                    return View(model);
+                }
+
+                var fileInput = model.ContainerVehicleAssignFile;
+
+                void ErrorHandleCallback(Exception e)
+                {
+                    // Handle the exception
+                    ModelState.AddModelError("Assign", e.Message);
+                }
+
+                await _assetsHandler.AssignAssets(fileInput, ErrorHandleCallback);
+            }
             else
             {
                 if (model.DeleteFile == null)
@@ -73,14 +91,15 @@ namespace CarImagesWeb.Controllers
             // Return a success response
             return RedirectToAction("List", "Assets");
         }
-        
+
         public async Task<IActionResult> List()
         {
             // Get the assets from the database
             var assets = await _assetsHandler.GetAllAssets();
+            ViewBag.vehicleContainerMappings = await _assetsHandler.GetAllContainerVehicleMappings();
             return View(assets);
         }
-        
+
         [Obsolete("This method is incomplete and is intended for testing purposes only.")]
         public async Task<FileStreamResult> Export()
         {
@@ -94,11 +113,11 @@ namespace CarImagesWeb.Controllers
                 Type = a.Type
             });
             // asset records to csv
-            
+
             var memoryStream = new MemoryStream(await _csvHandler.WriteCsvAsync(assetRecords));
-            
+
             var file = new FormFile(memoryStream, 0, memoryStream.Length, null, "data.csv");
-            
+
             return new FileStreamResult(file.OpenReadStream(), "text/csv")
             {
                 FileDownloadName = "export.csv"
@@ -111,5 +130,16 @@ namespace CarImagesWeb.Controllers
         public string Name { get; set; }
         public string Code { get; set; }
         public string Type { get; set; }
+        public string Stock { get; set; }
+        public string PurchaseDate { get; set; }
+        public string Market { get; set; }
+        public string SalesSegment { get; set; }
+        public string YardInDate { get; set; }
+    }
+
+    public class AssignmentRecord
+    {
+        public string ContainerCode { get; set; }
+        public string VehicleCode { get; set; }
     }
 }

@@ -10,9 +10,12 @@ namespace CarImagesWeb.ViewModels
         public IFormFile File { get; set; }
 
         public bool IsReset { get; set; }
+        public bool IsAssignment { get; set; }
         
         [SheetFile]
         public IFormFile DeleteFile { get; set; }
+        [SheetFile]
+        public IFormFile ContainerVehicleAssignFile { get; set; }
     }
 
     public class SheetFile : ValidationAttribute

@@ -37,26 +37,30 @@ namespace CarImagesWeb.Services
         /// </param>
         /// <returns></returns>
         Task<Asset> GetAssetToUpload(ImageUploadDto imageUploadDto);
-        
+
         Task ResetAssetsAsync(IFormFile sheet, Action<Exception> errorHandleCallback);
         Task DeleteAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback);
         Task<List<Asset>> GetAllAssets();
+        Task AssignAssets(IFormFile fileInput, Action<Exception> errorHandleCallback);
+        Task<List<ContainerVehicleMapping>> GetAllContainerVehicleMappings();
     }
 
     public class AssetsHandler : IAssetsHandler
     {
         private readonly IAssetRepository _repository;
+        private readonly IVehicleContainerRepository _vehicleContainerRepository;
 
-        public AssetsHandler(IAssetRepository repository)
+        public AssetsHandler(IAssetRepository repository, IVehicleContainerRepository vehicleContainerRepository)
         {
             _repository = repository;
+            _vehicleContainerRepository = vehicleContainerRepository;
         }
-        
+
         public async Task<IEnumerable<Asset>> GetVehiclesAsync()
         {
             return await _repository.GetAllAsync(a => a.Type == AssetType.Vehicle.ToString());
         }
-        
+
         public async Task<IEnumerable<Asset>> GetContainersAsync()
         {
             return await _repository.GetAllAsync(a => a.Type == AssetType.Container.ToString());
@@ -87,7 +91,7 @@ namespace CarImagesWeb.Services
             {
                 //find existing assets by name and code
                 var existingAssets = await _repository.FindAsync(
-                        a => assets.Select(asset => asset.Code).Contains(a.Code));
+                    a => assets.Select(asset => asset.Code).Contains(a.Code));
 
                 if (existingAssets.Any())
                 {
@@ -98,21 +102,26 @@ namespace CarImagesWeb.Services
                         if (relevantAsset == null) continue;
                         asset.Name = relevantAsset.Name;
                         asset.Type = relevantAsset.Type;
+                        asset.Market = relevantAsset.Market;
+                        asset.Stock = relevantAsset.Stock;
+                        asset.PurchaseDate = relevantAsset.PurchaseDate;
+                        asset.YardInDate = relevantAsset.YardInDate;
                     }
+
                     await _repository.UpdateRangeAsync(existingAssets);
                 }
-                
+
                 //add the rest of the assets
                 var newAssets = assets.Where(
                     a => !existingAssets.Select(asset => asset.Code).Contains(a.Code)).ToList();
-                
-                if(newAssets.Any())
+
+                if (newAssets.Any())
                     await _repository.AddRangeAsync(newAssets);
             }
-            
+
             await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation);
         }
-        
+
         /// <summary>
         /// Delete the assets with the same name and code from the database that are in the file 
         /// </summary>
@@ -125,12 +134,11 @@ namespace CarImagesWeb.Services
             {
                 // Get the assets from the database by name and code
                 var existingAssets = await _repository.FindAsync(
-                    a => assets.Select(asset => asset.Name).Contains(a.Name) 
-                         && assets.Select(asset => asset.Code).Contains(a.Code));
-                
+                    a => assets.Select(asset => asset.Code).Contains(a.Code));
+
                 await _repository.DeleteRangeAsync(existingAssets);
             }
-            
+
             await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation);
         }
 
@@ -139,7 +147,68 @@ namespace CarImagesWeb.Services
             return await _repository.GetAllAsync();
         }
 
-        private static async Task ManageAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback, 
+        public async Task AssignAssets(IFormFile fileInput, Action<Exception> errorHandleCallback)
+        {
+            // Get the file extension
+            var fileExtension = Path.GetExtension(fileInput.FileName);
+
+            switch (fileExtension)
+            {
+                case ".csv":
+                {
+                    using var reader = new StreamReader(fileInput.OpenReadStream());
+                    using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+                    var containerVehicleMappings = new List<ContainerVehicleMapping>();
+                    // Read the CSV data into a list of Asset objects
+                    try
+                    {
+                        var mappingCodeRecords = csv.GetRecords<AssignmentRecord>().ToList();
+
+                        if (mappingCodeRecords.Count == 0)
+                            errorHandleCallback(
+                                new Exception("No data found in the file"));
+
+                        containerVehicleMappings.AddRange(mappingCodeRecords.Select(m => new ContainerVehicleMapping
+                        {
+                            ContainerAssetId = _repository.GetAsync(a => a.Code.Equals(m.ContainerCode)).Result.Id,
+                            VehicleAssetId = _repository.GetAsync(a => a.Code.Equals(m.VehicleCode)).Result.Id
+                        }));
+                    }
+                    catch (HeaderValidationException e)
+                    {
+                        var headerNames = new List<string>();
+                        // get the missing header names
+                        foreach (var invalidHeader in e.InvalidHeaders)
+                        {
+                            // if header name is not already in the list
+                            if (!headerNames.Contains(invalidHeader.Names[0]))
+                                headerNames.AddRange(invalidHeader.Names);
+                        }
+
+                        // Handle the missing field exception
+                        var exception = new Exception(
+                            "The following headers are missing: " + headerNames.Join(", "));
+
+                        errorHandleCallback(exception);
+                    }
+
+                    // Perform the database operation
+                    if (containerVehicleMappings.Any())
+                    {
+                        await _vehicleContainerRepository.AddRangeAsync(containerVehicleMappings);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        public async Task<List<ContainerVehicleMapping>> GetAllContainerVehicleMappings()
+        {
+            return await _vehicleContainerRepository.GetAllAsync();
+        }
+
+        private static async Task ManageAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback,
             Func<List<Asset>, Task> dbOperation)
         {
             // Get the file extension
@@ -156,20 +225,25 @@ namespace CarImagesWeb.Services
                     try
                     {
                         var assetRecords = csv.GetRecords<AssetRecord>().ToList();
-                        
-                        if(assetRecords.Count == 0) errorHandleCallback(
-                            new Exception("No data found in the file"));
-                        
+
+                        if (assetRecords.Count == 0)
+                            errorHandleCallback(
+                                new Exception("No data found in the file"));
+
                         assets.AddRange(assetRecords.Select(assetRecord => new Asset
                         {
                             Name = assetRecord.Name,
                             Code = assetRecord.Code,
-                            Type = assetRecord.Type
+                            Type = assetRecord.Type,
+                            Market = assetRecord.Market,
+                            Stock = assetRecord.Stock,
+                            PurchaseDate = !assetRecord.PurchaseDate.Equals("") ? DateTime.Parse(assetRecord.PurchaseDate) : DateTime.Now,
+                            SalesSegment = assetRecord.SalesSegment,
+                            YardInDate = !assetRecord.YardInDate.Equals("") ? DateTime.Parse(assetRecord.YardInDate) : DateTime.Now
                         }));
                     }
                     catch (HeaderValidationException e)
                     {
-
                         var headerNames = new List<string>();
                         // get the missing header names
                         foreach (var invalidHeader in e.InvalidHeaders)
@@ -178,23 +252,21 @@ namespace CarImagesWeb.Services
                             if (!headerNames.Contains(invalidHeader.Names[0]))
                                 headerNames.AddRange(invalidHeader.Names);
                         }
-                        
+
                         // Handle the missing field exception
                         var exception = new Exception(
                             "The following headers are missing: " + headerNames.Join(", "));
-                        
+
                         errorHandleCallback(exception);
                     }
-                    
+
                     // Perform the database operation
                     if (assets.Any())
                         await dbOperation(assets);
-                    
+
                     break;
                 }
             }
         }
-
-        
     }
 }

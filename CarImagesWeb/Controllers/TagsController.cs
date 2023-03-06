@@ -12,26 +12,33 @@ namespace CarImagesWeb.Controllers
     public class TagsController : Controller
     {
         private readonly ITagRepository _tagRepository;
+        private readonly ICountryRepository _countryRepository;
 
-        public TagsController(ITagRepository tagRepository)
+        public TagsController(ITagRepository tagRepository, ICountryRepository countryRepository)
         {
             _tagRepository = tagRepository;
+            _countryRepository = countryRepository;
         }
 
-        public IActionResult CreateTag()
+        public async Task<IActionResult> CreateTag()
         {
-            return View();
+            return View(new CreateTagViewModel()
+            {
+                Countries = await _countryRepository.GetAllAsync()
+            });
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateTag(CreateEntityViewModel model)
+        public async Task<IActionResult> CreateTag(CreateTagViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
             var result = await _tagRepository.AddAsync(new Tag
             {
                 Name = model.Name,
-                Code = model.Code
+                Code = model.Code,
+                CountryId = model.SelectedCountryId,
+                Type = model.Type
             });
 
             return RedirectToAction("ListTags", "Tags");
@@ -49,18 +56,21 @@ namespace CarImagesWeb.Controllers
             var tag = await _tagRepository.GetAsync(t => t.Id == id);
             if (tag is null) return NotFound();
 
-            var model = new EditEntityViewModel
+            var model = new EditTagViewModel()
             {
                 Id = tag.Id,
                 Name = tag.Name,
-                Code = tag.Code
+                Code = tag.Code,
+                SelectedCountryId = tag.CountryId,
+                Type = tag.Type,
+                Countries = await _countryRepository.GetAllAsync()
             };
 
             return View(model);
         }
         
         [HttpPost]
-        public async Task<IActionResult> EditTag(EditEntityViewModel model)
+        public async Task<IActionResult> EditTag(EditTagViewModel model)
         {
             if (!ModelState.IsValid) return View(model);
 
@@ -68,6 +78,8 @@ namespace CarImagesWeb.Controllers
             if (tag is null) return NotFound();
 
             tag.Name = model.Name;
+            tag.CountryId = model.SelectedCountryId;
+            tag.Type = model.Type;
 
             await _tagRepository.UpdateAsync(tag);
 
