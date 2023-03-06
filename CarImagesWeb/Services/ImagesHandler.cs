@@ -44,6 +44,7 @@ namespace CarImagesWeb.Services
         Task HandleUpload(ImageUploadDto dto, IFormFileCollection files);
 
         Task HandleUpload(ImageUploadDto dto);
+        Task DeleteUpload(ImageUpload upload);
     }
 
     public class ImagesHandler : IImagesHandler
@@ -51,16 +52,18 @@ namespace CarImagesWeb.Services
         private readonly IAssetsHandler _assetHandler;
         private readonly string _containerUrl;
         private readonly ICountryHandler _countryHandler;
+        private readonly IAssetRepository _assetRepository;
         private readonly IImagesRepository _imagesRepository;
         private readonly ITagsHandler _tagHandler;
 
         public ImagesHandler(IImagesRepository imagesRepository, IAssetsHandler assetHandler,
-            ITagsHandler tagHandler, ICountryHandler countryHandler, IConfiguration configuration)
+            ITagsHandler tagHandler, ICountryHandler countryHandler, IConfiguration configuration, IAssetRepository assetRepository)
         {
             _imagesRepository = imagesRepository;
             _assetHandler = assetHandler;
             _tagHandler = tagHandler;
             _countryHandler = countryHandler;
+            _assetRepository = assetRepository;
             var storageAccountName = configuration["AzureStorage:AccountName"];
             var containerName = configuration["AzureStorage:ContainerName"];
             _containerUrl = $"https://{storageAccountName}.blob.core.windows.net/{containerName}";
@@ -69,6 +72,14 @@ namespace CarImagesWeb.Services
         public async Task HandleUpload(ImageUploadDto dto)
         {
             await HandleUpload(dto, dto.File);
+        }
+
+        public async Task DeleteUpload(ImageUpload upload)
+        {
+            var filepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + upload.FileName;
+            var thumbFilepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + GetThumbnailName(upload.FileName);
+            await _imagesRepository.DeleteImageAsync(thumbFilepath);
+            await _imagesRepository.DeleteImageAsync(filepath);
         }
 
         public async Task HandleUpload(ImageUploadDto dto, IFormFile file)

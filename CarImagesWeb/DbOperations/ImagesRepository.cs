@@ -14,6 +14,7 @@ namespace CarImagesWeb.DbOperations
             List<ImageThumbnail> imageThumbnails, string assetDirectory);
 
         Task SaveImageAsync(ImageUpload imageUpload, IFormFile file, ImageThumbnail thumbnail, string assetDirectory);
+        Task DeleteImageAsync(string filePath);
     }
 
     public class ImagesRepository : Repository<ImageUpload>, IImagesRepository
@@ -41,6 +42,11 @@ namespace CarImagesWeb.DbOperations
         {
             await AddAsync(imageUpload);
             await _blobStorageHandler.UploadImageAsync(file, thumbnail, assetDirectory);
+        }
+
+        public async Task DeleteImageAsync(string filePath)
+        {
+           await _blobStorageHandler.DeleteImageAsync(filePath);
         }
     }
 }

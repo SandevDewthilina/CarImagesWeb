@@ -1,5 +1,6 @@
 class Image {
-    constructor(url, downloadUrl, imageData) {
+    constructor(uploadId, url, downloadUrl, imageData) {
+        this.uploadId = uploadId
         this.isSelected = false;
         this.url = url;
         this.country = imageData.country;
@@ -23,6 +24,7 @@ app = Vue.createApp({
             countries: [],
             downloading: false,
             searching: false,
+            deletingIndex: null,
             _initialSearch: false,
             selectedCountryCode: ''
         }
@@ -62,12 +64,12 @@ app = Vue.createApp({
         },
         isSearching() {
             return this.searching;
+        },
+        getDeletingIndex() {
+            return this.deletingIndex
         }
     },
     methods: {
-        change() {
-            console.log("dfs")
-        },
         moreInfo(index) {
             const image = this._images[index]
             $(document).Toasts('create', {
@@ -85,7 +87,20 @@ app = Vue.createApp({
             })
         },
         deleteClick(index) {
-            console.log(index)
+            if (this.deletingIndex !== null && this.deletingIndex !== index) {
+                return
+            }
+            const uploadId = this._images[index].uploadId
+            this.deletingIndex = index
+            axios.get('/api/ImagesApi/DeleteUpload?uploadId=' + uploadId).then(resp => {
+                this.deletingIndex = null
+                if(resp.data.success) {
+                    this.searchImages()
+                } 
+            }).catch(err => {
+                this.deletingIndex = null
+                alert(err.message)
+            })
         },
         setSearching(isSearching) {
             this.searching = isSearching;
@@ -113,7 +128,7 @@ app = Vue.createApp({
                     this._images = [];
                     // TODO: update Image class to include assetType, asset, country , tags and imageUrl as well
                     data.forEach(obj => {
-                        this._images.push(new Image(obj.url, obj.downloadUrl, obj.imageData));
+                        this._images.push(new Image(obj.uploadId, obj.url, obj.downloadUrl, obj.imageData));
                     });
                 }).finally(() => {
                     this.setSearching(false)

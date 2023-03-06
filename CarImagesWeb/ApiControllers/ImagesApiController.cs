@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
+using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
+using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,10 +18,12 @@ namespace CarImagesWeb.ApiControllers
     public class ImagesApiController : Controller
     {
         private readonly IImagesHandler _imagesHandler;
+        private readonly IImagesRepository _imagesRepository;
 
-        public ImagesApiController(IImagesHandler imagesHandler)
+        public ImagesApiController(IImagesHandler imagesHandler, IImagesRepository imagesRepository)
         {
             _imagesHandler = imagesHandler;
+            _imagesRepository = imagesRepository;
         }
 
         /// <summary>
@@ -90,6 +94,7 @@ namespace CarImagesWeb.ApiControllers
                 var thumbnail = _imagesHandler.GetImageThumbnailUrl(imageUpload);
                 data.Add(new
                 {
+                    uploadId = imageUpload.Id,
                     url = thumbnail,
                     imageData = new
                     {
@@ -119,6 +124,15 @@ namespace CarImagesWeb.ApiControllers
             Response.ContentType = "application/zip";
             Response.Headers.Add("Content-Disposition", "attachment; filename='images.zip'");
             await Response.Body.WriteAsync(fileBytes, 0, fileBytes.Length);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> DeleteUpload(int uploadId)
+        {
+            var upload = await _imagesRepository.GetAsync(iu => iu.Id == uploadId);
+            _imagesHandler.DeleteUpload(upload).Wait();
+            await _imagesRepository.DeleteAsync(upload);
+            return Json(new {success = true});
         }
     }
 }
