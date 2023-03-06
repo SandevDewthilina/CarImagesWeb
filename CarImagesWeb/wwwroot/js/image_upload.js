@@ -56,6 +56,7 @@ function initializeUploadForm() {
 
     $("input[name='ImageCategory']").change(function () {
         let category = $(this).val();
+        sessionStorage.setItem('type', category)
         if (category === "Vehicle") {
             vehicleInputs.show();
             containerInputs.hide();
@@ -66,6 +67,42 @@ function initializeUploadForm() {
             //default
             vehicleInputs.hide();
             containerInputs.hide();
+        }
+    });
+
+    $('#CountryCode').on('change', function() {
+        
+        const category =  sessionStorage.getItem('type')
+        
+        let tags = []
+        let id_prefix = 'vehicle'
+        if (category === 'Vehicle') {
+            tags = vehicleTags
+            id_prefix = 'vehicle'
+            document.getElementById('VehicleTag').value='';
+        }
+        else {
+            tags = containerTags
+            id_prefix = 'container'
+            document.getElementById('ContainerTag').value='';
+        }
+            
+        if (this.value === '') {
+            tags.forEach(tag => {
+                let option = $('#' + id_prefix + '_option_' + tag.Id)
+                option.show()
+            })
+        } else {
+            tags.forEach(tag => {
+                if(tag.Country.Code !== this.value) {
+                    let option = $('#' + id_prefix + '_option_' + tag.Id)
+                    option.hide()
+                } else {
+                    let option = $('#' + id_prefix + '_option_' + tag.Id)
+                    option.show()
+                }
+                
+            })
         }
     });
 }

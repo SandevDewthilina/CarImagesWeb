@@ -34,8 +34,8 @@ namespace CarImagesWeb.Services
         Task<UserRoleTagMapping> UpdateTagToRole(Tag tag, UserRole role, bool allowUpload, bool allowDownload);
         Task<List<Tag>> TagsInRole(UserRole role);
         Task<Tag> GetTagAsync(int tagId);
-        Task<IEnumerable<Tag>> GetTagsForRole(string userRole);
-        Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles);
+        Task<IEnumerable<Tag>> GetTagsForRole(string userRole, string context = "Any");
+        Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles, string context = "Any");
     }
 
     public class TagsHandler : ITagsHandler
@@ -114,21 +114,35 @@ namespace CarImagesWeb.Services
             return await _tagRepository.GetAsync(t => t.Id == tagId);
         }
 
-        public async Task<IEnumerable<Tag>> GetTagsForRole(string userRole)
+        public async Task<IEnumerable<Tag>> GetTagsForRole(string userRole, string context = "Any")
         {
-            var roleTags = await _roleTagRepository
-                .FindAsync(rt => rt.UserRole.Name == userRole);
-            return roleTags.Select(rt => rt.Tag);
+            switch (context)
+            {
+                case "Upload":
+                    var roleTags = await _roleTagRepository
+                        .FindAsync(rt => rt.UserRole.Name == userRole && rt.AllowUpload);
+                    return roleTags.Select(rt => rt.Tag);
+                    
+                case "Download":
+                    var roleTags1 = await _roleTagRepository
+                        .FindAsync(rt => rt.UserRole.Name == userRole && (rt.AllowDownload));
+                    return roleTags1.Select(rt => rt.Tag);
+                default:
+                    var roleTags2 = await _roleTagRepository
+                        .FindAsync(rt => rt.UserRole.Name == userRole);
+                    return roleTags2.Select(rt => rt.Tag);
+            }
+            
         }
 
-        public async Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles)
+        public async Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles, string context = "Any")
         {
             // get all tags for each role
             // add to the list of tags if it is not already in the list
             var tags = new List<Tag>();
             foreach (var userRole in userRoles)
             {
-                var roleTags = await GetTagsForRole(userRole);
+                var roleTags = await GetTagsForRole(userRole, context);
                 foreach (var roleTag in roleTags)
                 {
                     if (!tags.Contains(roleTag))

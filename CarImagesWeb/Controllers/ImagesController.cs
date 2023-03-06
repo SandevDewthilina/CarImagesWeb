@@ -31,7 +31,7 @@ namespace CarImagesWeb.Controllers
         public async Task<IActionResult> Upload()
         {
             var userRoles = UserHelper.GetRolesOfUser(User);
-            var tagList = await _tagsHandler.GetTagsForRoles(userRoles);
+            var tagList = await _tagsHandler.GetTagsForRoles(userRoles, context: "Upload");
             var countries = await _countryHandler.GetCountryForRoles(userRoles);
             foreach (Tag tag in tagList)
             {
@@ -42,7 +42,8 @@ namespace CarImagesWeb.Controllers
             {
                 Vehicles = await _assetsHandler.GetVehiclesAsync(),
                 Containers = await _assetsHandler.GetContainersAsync(),
-                Tags =tagList,
+                VehicleTags = tagList.Where(t => t.Type.Equals("Vehicle")),
+                ContainerTags = tagList.Where(t => t.Type.Equals("Container")),
                 CountryCodes = countries.Select(c => c.Code)
             };
             return View(viewModel);

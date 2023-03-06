@@ -25,7 +25,7 @@ namespace CarImagesWeb.ApiControllers
         public async Task<IActionResult> GetTags()
         {
             var userRoles = UserHelper.GetRolesOfUser(User);
-            var tags = await _tagsHandler.GetTagsForRoles(userRoles);
+            var tags = await _tagsHandler.GetTagsForRoles(userRoles, context: "Download");
             return Json(new
             {
                 data = new

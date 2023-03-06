@@ -1,4 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
+@using Newtonsoft.Json
 @model CarImagesWeb.ViewModels.ImageUploadViewModel
 @{
     ViewData["Title"] = "Upload Images";
@@ -64,14 +65,14 @@
                             </div>
                             <div class="form-group" id="VehicleTagDropdown">
                                 <label>Select Tag</label>
-                                <select id="VehicleTag" class="form-control select2"
+                                <select id="VehicleTag" class="form-control"
                                         name="@nameof(Model.ImageUploadDto.VehicleTagId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Vehicle Tag --</option>
                                     <!-- Bind options to the list of vehicle tags in the view model -->
-                                    @foreach (var tag in Model.Tags)
+                                    @foreach (var tag in Model.VehicleTags)
                                     {
-                                        <option value="@tag.Id.ToString()">@tag.ToString()</option>
+                                        <option value="@tag.Id.ToString()" id="vehicle_option_@tag.Id">@tag.ToString()</option>
                                     }
                                 </select>
                             </div>
@@ -92,14 +93,14 @@
                             </div>
                             <div class="form-group" id="ContainerTagDropdown">
                                 <label>Select Tag</label>
-                                <select id="ContainerTag" class="form-control select2"
+                                <select id="ContainerTag" class="form-control"
                                         name="@nameof(Model.ImageUploadDto.ContainerTagId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Container Tag --</option>
                                     <!-- Bind options to the list of vehicle tags in the view model -->
-                                    @foreach (var tag in Model.Tags)
+                                    @foreach (var tag in Model.ContainerTags)
                                     {
-                                        <option value="@tag.Id">@tag.ToString()</option>
+                                        <option value="@tag.Id" id="container_option_@tag.Id">@tag.ToString()</option>
                                     }
                                 </select>
                             </div>
@@ -122,6 +123,11 @@
 
 @section Scripts
 {
+    <script>
+        const vehicleTags = @Html.Raw(JsonConvert.SerializeObject(Model.VehicleTags))
+        const containerTags = @Html.Raw(JsonConvert.SerializeObject(Model.ContainerTags))
+        console.log(containerTags)
+    </script>
     <!-- Uppy -->
     <script src="https://releases.transloadit.com/uppy/v3.4.0/uppy.min.js"></script>
     <!--Custom scripts-->

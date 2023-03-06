@@ -8,7 +8,8 @@ namespace CarImagesWeb.ViewModels
     {
         public IEnumerable<Asset> Vehicles { get; set; }
         public IEnumerable<Asset> Containers { get; set; }
-        public IEnumerable<Tag> Tags { get; set; }
+        public IEnumerable<Tag> VehicleTags { get; set; }
+        public IEnumerable<Tag> ContainerTags { get; set; }
         public IEnumerable<string> CountryCodes { get; set; }
         public ImageUploadDto ImageUploadDto { get; }
     }
