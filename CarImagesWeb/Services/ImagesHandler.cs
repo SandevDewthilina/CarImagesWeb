@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -53,17 +54,22 @@ namespace CarImagesWeb.Services
         private readonly string _containerUrl;
         private readonly ICountryHandler _countryHandler;
         private readonly IAssetRepository _assetRepository;
+        private readonly IVehicleContainerRepository _vehicleContainerRepository;
+        private readonly ITagRepository _tagRepository;
         private readonly IImagesRepository _imagesRepository;
         private readonly ITagsHandler _tagHandler;
 
         public ImagesHandler(IImagesRepository imagesRepository, IAssetsHandler assetHandler,
-            ITagsHandler tagHandler, ICountryHandler countryHandler, IConfiguration configuration, IAssetRepository assetRepository)
+            ITagsHandler tagHandler, ICountryHandler countryHandler, IConfiguration configuration, 
+            IAssetRepository assetRepository, IVehicleContainerRepository vehicleContainerRepository, ITagRepository tagRepository)
         {
             _imagesRepository = imagesRepository;
             _assetHandler = assetHandler;
             _tagHandler = tagHandler;
             _countryHandler = countryHandler;
             _assetRepository = assetRepository;
+            _vehicleContainerRepository = vehicleContainerRepository;
+            _tagRepository = tagRepository;
             var storageAccountName = configuration["AzureStorage:AccountName"];
             var containerName = configuration["AzureStorage:ContainerName"];
             _containerUrl = $"https://{storageAccountName}.blob.core.windows.net/{containerName}";
@@ -165,26 +171,26 @@ namespace CarImagesWeb.Services
             Expression<Func<ImageUpload, bool>> expression;
             
             // if asset type is Vehicle allow both container and vehicle results
-            bool assetTypePass = assetType.Equals("Vehicle");
+            bool isVehicle = assetType.Equals("Vehicle");
             
             if (assetId != string.Empty || tagIds.Count == 0)
             {
                 var asset = int.Parse(assetId);
-                expression = i => i.AssetId == asset && (assetTypePass || i.Asset.Type == assetType);
+                expression = i => i.AssetId == asset && i.Asset.Type == assetType;
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
-                    expression = i => i.AssetId == asset &&  (assetTypePass || i.Asset.Type == assetType)
+                    expression = i => i.AssetId == asset && i.Asset.Type == assetType
                                                          && i.Country.Code == countryCode;
                 }
             }
             else if (assetId == string.Empty && tagIds.Count > 0)
             {
-                expression = i => tagIds.Contains(i.TagId) &&  (assetTypePass || i.Asset.Type == assetType);
+                expression = i => tagIds.Contains(i.TagId) &&  i.Asset.Type == assetType;
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
-                    expression = i => tagIds.Contains(i.TagId) &&  (assetTypePass || i.Asset.Type == assetType)
+                    expression = i => tagIds.Contains(i.TagId) &&   i.Asset.Type == assetType
                                                                && i.Country.Code == countryCode;
                 }
             }
@@ -192,18 +198,49 @@ namespace CarImagesWeb.Services
             {
                 var asset = int.Parse(assetId);
                 expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
-                                                     &&  (assetTypePass || i.Asset.Type == assetType);
+                                                     &&  ( i.Asset.Type == assetType);
                 if(countryCode != string.Empty)
                 {
                     // aggregate the countryCode to the expression
                     expression = i => i.AssetId == asset && tagIds.Contains(i.TagId) 
-                                                         &&  (assetTypePass || i.Asset.Type == assetType) && i.Country.Code == countryCode;
+                                                         &&  ( i.Asset.Type == assetType) && i.Country.Code == countryCode;
                 }
             }
             
             uploads = await _imagesRepository.FindAsync(
                 expression);
 
+            // combine the container images
+            if (isVehicle)
+            {
+                // get mapped containers
+                var containerIdList = new List<int>();
+                foreach (ImageUpload imageUpload in uploads)
+                {
+                    var asset = imageUpload.Asset;
+                    var mappings = await _vehicleContainerRepository
+                        .FindAsync(a => a.VehicleAssetId == asset.Id);
+                    var containers = mappings.Select(m => m.ContainerAssetId);
+                    containerIdList.AddRange(containers);
+                }
+                Expression<Func<ImageUpload, bool>> containerUploadsExpression = u => containerIdList.Contains(u.AssetId);
+                var containerTagList = await _tagRepository.FindAsync(t => tagIds.Contains(t.Id) && t.Type.Equals("Container"));
+                if (containerTagList?.Count > 0)
+                {
+                    containerUploadsExpression = u => containerIdList.Contains(u.AssetId) && tagIds.Contains(u.TagId);
+                }
+                
+
+                // get image uploads for the containers
+                var imageUploadsForContainer = await _imagesRepository
+                    .FindAsync(containerUploadsExpression);
+                if (imageUploadsForContainer != null)
+                {
+                    uploads.AddRange(imageUploadsForContainer);
+                }
+            }
+            
+            
             return uploads.ToList();
         }
 

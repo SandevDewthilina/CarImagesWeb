@@ -195,6 +195,7 @@ namespace CarImagesWeb.Services
                     // Perform the database operation
                     if (containerVehicleMappings.Any())
                     {
+                        await _vehicleContainerRepository.DeleteAllAsync();
                         await _vehicleContainerRepository.AddRangeAsync(containerVehicleMappings);
                     }
 

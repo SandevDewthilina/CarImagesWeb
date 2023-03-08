@@ -64,7 +64,7 @@ namespace CarImagesWeb.Controllers
                     // Handle the exception
                     ModelState.AddModelError("Assign", e.Message);
                 }
-
+                
                 await _assetsHandler.AssignAssets(fileInput, ErrorHandleCallback);
             }
             else
