@@ -48,6 +48,11 @@
                                         <th>Name</th>
                                         <th>Code</th>
                                         <th>Type</th>
+                                        <th>Market</th>
+                                        <th>Purchased Date</th>
+                                        <th>Yard In Date</th>
+                                        <th>Stock</th>
+                                        <th>Sales Segment</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -58,16 +63,14 @@
                                             <td>@asset.Name</td>
                                             <td>@asset.Code</td>
                                             <td>@asset.Type</td>
+                                            <td>@asset.Market</td>
+                                            <td>@asset.PurchaseDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@asset.YardInDate.ToString("dd/MM/yyyy")</td>
+                                            <td>@asset.Stock</td>
+                                            <td>@asset.SalesSegment</td>
                                         </tr>
                                     }
                                     </tbody>
-                                    <tfoot>
-                                    <tr>
-                                        <th>Name</th>
-                                        <th>Code</th>
-                                        <th>Type</th>
-                                    </tr>
-                                    </tfoot>
                                 </table>
                             }
                             else
