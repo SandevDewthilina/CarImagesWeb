@@ -166,14 +166,18 @@ namespace CarImagesWeb.Services
             string countryCode)
         {
             // Get the asset from the database
-            var tagIds = tags.Select(int.Parse).ToList();
+            // var tagIds = tags.Select(int.Parse).ToList();
+            var tagIds = new List<int>();
+            tagIds = tags.Select(int.Parse).ToList();
+
+
             List<ImageUpload> uploads;
             Expression<Func<ImageUpload, bool>> expression;
             
             // if asset type is Vehicle allow both container and vehicle results
             bool isVehicle = assetType.Equals("Vehicle");
             
-            if (assetId != string.Empty || tagIds.Count == 0)
+            if (assetId != string.Empty && tagIds.Count == 0)
             {
                 var asset = int.Parse(assetId);
                 expression = i => i.AssetId == asset && i.Asset.Type == assetType;
