@@ -10,7 +10,18 @@ function initializeUppy() {
         note: 'Images only',
         restrictions: {
             allowedFileTypes: ['image/*'],
-        }
+        },
+        onBeforeFileAdded: (currentFile, files) => {
+            console.log(currentFile)
+            console.log(Object.values(files))
+            if (Object.values(files).length === 0)
+                return true
+            if (Object.values(files).filter(f => f.name === currentFile.name)) {
+                return true
+            } else {
+                return false
+            }
+        },
     })
 
     uppy.use(Uppy.Dashboard, {
@@ -27,6 +38,7 @@ function initializeUppy() {
         }
 
     })
+    uppy.use(Uppy.DragDrop, {});
     uppy.use(Uppy.ImageEditor, {target: Uppy.Dashboard})
     uppy.use(Uppy.Form, {target: '#upload-form'})
     // Allow dropping files on any element or the whole document
@@ -70,23 +82,45 @@ function initializeUploadForm() {
         }
     });
 
-    $('#CountryCode').on('change', function() {
-        
-        const category =  sessionStorage.getItem('type')
-        
+    $('.assetDrop').on('change', function () {
+        console.log(this.value)
+        const tagIds = []
+        $('.tagSelect option').each(function () {
+            if ($(this).val() !== '') {
+                tagIds.push($(this).val())
+            }
+           
+        })
+        const body = {
+            tagIds: tagIds.map(id => parseInt(id)),
+            assetId: parseInt(this.value)
+        }
+        axios.post(`/api/TagsApi/GetTagsWithCountForVehicle`, body).then(resp => {
+            resp.data.data.forEach(tag => {
+                $(`option[value='${tag.id}']`).text(tag.name)
+            })
+            
+        }).catch(err => {
+            console.log(err)
+        })
+    })
+
+    $('#CountryCode').on('change', function () {
+
+        const category = sessionStorage.getItem('type')
+
         let tags = []
         let id_prefix = 'vehicle'
         if (category === 'Vehicle') {
             tags = vehicleTags
             id_prefix = 'vehicle'
-            document.getElementById('VehicleTag').value='';
-        }
-        else {
+            document.getElementById('VehicleTag').value = '';
+        } else {
             tags = containerTags
             id_prefix = 'container'
-            document.getElementById('ContainerTag').value='';
+            document.getElementById('ContainerTag').value = '';
         }
-            
+
         if (this.value === '') {
             tags.forEach(tag => {
                 let option = $('#' + id_prefix + '_option_' + tag.Id)
@@ -94,14 +128,14 @@ function initializeUploadForm() {
             })
         } else {
             tags.forEach(tag => {
-                if(tag.Country.Code !== this.value) {
+                if (tag.Country.Code !== this.value) {
                     let option = $('#' + id_prefix + '_option_' + tag.Id)
                     option.hide()
                 } else {
                     let option = $('#' + id_prefix + '_option_' + tag.Id)
                     option.show()
                 }
-                
+
             })
         }
     });

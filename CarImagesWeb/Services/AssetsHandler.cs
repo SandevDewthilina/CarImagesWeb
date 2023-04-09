@@ -231,6 +231,10 @@ namespace CarImagesWeb.Services
                             errorHandleCallback(
                                 new Exception("No data found in the file"));
 
+                        if (assetRecords.Any(r => !r.IsNonEmpty()))
+                            errorHandleCallback(
+                                new Exception("Contain empty values"));
+                        
                         assets.AddRange(assetRecords.Select(assetRecord => new Asset
                         {
                             Name = assetRecord.Name,
@@ -240,7 +244,7 @@ namespace CarImagesWeb.Services
                             Stock = assetRecord.Stock,
                             PurchaseDate = !assetRecord.PurchaseDate.Equals("") ? DateTime.Parse(assetRecord.PurchaseDate) : DateTime.Now,
                             SalesSegment = assetRecord.SalesSegment,
-                            YardInDate = !assetRecord.YardInDate.Equals("") ? DateTime.Parse(assetRecord.YardInDate) : DateTime.Now
+                            YardInDate = DateTime.Now
                         }));
                     }
                     catch (HeaderValidationException e)

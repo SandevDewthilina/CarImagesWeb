@@ -34,7 +34,16 @@ app = Vue.createApp({
             return this._initialSearch;
         },
         images() {
-            return this._images;
+            const grouped = this._images.reduce((acc, obj) => {
+                const key = obj.tag;
+                if (!acc[key]) {
+                    acc[key] = [];
+                }
+                acc[key].push(obj);
+                return acc;
+            }, []);
+            console.log(Object.entries(grouped))
+            return Object.entries(grouped)
         },
         assets() {
             if (this.imageCategory === '') {
@@ -70,6 +79,9 @@ app = Vue.createApp({
         }
     },
     methods: {
+        change() {
+            console.log('ds')
+        },
         moreInfo(index) {
             const image = this._images[index]
             $(document).Toasts('create', {
@@ -81,17 +93,16 @@ app = Vue.createApp({
                     Market: ${image.assetInfo.market}<br>
                     Sales Segment: ${image.assetInfo.salesSegment}<br>
                     Stock: ${image.assetInfo.stock}<br>
-                    Yard In Date: ${image.assetInfo.yardInDate.substring(0, 10)}<br>
                     Purchase Date: ${image.assetInfo.purchaseDate.substring(0, 10)}<br>
                     `
             })
         },
-        deleteClick(index) {
+        deleteClick(id) {
             if (this.deletingIndex !== null && this.deletingIndex !== index) {
                 return
             }
-            const uploadId = this._images[index].uploadId
-            this.deletingIndex = index
+            const uploadId = this._images.find(i => i.uploadId === id).uploadId
+            this.deletingIndex = id
             axios.get('/api/ImagesApi/DeleteUpload?uploadId=' + uploadId).then(resp => {
                 this.deletingIndex = null
                 if(resp.data.success) {

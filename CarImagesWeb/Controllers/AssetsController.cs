@@ -134,7 +134,19 @@ namespace CarImagesWeb.Controllers
         public string PurchaseDate { get; set; }
         public string Market { get; set; }
         public string SalesSegment { get; set; }
-        public string YardInDate { get; set; }
+
+        public bool IsNonEmpty()
+        {
+            return !string.IsNullOrEmpty(Name)
+                   && !string.IsNullOrEmpty(Code)
+                   && !string.IsNullOrEmpty(Type)
+                   && !string.IsNullOrEmpty(Stock)
+                   && !string.IsNullOrEmpty(PurchaseDate)
+                   && !string.IsNullOrEmpty(Market)
+                   && !string.IsNullOrEmpty(SalesSegment);
+
+
+        }
     }
 
     public class AssignmentRecord

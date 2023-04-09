@@ -140,47 +140,53 @@
                     </button>
                 </div>
             </div>
-            <div class="row my-2">
-                <div class="gallery col-12">
-                    <div v-for="(image,index) in images" v-bind:key="image" class="image-container card">
-                        <div class="card-body p-1">
-                            <button class="btn btn-sm btn-danger delete_btn" v-on:click="deleteClick(index)">
-                                <i class="fa fa-trash"></i>
-                                <span class="spinner-border spinner-border-sm ml-2" v-if="getDeletingIndex === index"></span>
-                            </button>
-                            <div class="download-check-box icheck-primary">
-                                <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
-                                       v-bind:name="'img-'+index" alt="" hidden>
-                                <label v-bind:for="'img-'+index"></label>
-                            </div>
-                            <div class="image border">
-                                <button class="btn bg-transparent p-0 m-0" v-on:click="moreInfo(index)">
-                                    <img v-bind:src="image.url" alt="">
-                                </button>
-                            </div>
+            <div v-for="block in images" class="col">
+                <h5>Tag: {{block[0]}}</h5>
+                <div class="row my-2">
+                    <div class="gallery col-12">
+                        <div v-for="(image,index) in block[1]" v-bind:key="image" class="image-container card">
+                            <div class="card-body p-1">
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <button class="btn btn-sm btn-danger delete_btn" v-on:click="deleteClick(image.uploadId)">
+                                        <i class="fa fa-trash"></i>
+                                        <span class="spinner-border spinner-border-sm ml-2" v-if="getDeletingIndex === image.uploadId"></span>
+                                    </button>
+                                }
+                                <div class="download-check-box icheck-primary">
+                                    <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
+                                           v-bind:name="'img-'+index" alt="" hidden>
+                                    <label v-bind:for="'img-'+index"></label>
+                                </div>
+                                <div class="image border">
+                                    <button class="btn bg-transparent p-0 m-0" v-on:click="moreInfo(index)">
+                                        <img v-bind:src="image.url" alt="">
+                                    </button>
+                                </div>
 
-                        </div>
-                        <div class="card-footer p-2">
-                            <div class="image-info d-flex pr-3">
-                                <div class="col-10">
-                                    <div class="row">
-                                        <div class="badge badge-primary mr-1 mb-1">Country:{{image.country}}</div>
-                                        <div class="badge badge-info mr-1 mb-1">Asset:{{image.asset}}</div>
-                                        <div class="badge badge-warning mr-1 mb-1">Tag:{{image.tag}}</div>
+                            </div>
+                            <div class="card-footer p-2">
+                                <div class="image-info d-flex pr-3">
+                                    <div class="col-10">
+                                        <div class="row">
+                                            <div class="badge badge-primary mr-1 mb-1">Country:{{image.country}}</div>
+                                            <div class="badge badge-info mr-1 mb-1">Asset:{{image.asset}}</div>
+                                            <div class="badge badge-warning mr-1 mb-1">Tag:{{image.tag}}</div>
+                                        </div>
+                                    </div>
+                                    <div class="col-2 d-flex flex-column justify-content-center">
+                                        <a v-bind:href="image.downloadUrl" target="_blank">
+                                            <span class="badge badge-success p-2">
+                                                <i class="fas fa-lg fa-arrow-alt-circle-down"></i>
+                                            </span>
+                                        </a>
                                     </div>
                                 </div>
-                                <div class="col-2 d-flex flex-column justify-content-center">
-                                    <a v-bind:href="image.downloadUrl" target="_blank">
-                                        <span class="badge badge-success p-2">
-                                            <i class="fas fa-lg fa-arrow-alt-circle-down"></i>
-                                        </span>
-                                    </a>
-                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div v-if="images.length === 0 && initialSearch">
-                        <h5 class="text-secondary">No images found</h5>
+                        <div v-if="images.length === 0 && initialSearch">
+                            <h5 class="text-secondary">No images found</h5>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -194,4 +200,28 @@
     <script src="~/plugins/toastr/toastr.min.js"></script>
     <script src="~/lib/axios/axios.min.js"></script>
     <script src="~/js/image_gallery.js"></script>
+    <script>
+    $('#Asset').on('change', function() {
+        const tagIds = []
+        $('#Asset option').each(function () {
+            if ($(this).val() !== '') {
+                tagIds.push($(this).val())
+            }
+           
+        })
+        const body = {
+                    tagIds: tagIds.map(id => parseInt(id)),
+                    assetId: parseInt(this.value)
+                }
+        console.log(body)
+        axios.post(`/api/TagsApi/GetTagsWithCountForVehicle`, body).then(resp => {
+            resp.data.data.forEach(tag => {
+                $(`option[value='${tag.id}']`).text(tag.name)
+            })
+            
+        }).catch(err => {
+            console.log(err)
+        })
+    })
+    </script>
 }

@@ -34,6 +34,7 @@ namespace CarImagesWeb.Services
         Task<UserRoleTagMapping> UpdateTagToRole(Tag tag, UserRole role, bool allowUpload, bool allowDownload);
         Task<List<Tag>> TagsInRole(UserRole role);
         Task<Tag> GetTagAsync(int tagId);
+        Task<List<Tag>> GetTagsForIdsAsync(List<int> tagIdList);
         Task<IEnumerable<Tag>> GetTagsForRole(string userRole, string context = "Any");
         Task<IEnumerable<Tag>> GetTagsForRoles(List<string> userRoles, string context = "Any");
     }
@@ -112,6 +113,11 @@ namespace CarImagesWeb.Services
         public async Task<Tag> GetTagAsync(int tagId)
         {
             return await _tagRepository.GetAsync(t => t.Id == tagId);
+        }
+
+        public async Task<List<Tag>> GetTagsForIdsAsync(List<int> tagIdList)
+        {
+            return await _tagRepository.FindAsync(t => tagIdList.Contains(t.Id));
         }
 
         public async Task<IEnumerable<Tag>> GetTagsForRole(string userRole, string context = "Any")

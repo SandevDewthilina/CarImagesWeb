@@ -33,11 +33,11 @@ namespace CarImagesWeb.Controllers
             var userRoles = UserHelper.GetRolesOfUser(User);
             var tagList = await _tagsHandler.GetTagsForRoles(userRoles, context: "Upload");
             var countries = await _countryHandler.GetCountryForRoles(userRoles);
-            foreach (Tag tag in tagList)
-            {
-                var imageUploads = await _imagesRepository.FindAsync(u => u.TagId == tag.Id);
-                tag.Name = tag.Name + $"({imageUploads.Count} Uploads)";
-            }
+            // foreach (Tag tag in tagList)
+            // {
+            //     var imageUploads = await _imagesRepository.FindAsync(u => u.TagId == tag.Id);
+            //     tag.Name = tag.Name + $"({imageUploads.Count} Uploads)";
+            // }
             var viewModel = new ImageUploadViewModel
             {
                 Vehicles = await _assetsHandler.GetVehiclesAsync(),

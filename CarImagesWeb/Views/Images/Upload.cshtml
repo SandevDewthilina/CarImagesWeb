@@ -8,6 +8,11 @@
 @section Styles{
     <!--Upload container css-->
     <link href="https://releases.transloadit.com/uppy/v3.4.0/uppy.min.css" rel="stylesheet">
+    <style>
+        .uppy-Dashboard-Item {
+            pointer-events: none;
+        }
+    </style>
 }
 
 <form method="post" action="api/ImagesApi/Upload" id="upload-form" enctype="multipart/form-data">
@@ -52,7 +57,7 @@
                             <!-- Show the dropdown only if Vehicles radio button is selected -->
                             <div class="form-group" id="VehicleDropdown">
                                 <label>Vehicle</label>
-                                <select id="VehicleType" class="form-control select2"
+                                <select id="VehicleType" class="form-control select2 assetDrop"
                                         name="@nameof(Model.ImageUploadDto.VehicleId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Vehicle --</option>
@@ -65,7 +70,7 @@
                             </div>
                             <div class="form-group" id="VehicleTagDropdown">
                                 <label>Select Tag</label>
-                                <select id="VehicleTag" class="form-control"
+                                <select id="VehicleTag" class="form-control tagSelect"
                                         name="@nameof(Model.ImageUploadDto.VehicleTagId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Vehicle Tag --</option>
@@ -80,7 +85,7 @@
                         <div id="container-inputs" class="hide">
                             <div class="form-group" id="ContainerDropdown">
                                 <label>Container</label>
-                                <select id="Container" class="form-control select2"
+                                <select id="Container" class="form-control select2 assetDrop"
                                         name="@nameof(Model.ImageUploadDto.ContainerId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Container --</option>
@@ -93,7 +98,7 @@
                             </div>
                             <div class="form-group" id="ContainerTagDropdown">
                                 <label>Select Tag</label>
-                                <select id="ContainerTag" class="form-control"
+                                <select id="ContainerTag" class="form-control tagSelect"
                                         name="@nameof(Model.ImageUploadDto.ContainerTagId)"
                                         style="width: 100%;">
                                     <option selected="selected" value="">-- Select Container Tag --</option>
@@ -130,6 +135,7 @@
     </script>
     <!-- Uppy -->
     <script src="https://releases.transloadit.com/uppy/v3.4.0/uppy.min.js"></script>
+    <script src="~/lib/axios/axios.min.js"></script>
     <!--Custom scripts-->
     <script src="~/js/image_upload.js" type="module"></script>
 }
