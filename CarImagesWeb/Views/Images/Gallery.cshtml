@@ -216,7 +216,7 @@
         console.log(body)
         axios.post(`/api/TagsApi/GetTagsWithCountForVehicle`, body).then(resp => {
             resp.data.data.forEach(tag => {
-                $(`option[value='${tag.id}']`).text(tag.name)
+                $(`#AssetTags option[value='${tag.id}']`).text(tag.name)
             })
             
         }).catch(err => {
