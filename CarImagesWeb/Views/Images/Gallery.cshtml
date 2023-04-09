@@ -2,6 +2,7 @@
 {
     <!-- Toastr -->
     <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
     <style>
   /*A  gallery with max 5 columns*/
   .gallery{
@@ -100,9 +101,12 @@
                             </div>
                         </div>
                         <div class="col-lg-4 col-12">
-                            <div class="form-group" id="TagDropdown">
+                            <div class="form-group d-flex flex-column" id="TagDropdown">
                                 <label>Select Tags</label>
-                                <select id="AssetTags" class="select2" multiple
+                                <select id="AssetTags" class="selectpicker" multiple
+                                        data-live-search="true"
+                                        data-width="100%"
+                                        data-actions-box="true"
                                         data-placeholder="Choose" style="width: 100%;">
                                     <option v-for="tag in assetTags" v-bind:key="tag.id" v-bind:value="tag.id" :id="'tag_option_' + tag.id">{{tag.name+':'+tag.code}}</option>
                                 </select>
@@ -199,11 +203,15 @@
     <!-- Toastr -->
     <script src="~/plugins/toastr/toastr.min.js"></script>
     <script src="~/lib/axios/axios.min.js"></script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script src="~/js/image_gallery.js"></script>
+   
+
     <script>
+    $('#AssetTags').selectpicker();
     $('#Asset').on('change', function() {
         const tagIds = []
-        $('#Asset option').each(function () {
+        $('#AssetTags option').each(function () {
             if ($(this).val() !== '') {
                 tagIds.push($(this).val())
             }
@@ -217,6 +225,7 @@
         axios.post(`/api/TagsApi/GetTagsWithCountForVehicle`, body).then(resp => {
             resp.data.data.forEach(tag => {
                 $(`#AssetTags option[value='${tag.id}']`).text(tag.name)
+                 $('#AssetTags').selectpicker('refresh');
             })
             
         }).catch(err => {

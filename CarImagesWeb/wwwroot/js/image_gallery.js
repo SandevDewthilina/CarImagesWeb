@@ -46,6 +46,7 @@ app = Vue.createApp({
             return Object.entries(grouped)
         },
         assets() {
+            $('#AssetTags').selectpicker('refresh');
             if (this.imageCategory === '') {
                 return [];
             } else if (this.imageCategory === 'Vehicle') {
@@ -54,6 +55,7 @@ app = Vue.createApp({
             return this.containers;
         },
         assetTags() {
+            setTimeout(() => $('#AssetTags').selectpicker('refresh'), 1000)
             const country = this.selectedCountryCode
             if (this.imageCategory === '') {
                 return [];
@@ -196,8 +198,8 @@ app = Vue.createApp({
         // Get the selected asset tags from the select2 dropdown (multiple select)
         _getSelectedAssetTags() {
             let assetTags = [];
-            $('#AssetTags').select2('data').forEach(tag => {
-                assetTags.push(tag.id);
+            $('#AssetTags option:selected').each(function() {
+                assetTags.push(this.value);
             });
             return assetTags;
         },
