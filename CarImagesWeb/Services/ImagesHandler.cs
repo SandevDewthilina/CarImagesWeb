@@ -152,7 +152,7 @@ namespace CarImagesWeb.Services
                     File = thumb
                 });
             }
-
+            
             await _imagesRepository.SaveImagesAsync(imageUploads, files, thumbnails, assetDirectory);
         }
 

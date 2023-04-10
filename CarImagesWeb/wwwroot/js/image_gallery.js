@@ -46,7 +46,7 @@ app = Vue.createApp({
             return Object.entries(grouped)
         },
         assets() {
-            $('#AssetTags').selectpicker('refresh');
+            setTimeout(() => $('#Asset').selectpicker('refresh'), 200)
             if (this.imageCategory === '') {
                 return [];
             } else if (this.imageCategory === 'Vehicle') {
@@ -190,8 +190,8 @@ app = Vue.createApp({
         // Get the selected asset type from the select2 dropdown
         _getSelectedAsset() {
             let assetType = '';
-            $('#Asset').select2('data').forEach(asset => {
-                assetType = asset.id;
+            $('#Asset option:selected').each(function() {
+                assetType = this.value
             });
             return assetType;
         },

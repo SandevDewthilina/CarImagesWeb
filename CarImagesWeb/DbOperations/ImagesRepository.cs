@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using CarImagesWeb.DbContext;
 using CarImagesWeb.Helpers;
@@ -35,18 +37,25 @@ namespace CarImagesWeb.DbOperations
             foreach (var imageUpload in imageUploads) await AddAsync(imageUpload);
             // Upload the images to blob storage
             await _blobStorageHandler.UploadImagesAsync(files, imageThumbnails, assetDirectory);
+
+            foreach (ImageUpload imageUpload in imageUploads)
+            {
+                var file = files.FirstOrDefault(f => f.FileName.Equals(imageUpload.FileName));
+                var thumbnail = imageThumbnails.FirstOrDefault(t => t.FileName.Equals(imageUpload.FileName));
+                await SaveImageAsync(imageUpload, file, thumbnail, assetDirectory);
+            }
         }
 
         public async Task SaveImageAsync(ImageUpload imageUpload, IFormFile file, ImageThumbnail thumbnail,
             string assetDirectory)
         {
-            await AddAsync(imageUpload);
             await _blobStorageHandler.UploadImageAsync(file, thumbnail, assetDirectory);
+            await AddAsync(imageUpload);
         }
 
         public async Task DeleteImageAsync(string filePath)
         {
-           await _blobStorageHandler.DeleteImageAsync(filePath);
+            await _blobStorageHandler.DeleteImageAsync(filePath);
         }
     }
 }

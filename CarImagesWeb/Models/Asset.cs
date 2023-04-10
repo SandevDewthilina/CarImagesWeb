@@ -13,5 +13,10 @@ namespace CarImagesWeb.Models
         public string Market { get; set; }
         public string SalesSegment { get; set; }
         public DateTime YardInDate { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Code} : {Stock}";
+        }
     }
 }

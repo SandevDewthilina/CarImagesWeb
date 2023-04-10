@@ -35,6 +35,7 @@ function initializeUppy() {
         note: 'Images only',
         doneButtonHandler: () => {
             window.location.href = "/Images/Upload";
+            // this.reset()
         }
 
     })

@@ -2,7 +2,7 @@
 {
     <!-- Toastr -->
     <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"/>
     <style>
   /*A  gallery with max 5 columns*/
   .gallery{
@@ -91,10 +91,14 @@
                                 <div class="form-group" id="VehicleDropdown">
                                     <label>Select {{imageCategory || 'Assets'}}</label>
                                     <select id="Asset"
-                                            class="form-control select2" name="Asset" style="width: 100%;">
-                                        <option value="" selected="selected" id="assetchoose">Choose</option>
+                                            data-live-search="true"
+                                            data-width="100%"
+                                            data-actions-box="true"
+                                            data-placeholder="Choose"
+                                            class="form-control" name="Asset" style="width: 100%;">
+                                          <option value="" selected="selected">Choose</option>
                                         <option v-for="val in assets" v-bind:key="val.id" v-bind:value="val.id" :id="'country_option_' + val.id">
-                                            {{ val.name+':'+val.code }}
+                                            {{ val.code+' : '+val.stock }}
                                         </option>
                                     </select>
                                 </div>
@@ -203,12 +207,12 @@
     <!-- Toastr -->
     <script src="~/plugins/toastr/toastr.min.js"></script>
     <script src="~/lib/axios/axios.min.js"></script>
-     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/js/bootstrap-select.min.js"></script>
     <script src="~/js/image_gallery.js"></script>
-   
-
+    
     <script>
     $('#AssetTags').selectpicker();
+    $('#Asset').selectpicker();
     $('#Asset').on('change', function() {
         const tagIds = []
         $('#AssetTags option').each(function () {
