@@ -231,9 +231,9 @@ namespace CarImagesWeb.Services
                             errorHandleCallback(
                                 new Exception("No data found in the file"));
 
-                        if (assetRecords.Any(r => !r.IsNonEmpty()))
-                            errorHandleCallback(
-                                new Exception("Contain empty values"));
+                        // if (assetRecords.Any(r => !r.IsNonEmpty()))
+                        //     errorHandleCallback(
+                        //         new Exception("Contain empty values"));
                         
                         assets.AddRange(assetRecords.Select(assetRecord => new Asset
                         {
