@@ -83,13 +83,20 @@ namespace CarImagesWeb.Controllers
                     ModelState.AddModelError("Delete", e.Message);
                 }
 
-                await _assetsHandler.DeleteAssetsAsync(fileInput, ErrorHandleCallback);
+                try
+                {
+                    await _assetsHandler.DeleteAssetsAsync(fileInput, ErrorHandleCallback);
+                }
+                catch (Exception e)
+                {
+                    ModelState.AddModelError("Delete", e.Message);
+                }
             }
 
             if (ModelState.ErrorCount > 0) return View(model);
-
             // Return a success response
-            return RedirectToAction("List", "Assets");
+            ViewBag.status = true;
+            return View(model);
         }
 
         public async Task<IActionResult> List()

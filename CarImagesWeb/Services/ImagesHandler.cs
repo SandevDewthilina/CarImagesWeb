@@ -11,6 +11,7 @@ using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp;
@@ -56,12 +57,13 @@ namespace CarImagesWeb.Services
         private readonly IAssetRepository _assetRepository;
         private readonly IVehicleContainerRepository _vehicleContainerRepository;
         private readonly ITagRepository _tagRepository;
+        private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly IImagesRepository _imagesRepository;
         private readonly ITagsHandler _tagHandler;
 
         public ImagesHandler(IImagesRepository imagesRepository, IAssetsHandler assetHandler,
             ITagsHandler tagHandler, ICountryHandler countryHandler, IConfiguration configuration, 
-            IAssetRepository assetRepository, IVehicleContainerRepository vehicleContainerRepository, ITagRepository tagRepository)
+            IAssetRepository assetRepository, IVehicleContainerRepository vehicleContainerRepository, ITagRepository tagRepository, IWebHostEnvironment webHostEnvironment)
         {
             _imagesRepository = imagesRepository;
             _assetHandler = assetHandler;
@@ -70,6 +72,7 @@ namespace CarImagesWeb.Services
             _assetRepository = assetRepository;
             _vehicleContainerRepository = vehicleContainerRepository;
             _tagRepository = tagRepository;
+            _webHostEnvironment = webHostEnvironment;
             var storageAccountName = configuration["AzureStorage:AccountName"];
             var containerName = configuration["AzureStorage:ContainerName"];
             _containerUrl = $"https://{storageAccountName}.blob.core.windows.net/{containerName}";
@@ -94,9 +97,10 @@ namespace CarImagesWeb.Services
             var tag = await _tagHandler.GetTagToUpload(dto);
             var country = await _countryHandler.GetCountryFromCode(dto.CountryCode);
             var assetDirectory = GetAssetDirectory(asset, country, tag);
+            var filename = Guid.NewGuid() + Path.GetExtension(file.FileName);
             var imageUpload = new ImageUpload
             {
-                FileName = file.FileName,
+                FileName = filename,
                 Asset = asset,
                 AssetId = asset.Id,
                 Country = country,
@@ -107,7 +111,7 @@ namespace CarImagesWeb.Services
             };
 
             var thumbnail = await CreateThumbnailAsync(file, 200);
-            var thumbFileName = GetThumbnailName(file.FileName);
+            var thumbFileName = GetThumbnailName(filename);
             var imageThumbnail = new ImageThumbnail
             {
                 FileName = thumbFileName,
@@ -116,7 +120,7 @@ namespace CarImagesWeb.Services
 
             await _imagesRepository.SaveImageAsync(imageUpload, file, imageThumbnail, assetDirectory);
         }
-
+        
         //TODO: Refactor this method
         public async Task HandleUpload(ImageUploadDto dto, IFormFileCollection files)
         {
@@ -126,9 +130,16 @@ namespace CarImagesWeb.Services
 
             var assetDirectory = GetAssetDirectory(asset, country, tag);
 
-            var imageUploads = files.Select(file => new ImageUpload
+            var imageUploads = new List<ImageUpload>();
+
+            // convert files to list
+            // create thumbnails for each image
+            var thumbnails = new List<ImageThumbnail>();
+            foreach (var file in files)
+            {
+                var imageUpload = new ImageUpload
                 {
-                    FileName = file.FileName,
+                    FileName = Guid.NewGuid() + Path.GetExtension(file.FileName),
                     Asset = asset,
                     AssetId = asset.Id,
                     Country = country,
@@ -136,16 +147,10 @@ namespace CarImagesWeb.Services
                     UserId = "",
                     Tag = tag,
                     TagId = tag.Id
-                })
-                .ToList();
-
-            // convert files to list
-            // create thumbnails for each image
-            var thumbnails = new List<ImageThumbnail>();
-            foreach (var file in files)
-            {
+                };
+                imageUploads.Add(imageUpload);
                 var thumb = await CreateThumbnailAsync(file, 200);
-                var thumbFileName = GetThumbnailName(file.FileName);
+                var thumbFileName = GetThumbnailName(imageUpload.FileName);
                 thumbnails.Add(new ImageThumbnail
                 {
                     FileName = thumbFileName,
@@ -296,7 +301,7 @@ namespace CarImagesWeb.Services
         private static async Task<Image> CreateThumbnailAsync(IFormFile file, int maxHeight, int quality = 100)
         {
             // Load the original image from the form file
-            using var stream = new MemoryStream();
+            await using var stream = new MemoryStream();
             await file.CopyToAsync(stream);
             stream.Seek(0, SeekOrigin.Begin);
 

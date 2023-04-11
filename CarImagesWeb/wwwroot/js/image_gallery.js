@@ -84,8 +84,11 @@ app = Vue.createApp({
         change() {
             console.log('ds')
         },
-        moreInfo(index) {
-            const image = this._images[index]
+        moreInfo(id) {
+            const image = this._images.find(i => i.uploadId === id)
+            let i = {...image}
+            $('#modalImage').attr('src', i.url.replace('_thumb', ''));
+            $('#imageModal').modal('show');
             $(document).Toasts('create', {
                 title: 'Toast Title',
                 body:

@@ -49,11 +49,14 @@ namespace CarImagesWeb.Services
     {
         private readonly IAssetRepository _repository;
         private readonly IVehicleContainerRepository _vehicleContainerRepository;
+        private readonly IImagesRepository _imagesRepository;
 
-        public AssetsHandler(IAssetRepository repository, IVehicleContainerRepository vehicleContainerRepository)
+        public AssetsHandler(IAssetRepository repository, IVehicleContainerRepository vehicleContainerRepository,
+            IImagesRepository imagesRepository)
         {
             _repository = repository;
             _vehicleContainerRepository = vehicleContainerRepository;
+            _imagesRepository = imagesRepository;
         }
 
         public async Task<IEnumerable<Asset>> GetVehiclesAsync()
@@ -136,10 +139,32 @@ namespace CarImagesWeb.Services
                 var existingAssets = await _repository.FindAsync(
                     a => assets.Select(asset => asset.Code).Contains(a.Code));
 
-                await _repository.DeleteRangeAsync(existingAssets);
+                foreach (Asset existingAsset in existingAssets)
+                {
+                    var uploads = await _imagesRepository.GetAllAsync(i => i.AssetId == existingAsset.Id);
+                    foreach (var upload in uploads)
+                    {
+                        var filepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + upload.FileName;
+                        var thumbFilepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + GetThumbnailName(upload.FileName);
+                        await _imagesRepository.DeleteImageAsync(thumbFilepath);
+                        await _imagesRepository.DeleteImageAsync(filepath);   
+                    }
+                   
+                    await _repository.DeleteAsync(existingAsset);
+                }
             }
 
-            await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation);
+            await ManageAssetsAsync(fileInput, errorHandleCallback, DbOperation, true);
+        }
+        
+        public string GetAssetDirectory(Asset asset, Country country, Tag tag)
+        {
+            return Path.Combine(asset.Type, asset.Code, country.Code, tag.Name);
+        }
+
+        public string GetThumbnailName(string fileName)
+        {
+            return Path.GetFileNameWithoutExtension(fileName) + "_thumb" + Path.GetExtension(fileName);
         }
 
         public async Task<List<Asset>> GetAllAssets()
@@ -210,7 +235,7 @@ namespace CarImagesWeb.Services
         }
 
         private static async Task ManageAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback,
-            Func<List<Asset>, Task> dbOperation)
+            Func<List<Asset>, Task> dbOperation, bool isDelete = false)
         {
             // Get the file extension
             var fileExtension = Path.GetExtension(fileInput.FileName);
@@ -231,10 +256,13 @@ namespace CarImagesWeb.Services
                             errorHandleCallback(
                                 new Exception("No data found in the file"));
 
-                        // if (assetRecords.Any(r => !r.IsNonEmpty()))
-                        //     errorHandleCallback(
-                        //         new Exception("Contain empty values"));
-                        
+                        if (!isDelete)
+                        {
+                            if (assetRecords.Any(r => !r.IsNonEmpty()))
+                                errorHandleCallback(
+                                    new Exception("Contain empty values"));
+                        }
+
                         assets.AddRange(assetRecords.Select(assetRecord => new Asset
                         {
                             Name = assetRecord.Name,

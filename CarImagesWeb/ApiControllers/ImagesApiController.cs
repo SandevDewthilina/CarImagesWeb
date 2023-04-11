@@ -86,7 +86,7 @@ namespace CarImagesWeb.ApiControllers
 
             // find imageUploads by assetType and assetId and/or tags
             var imageUploads = await _imagesHandler.HandleSearch(assetType, assetId, tags, countryCode);
-            
+
             // make list of anonymous objects of imageUploads and their thumbnails
             var data = new List<object>();
             foreach (var imageUpload in imageUploads)
@@ -106,9 +106,9 @@ namespace CarImagesWeb.ApiControllers
                     downloadUrl = _imagesHandler.GetImageUrlFromThumbnail(thumbnail)
                 });
             }
-            
+
             // await _imagesHandler.HandleSearch();
-            return Json(new {data = data });
+            return Json(new {data = data});
         }
 
         /// <summary>
@@ -132,6 +132,7 @@ namespace CarImagesWeb.ApiControllers
             var upload = await _imagesRepository.GetAsync(iu => iu.Id == uploadId);
             _imagesHandler.DeleteUpload(upload).Wait();
             await _imagesRepository.DeleteAsync(upload);
+
             return Json(new {success = true});
         }
     }

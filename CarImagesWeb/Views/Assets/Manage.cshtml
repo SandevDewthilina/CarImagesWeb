@@ -1,7 +1,14 @@
-﻿@model CarImagesWeb.ViewModels.UpdateAssetsViewModel
+﻿@using Microsoft.CodeAnalysis
+@model CarImagesWeb.ViewModels.UpdateAssetsViewModel
 
 @{
     ViewData["Title"] = "Manage";
+}
+
+@section Styles
+{
+    <link rel="stylesheet" href="~/plugins/sweetalert2/sweetalert2.min.css" />
+
 }
 
 <!-- Content Wrapper. Contains page content -->
@@ -71,54 +78,57 @@
                     </div>
                 </form>
             </div>
-            <!-- /.card -->
-            <div class="card card-danger">
-                <div class="card-header">
-                    <h3 class="card-title">Delete Specific Assets</h3>
-                </div>
-                <!-- /.card-header -->
-                <!-- form start -->
-                <form asp-action="Manage" method="post" enctype="multipart/form-data">
-                    <div class="card-body">
-                        <div class="form-group">
-                            <label for="sheet">File input</label>
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input asp-for="DeleteFile" type="file" accept="text/*, 
+            @if (User.IsInRole("Admin"))
+            {
+                <!-- /.card -->
+                <div class="card card-danger">
+                    <div class="card-header">
+                        <h3 class="card-title">Delete Specific Assets</h3>
+                    </div>
+                    <!-- /.card-header -->
+                    <!-- form start -->
+                    <form asp-action="Manage" method="post" enctype="multipart/form-data">
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label for="sheet">File input</label>
+                                <div class="input-group">
+                                    <div class="custom-file">
+                                        <input asp-for="DeleteFile" type="file" accept="text/*, 
                                             application/vnd.ms-excel, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                           class="custom-file-input" id="delete-sheet">
-                                    <label asp-for="DeleteFile" class="custom-file-label" for="sheet" id="delete-sheet-name">
-                                        Choose file
-                                    </label>
+                                               class="custom-file-input" id="delete-sheet">
+                                        <label asp-for="DeleteFile" class="custom-file-label" for="sheet" id="delete-sheet-name">
+                                            Choose file
+                                        </label>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="mt-2">
-                                <div class="text-danger">
-                                    <ul>
-                                        @{
-                                            var errors = ViewData.ModelState["Delete"]?.Errors;
-                                            if (errors != null)
-                                            {
-                                                foreach (var error in errors)
+                                <div class="mt-2">
+                                    <div class="text-danger">
+                                        <ul>
+                                            @{
+                                                var errors = ViewData.ModelState["Delete"]?.Errors;
+                                                if (errors != null)
                                                 {
-                                                    <li>@error.ErrorMessage</li>
+                                                    foreach (var error in errors)
+                                                    {
+                                                        <li>@error.ErrorMessage</li>
+                                                    }
                                                 }
                                             }
-                                        }
-                                    </ul>
+                                        </ul>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- /.card-body -->
+                        <!-- /.card-body -->
 
-                    <div class="card-footer">
-                        <input type="checkbox" asp-for="IsReset" hidden/>
-                        <button type="submit" class="btn btn-danger">Upload</button>
-                    </div>
-                </form>
-            </div>
-            <!-- /.card -->
+                        <div class="card-footer">
+                            <input type="checkbox" asp-for="IsReset" hidden/>
+                            <button type="submit" class="btn btn-danger">Upload</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.card -->
+            }
             <div class="card card-secondary">
                 <div class="card-header">
                     <h3 class="card-title">Create Vehicle Container Assignements</h3>
@@ -173,6 +183,19 @@
 
 @section Scripts
 {
+    <script src="~/plugins/sweetalert2/sweetalert2.all.min.js"></script>
+    <script>
+        const status = '@Html.Raw(ViewBag.status)' === 'True'
+       if (status) {
+            sweetAlert.fire("Success", "Upload Complete!", "success")
+            .then((result) => {
+               if (result.value) {
+                 window.location.href = '/assets/list'
+               } 
+             });
+       }
+       
+    </script>
     <script>
         $(function () {
             $('#sheet').change(function() {

@@ -33,18 +33,19 @@ namespace CarImagesWeb.Services
             _containerClient = _blobServiceClient.GetBlobContainerClient(containerName);
         }
 
-        public async Task UploadImageAsync(IFormFile file, ImageThumbnail imageThumbnail, string directoryName)
+        public async Task UploadImageAsync(IFormFile file,ImageThumbnail imageThumbnail, string directoryName)
         {
+            var filename = imageThumbnail.FileName.Replace("_thumb", "");
             try
             {
-                await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + file.FileName);
+                await UploadImageAsync(file.OpenReadStream(), directoryName + "/" + filename);
             }
             catch (RequestFailedException e)
             {
                 if (e.ErrorCode == "BlobAlreadyExists")
                     throw new RequestFailedException(
                         e.Status,
-                        "Image already exist: " + file.FileName
+                        "Image already exist: " + filename
                     );
 
                 throw new Exception(
