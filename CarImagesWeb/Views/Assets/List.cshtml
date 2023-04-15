@@ -1,4 +1,4 @@
-﻿@model List<Asset>
+﻿@model CarImagesWeb.Controllers.ListSearchModel
 
 @{
     ViewBag.Title = "All Assets";
@@ -33,6 +33,40 @@
                 <div class="col-12">
                     <div class="card card-primary card-outline">
                         <div class="card-header">
+                            Search Results
+                        </div>
+                        <div class="card-body">
+                            <form asp-action="List">
+                                <div class="row">
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <lable>Start Date</lable>
+                                            <input type="date" asp-for="StartDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <lable>End Date</lable>
+                                            <input type="date" asp-for="EndDate" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <div class="form-group">
+                                            <lable>Asset Code</lable>
+                                            <input type="text" asp-for="Code" class="form-control">
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <button type="submit" class="btn btn-primary btn-block mt-3">Search</button>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                        </div>
+                    </div>
+                    <div class="card card-primary card-outline">
+                        <div class="card-header">
                             Assets List
                             @* <form action="Export"> *@
                             @*     <input class="btn btn-success" type="submit" value="Export"/> *@
@@ -40,7 +74,7 @@
                         </div>
                         <!-- /.card-header -->
                         <div class="card-body">
-                            @if (Model.Any())
+                            @if (Model.Assets.Any())
                             {
                                 <table id="example1" class="table table-bordered table-striped table-hover">
                                     <thead>
@@ -55,7 +89,7 @@
                                     </tr>
                                     </thead>
                                     <tbody>
-                                    @foreach (var asset in Model)
+                                    @foreach (var asset in Model.Assets)
                                     {
                                         <tr>
                                             @* looping through the properties of the Asset class *@

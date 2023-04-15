@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CarImagesWeb.DbOperations;
+using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,11 +17,13 @@ namespace CarImagesWeb.Controllers
     {
         private readonly IAssetsHandler _assetsHandler;
         private readonly ICsvHandler _csvHandler;
+        private readonly IAssetRepository _assetRepository;
 
-        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler)
+        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler, IAssetRepository assetRepository)
         {
             _assetsHandler = assetsHandler;
             _csvHandler = csvHandler;
+            _assetRepository = assetRepository;
         }
 
         public IActionResult Manage()
@@ -102,9 +107,30 @@ namespace CarImagesWeb.Controllers
         public async Task<IActionResult> List()
         {
             // Get the assets from the database
-            var assets = await _assetsHandler.GetAllAssets();
+            // var assets = await _assetsHandler.GetAllAssets();
             ViewBag.vehicleContainerMappings = await _assetsHandler.GetAllContainerVehicleMappings();
-            return View(assets);
+            return View(new ListSearchModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> List(ListSearchModel model)
+        {
+            ViewBag.vehicleContainerMappings = await _assetsHandler.GetAllContainerVehicleMappings();
+            if (string.IsNullOrWhiteSpace(model.Code) || string.IsNullOrEmpty(model.Code))
+            {
+                model.Assets = await _assetRepository
+                    .GetAllAsync(
+                        a => a.YardInDate.Date >= model.StartDate.Date && a.YardInDate.Date <= model.EndDate.Date
+                    );
+            }
+            else
+            {
+                model.Assets = await _assetRepository
+                    .GetAllAsync(
+                        a => a.Code.Equals(model.Code)
+                    );
+            }
+            return View(model);
         }
 
         [Obsolete("This method is incomplete and is intended for testing purposes only.")]
@@ -154,6 +180,20 @@ namespace CarImagesWeb.Controllers
 
 
         }
+    }
+
+    public class ListSearchModel
+    {
+        public ListSearchModel()
+        {
+            StartDate = DateTime.Now;
+            EndDate = DateTime.Now;
+            Assets = new List<Asset>();
+        }
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public string Code { get; set; }
+        public List<Asset> Assets { get; set; }
     }
 
     public class AssignmentRecord

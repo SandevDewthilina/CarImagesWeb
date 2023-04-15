@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Helpers;
 using CarImagesWeb.Models;
+using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -14,10 +16,12 @@ namespace CarImagesWeb.ApiControllers
     public class AssetsApiController : Controller
     {
         private readonly IAssetRepository _assetRepository;
+        private readonly IAssetsHandler _assetsHandler;
 
-        public AssetsApiController(IAssetRepository assetRepository)
+        public AssetsApiController(IAssetRepository assetRepository, IAssetsHandler assetsHandler)
         {
             _assetRepository = assetRepository;
+            _assetsHandler = assetsHandler;
         }
 
         [AllowAnonymous]
@@ -39,6 +43,19 @@ namespace CarImagesWeb.ApiControllers
                 {
                     vehicles, containers
                 }
+            });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FilterAssets(string startDate, string endDate, string code)
+        {
+            var sd = DateTime.Parse(startDate);
+            var ed = DateTime.Parse(endDate);
+            return Json(new {success = true, 
+                data = await _assetRepository
+                    .GetAllAsync(
+                        a => a.YardInDate.Date >= sd.Date && a.YardInDate.Date <= ed
+                        )
             });
         }
     }
