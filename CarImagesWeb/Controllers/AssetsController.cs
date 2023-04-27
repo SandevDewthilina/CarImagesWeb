@@ -120,7 +120,7 @@ namespace CarImagesWeb.Controllers
             {
                 model.Assets = await _assetRepository
                     .GetAllAsync(
-                        a => a.YardInDate.Date >= model.StartDate.Date && a.YardInDate.Date <= model.EndDate.Date
+                        a => a.PurchaseDate.Date >= model.StartDate.Date && a.PurchaseDate.Date <= model.EndDate.Date
                     );
             }
             else
