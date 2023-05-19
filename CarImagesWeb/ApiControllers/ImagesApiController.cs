@@ -8,6 +8,7 @@ using CarImagesWeb.DTOs;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.ApiControllers
@@ -19,11 +20,18 @@ namespace CarImagesWeb.ApiControllers
     {
         private readonly IImagesHandler _imagesHandler;
         private readonly IImagesRepository _imagesRepository;
+        private readonly IAssetRepository _assetRepository;
+        private readonly ITagRepository _tagRepository;
 
-        public ImagesApiController(IImagesHandler imagesHandler, IImagesRepository imagesRepository)
+        public ImagesApiController(IImagesHandler imagesHandler,
+            IImagesRepository imagesRepository, 
+            IAssetRepository assetRepository,
+            ITagRepository tagRepository)
         {
             _imagesHandler = imagesHandler;
             _imagesRepository = imagesRepository;
+            _assetRepository = assetRepository;
+            _tagRepository = tagRepository;
         }
 
         /// <summary>
@@ -46,6 +54,23 @@ namespace CarImagesWeb.ApiControllers
             }
 
             return Ok();
+        }
+
+        [AllowAnonymous]
+        [HttpPost]
+        public async Task<IActionResult> ExternalUpload([FromForm] ExternalImageUploadDto model)
+        {
+            try
+            {
+                await _imagesHandler.HandleExternalUpload(model);
+            }
+            catch (RequestFailedException e)
+            {
+                Response.StatusCode = e.Status;
+                return Json(new {error = e.Message});
+            }
+
+            return Json(new {success = true});
         }
 
         /// <summary>
@@ -111,6 +136,24 @@ namespace CarImagesWeb.ApiControllers
             return Json(new {data = data});
         }
 
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetAssetImages(string assetCode, string tagCode)
+        {
+            var asset = await _assetRepository.GetAsync(a => a.Code.Equals(assetCode));
+            var tag = await _tagRepository.GetAsync(t => t.Code.Equals(tagCode));
+            var imageUploads = await _imagesRepository.FindAsync(u => u.AssetId == asset.Id && u.TagId == tag.Id);
+            var data = imageUploads.Select(imageUpload => _imagesHandler
+                .GetImageThumbnailUrl(imageUpload))
+                .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/")).ToList();
+
+            return Json(new
+            {
+                success = true,
+                data = data
+            });
+        }
+        
         /// <summary>
         /// This endpoint is used to download images from the associated thumbnails.
         /// </summary>
@@ -135,5 +178,15 @@ namespace CarImagesWeb.ApiControllers
 
             return Json(new {success = true});
         }
+    }
+
+    public class ExternalImageUploadDto
+    {
+        public string ImageCategory { get; set; }
+        public string CountryCode { get; set; }
+        public string AssetCode { get; set; }
+        public string TagCode { get; set; }
+        public IFormFile File { get; set; }
+        public IFormFileCollection Files { get; set; }
     }
 }

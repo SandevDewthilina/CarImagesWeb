@@ -7,6 +7,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Net;
 using System.Threading.Tasks;
+using CarImagesWeb.ApiControllers;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.DTOs;
 using CarImagesWeb.Helpers;
@@ -47,6 +48,7 @@ namespace CarImagesWeb.Services
 
         Task HandleUpload(ImageUploadDto dto);
         Task DeleteUpload(ImageUpload upload);
+        Task HandleExternalUpload(ExternalImageUploadDto dto);
     }
 
     public class ImagesHandler : IImagesHandler
@@ -89,6 +91,38 @@ namespace CarImagesWeb.Services
             var thumbFilepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + GetThumbnailName(upload.FileName);
             await _imagesRepository.DeleteImageAsync(thumbFilepath);
             await _imagesRepository.DeleteImageAsync(filepath);
+        }
+
+        public async Task HandleExternalUpload(ExternalImageUploadDto dto)
+        {
+            var asset = await _assetRepository.GetAsync(a => a.Code.Equals(dto.AssetCode));
+            var tag = await _tagRepository.GetAsync(t => t.Code.Equals(dto.TagCode));
+            var country = await _countryHandler.GetCountryFromCode(dto.CountryCode);
+            var assetDirectory = GetAssetDirectory(asset, country, tag);
+            var filename = Guid.NewGuid() + Path.GetExtension(dto.File.FileName);
+            
+            var imageUpload = new ImageUpload
+            {
+                FileName = filename,
+                Asset = asset,
+                AssetId = asset.Id,
+                Country = country,
+                CountryId = country.Id,
+                UserId = "",
+                Tag = tag,
+                TagId = tag.Id
+            };
+
+            var thumbnail = await CreateThumbnailAsync(dto.File, 200);
+            var thumbFileName = GetThumbnailName(filename);
+            var imageThumbnail = new ImageThumbnail
+            {
+                FileName = thumbFileName,
+                File = thumbnail
+            };
+
+            await _imagesRepository.SaveImageAsync(imageUpload, dto.File, imageThumbnail, assetDirectory);
+            
         }
 
         public async Task HandleUpload(ImageUploadDto dto, IFormFile file)
