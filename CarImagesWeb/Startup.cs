@@ -34,13 +34,14 @@ namespace CarImagesWeb
 
             // EFCore identity and set password validations  
             services.AddIdentity<ApplicationUser, UserRole>(options =>
-            {
-                // options.Password.RequiredLength = 6;
-                // options.Password.RequireDigit = false;
-                // options.Password.RequireUppercase = false;
-                // options.Password.RequiredUniqueChars = 0;
-                // options.Password.RequireNonAlphanumeric = false;
-            }).AddEntityFrameworkStores<CarImagesDbContext>();
+                {
+                    // options.Password.RequiredLength = 6;
+                    // options.Password.RequireDigit = false;
+                    // options.Password.RequireUppercase = false;
+                    // options.Password.RequiredUniqueChars = 0;
+                    // options.Password.RequireNonAlphanumeric = false;
+                }).AddEntityFrameworkStores<CarImagesDbContext>()
+                .AddDefaultTokenProviders();
 
             // Add repository services
             services.AddScoped<IAssetRepository, AssetRepository>();

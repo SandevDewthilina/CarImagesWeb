@@ -39,6 +39,11 @@ namespace CarImagesWeb.Controllers
 
                 if (result.Succeeded)
                 {
+                    if (_signInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+                    
                     return RedirectToAction("Register");
                 }
 
@@ -84,6 +89,36 @@ namespace CarImagesWeb.Controllers
         public IActionResult AccessDenied(string returnUrl)
         {
             return View();
+        }
+
+        public IActionResult ResetPassword(string email, string token)
+        {
+            return View(new ResetPasswordViewModel() {Email = email, token = token});
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var user = await _userManager.FindByEmailAsync(model.Email);
+                if (user != null)
+                {
+                    var results = await _userManager.ResetPasswordAsync(user, model.token, model.NewPassword);
+                    if (results.Succeeded)
+                    {
+                        return RedirectToAction("ListUsers", "Administration");
+                    }
+
+                    foreach (var error in results.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+
+                    return View(model);
+                }
+            }
+            return View(model);
         }
     }
 }

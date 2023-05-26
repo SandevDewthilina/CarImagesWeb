@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CarImagesWeb.Controllers
 {
-    [Authorize]
+    [Authorize(Roles = "Admin")]
     public class TagsController : Controller
     {
         private readonly ITagRepository _tagRepository;
