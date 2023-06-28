@@ -214,7 +214,7 @@ namespace CarImagesWeb.Services
             Expression<Func<ImageUpload, bool>> expression;
             
             // if asset type is Vehicle allow both container and vehicle results
-            bool isVehicle = assetType.Equals("Vehicle");
+            bool isVehicle = assetType.ToLower().Equals(AssetType.Vehicle.ToString().ToLower());
             
             if (assetId != string.Empty && tagIds.Count == 0)
             {

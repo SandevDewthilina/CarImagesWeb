@@ -61,12 +61,12 @@ namespace CarImagesWeb.Services
 
         public async Task<IEnumerable<Asset>> GetVehiclesAsync()
         {
-            return await _repository.GetAllAsync(a => a.Type == AssetType.Vehicle.ToString());
+            return await _repository.GetAllAsync(a => a.Type.ToLower() == AssetType.Vehicle.ToString().ToLower());
         }
 
         public async Task<IEnumerable<Asset>> GetContainersAsync()
         {
-            return await _repository.GetAllAsync(a => a.Type == AssetType.Container.ToString());
+            return await _repository.GetAllAsync(a => a.Type.ToLower() == AssetType.Container.ToString().ToLower());
         }
 
         public async Task<Asset> GetAssetToUpload(ImageUploadDto imageUploadDto)

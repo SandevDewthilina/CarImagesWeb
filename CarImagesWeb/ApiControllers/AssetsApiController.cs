@@ -33,9 +33,9 @@ namespace CarImagesWeb.ApiControllers
             var containers = new List<Asset>();
             // divide assets into vehicles and containers based on their type
             foreach (var asset in assets)
-                if (asset.Type == AssetType.Vehicle.ToString())
+                if (asset.Type.ToLower() == AssetType.Vehicle.ToString().ToLower())
                     vehicles.Add(asset);
-                else if (asset.Type == AssetType.Container.ToString()) containers.Add(asset);
+                else if (asset.Type.ToLower() == AssetType.Container.ToString().ToLower()) containers.Add(asset);
 
             return Json(new
             {
