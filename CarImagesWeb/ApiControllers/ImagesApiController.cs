@@ -140,18 +140,45 @@ namespace CarImagesWeb.ApiControllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAssetImages(string assetCode, string tagCode)
         {
-            var asset = await _assetRepository.GetAsync(a => a.Code.Equals(assetCode));
-            var tag = await _tagRepository.GetAsync(t => t.Code.Equals(tagCode));
-            var imageUploads = await _imagesRepository.FindAsync(u => u.AssetId == asset.Id && u.TagId == tag.Id);
-            var data = imageUploads.Select(imageUpload => _imagesHandler
-                .GetImageThumbnailUrl(imageUpload))
-                .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/")).ToList();
-
-            return Json(new
+            try
             {
-                success = true,
-                data = data
-            });
+                var asset = await _assetRepository.GetAsync(a => a.Code.Equals(assetCode));
+                if (asset == null)
+                {
+                    throw new Exception("No Asset Found");
+                }
+                List<ImageUpload> imageUploads;
+                if (string.IsNullOrEmpty(tagCode))
+                {
+                    imageUploads = await _imagesRepository.FindAsync(u => u.AssetId == asset.Id);
+                }
+                else
+                {
+                    var tag = await _tagRepository.GetAsync(t => t.Code.Equals(tagCode));
+                    if (tag == null)
+                    {
+                        throw new Exception("Invalid Tag Code");
+                    }
+                    imageUploads = await _imagesRepository.FindAsync(u => u.AssetId == asset.Id && u.TagId == tag.Id);
+                }
+                var data = imageUploads.Select(imageUpload => _imagesHandler
+                        .GetImageThumbnailUrl(imageUpload))
+                    .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/")).ToList();
+
+                return Json(new
+                {
+                    success = true,
+                    data = data
+                });
+            }
+            catch (Exception e)
+            {
+                return Json(new
+                {
+                    success = false,
+                    message = e.Message
+                });
+            }
         }
         
         /// <summary>
