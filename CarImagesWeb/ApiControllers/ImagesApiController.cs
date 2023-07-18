@@ -161,10 +161,22 @@ namespace CarImagesWeb.ApiControllers
                     }
                     imageUploads = await _imagesRepository.FindAsync(u => u.AssetId == asset.Id && u.TagId == tag.Id);
                 }
-                var data = imageUploads.Select(imageUpload => _imagesHandler
-                        .GetImageThumbnailUrl(imageUpload))
-                    .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/")).ToList();
+                // var data = imageUploads.Select(imageUpload => _imagesHandler
+                //         .GetImageThumbnailUrl(imageUpload))
+                //     .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/")).ToList();
+                //
 
+                var data = imageUploads.GroupBy(u => u.Tag.Code)
+                    .Select(group => new
+                    {
+                        tag = group.Key,
+                        urls = group
+                            .Select(imageUpload => _imagesHandler.GetImageThumbnailUrl(imageUpload))
+                            .Select(thumbnail => _imagesHandler.GetImageUrlFromThumbnail(thumbnail).Replace("\\", "/"))
+                            .ToList()
+                        
+                    });
+                
                 return Json(new
                 {
                     success = true,
