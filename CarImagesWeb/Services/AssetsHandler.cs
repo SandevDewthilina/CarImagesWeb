@@ -43,6 +43,7 @@ namespace CarImagesWeb.Services
         Task<List<Asset>> GetAllAssets();
         Task AssignAssets(IFormFile fileInput, Action<Exception> errorHandleCallback);
         Task<List<ContainerVehicleMapping>> GetAllContainerVehicleMappings();
+        Task DeleteAssetRecordFromId(int assetId);
     }
 
     public class AssetsHandler : IAssetsHandler
@@ -232,6 +233,35 @@ namespace CarImagesWeb.Services
         public async Task<List<ContainerVehicleMapping>> GetAllContainerVehicleMappings()
         {
             return await _vehicleContainerRepository.GetAllAsync();
+        }
+
+        public async Task DeleteAssetRecordFromId(int assetId)
+        {
+            var uploads = await _imagesRepository.GetAllAsync(i => i.AssetId == assetId);
+                foreach (var upload in uploads)
+                {
+                    var filepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + upload.FileName;
+                    var thumbFilepath = GetAssetDirectory(upload.Asset, upload.Country, upload.Tag) + "/" + GetThumbnailName(upload.FileName);
+                    try
+                    {
+                        await _imagesRepository.DeleteImageAsync(thumbFilepath);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
+                    try
+                    {
+                        await _imagesRepository.DeleteImageAsync(filepath);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    } 
+                }
+
+                await _repository.DeleteAsync(await _repository.GetAsync(a => a.Id == assetId));
         }
 
         private static async Task ManageAssetsAsync(IFormFile fileInput, Action<Exception> errorHandleCallback,

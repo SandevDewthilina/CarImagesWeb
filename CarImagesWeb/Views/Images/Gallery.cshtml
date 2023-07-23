@@ -1,5 +1,6 @@
 ﻿@section Styles
 {
+    <link rel="stylesheet" href="~/lib/lightbox/css/lightbox.min.css">
     <!-- Toastr -->
     <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"/>
@@ -209,13 +210,13 @@
                                     </button>
                                 }
                                 <div class="download-check-box icheck-primary">
-                                    <input type="checkbox" v-model="image.isSelected" v-bind:id="'img-'+index"
+                                    <input type="checkbox" v-model="image.isSelected" v-bind:id="image.uploadId + '-img-'+index"
                                            v-bind:name="'img-'+index" alt="" hidden>
-                                    <label v-bind:for="'img-'+index"></label>
+                                    <label v-bind:for="image.uploadId + '-img-'+index"></label>
                                 </div>
                                 <div class="image border">
                                     <button class="btn bg-transparent p-0 m-0" v-on:click="moreInfo(image.uploadId)">
-                                        <img id="previewimg" v-bind:src="image.url" alt="">
+                                 <img id="previewimg" v-bind:src="image.url" alt="">
                                     </button>
                                 </div>
 
@@ -282,6 +283,24 @@
         }).catch(err => {
             console.log(err)
         })
+    })
+    </script>
+    <script src="~/lib/lightbox/js/lightbox.js"></script>
+    <script defer="defer">
+    lightbox.option({
+      albumLabel: 'Image %1 of %2',
+      alwaysShowNavOnTouchDevices: false,
+      fadeDuration: 600,
+      fitImagesInViewport: true,
+      imageFadeDuration: 600,
+      maxWidth: 800,
+      maxHeight: 600,
+      positionFromTop: 50,
+      resizeDuration: 700,
+      showImageNumberLabel: true,
+      wrapAround: false, // If true, when a user reaches the last image in a set, the right navigation arrow will appear and they will be to continue moving forward which will take them back to the first image in the set.
+    
+      sanitizeTitle: false
     })
     </script>
 }

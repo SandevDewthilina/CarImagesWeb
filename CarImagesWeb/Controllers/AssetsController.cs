@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CarImagesWeb.DbOperations;
 using CarImagesWeb.Models;
 using CarImagesWeb.Services;
 using CarImagesWeb.ViewModels;
+using CsvHelper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -18,12 +22,20 @@ namespace CarImagesWeb.Controllers
         private readonly IAssetsHandler _assetsHandler;
         private readonly ICsvHandler _csvHandler;
         private readonly IAssetRepository _assetRepository;
+        private readonly IImagesHandler _imagesHandler;
+        private readonly IImagesRepository _imagesRepository;
+        private readonly ITagRepository _tagRepository;
 
-        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler, IAssetRepository assetRepository)
+        public AssetsController(IAssetsHandler assetsHandler, ICsvHandler csvHandler, 
+            IAssetRepository assetRepository, IImagesHandler imagesHandler,
+            IImagesRepository imagesRepository, ITagRepository tagRepository)
         {
             _assetsHandler = assetsHandler;
             _csvHandler = csvHandler;
             _assetRepository = assetRepository;
+            _imagesHandler = imagesHandler;
+            _imagesRepository = imagesRepository;
+            _tagRepository = tagRepository;
         }
 
         public IActionResult Manage()
@@ -101,7 +113,7 @@ namespace CarImagesWeb.Controllers
             if (ModelState.ErrorCount > 0) return View(model);
             // Return a success response
             ViewBag.status = true;
-            return View(model);
+            return View("SuccessPage");
         }
 
         public async Task<IActionResult> List()
@@ -120,7 +132,7 @@ namespace CarImagesWeb.Controllers
             {
                 model.Assets = await _assetRepository
                     .GetAllAsync(
-                        a => a.PurchaseDate.Date >= model.StartDate.Date && a.PurchaseDate.Date <= model.EndDate.Date
+                        a => a.YardInDate.Date >= model.StartDate.Date && a.YardInDate.Date <= model.EndDate.Date
                     );
             }
             else
@@ -155,6 +167,85 @@ namespace CarImagesWeb.Controllers
             {
                 FileDownloadName = "export.csv"
             };
+        }
+        
+        public async Task<IActionResult> ExportDataForUploadCount()
+        {
+            // Create a new MemoryStream to hold the CSV data
+            var memoryStream = new MemoryStream();
+
+            // Create a new StreamWriter using the memory stream and UTF-8 encoding
+            var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8);
+
+            // Create a new CsvWriter using the StreamWriter
+            var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
+
+            // Write the data to the CSV file
+            var dictionary= new Dictionary<string, Dictionary<string, int>>();
+            var tagList = await _tagRepository.GetAllAsync();
+            var assetList = await _assetRepository.GetAllAsync();
+            var imageUploads = await _imagesRepository.GetAllAsync();
+
+            foreach (var asset in assetList)
+            {
+                var tempDic = tagList.ToDictionary(tag => tag.Code, tag => imageUploads.Count(u => u.AssetId == asset.Id && u.TagId == tag.Id));
+                dictionary.Add(asset.Code,tempDic);
+            }
+            
+            csvWriter.WriteField("");
+
+            foreach (var tag in tagList)
+            {
+                csvWriter.WriteField(tag.Code);
+            }
+            await csvWriter.NextRecordAsync();
+            
+            foreach (var row in dictionary)
+            {
+                csvWriter.WriteField(row.Key);
+                foreach (var cell in row.Value)
+                {
+                    csvWriter.WriteField(cell.Value);
+                }
+            
+                await csvWriter.NextRecordAsync();
+            }
+            
+            
+            // Flush the CsvWriter and StreamWriter
+            await csvWriter.FlushAsync();
+            await streamWriter.FlushAsync();
+
+            // Reset the position of the MemoryStream to the beginning
+            memoryStream.Position = 0;
+
+            // Return the CSV file as a FileStreamResult
+            return File(memoryStream, "text/csv", "data.csv");
+        }
+
+        public async Task<IActionResult> DeleteAssetFromId(int Id)
+        {
+            try
+            {
+                await _assetsHandler.DeleteAssetRecordFromId(Id);
+                return Json(new {success = true});
+            }
+            catch (Exception e)
+            {
+                return Json(new {success = false, error = e.Message});
+            }
+        }
+
+        public async Task<IActionResult> EditAsset(int Id)
+        {
+            return View(await _assetRepository.GetAsync(a => a.Id == Id));
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> EditAsset(Asset asset)
+        {
+            await _assetRepository.UpdateAsync(asset);
+            return View("SuccessPage");
         }
     }
 

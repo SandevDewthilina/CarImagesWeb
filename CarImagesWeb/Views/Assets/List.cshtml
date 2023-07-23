@@ -6,6 +6,7 @@
 
 @section Styles
 {
+    
     <!-- DataTables -->
     <link rel="stylesheet" href="~/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="~/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
@@ -19,7 +20,10 @@
             <div class="row mb-2">
                 <div class="col-12 d-flex justify-content-between">
                     <h1>All Assets</h1>
-                    <a asp-action="Manage" class="btn btn-primary" style="margin-left: 10px">Manage Assets</a>
+                    <div>
+                        <a asp-action="Manage" class="btn btn-primary" style="margin-left: 10px">Manage Assets</a>
+                        <a asp-action="ExportDataForUploadCount" class="btn btn-success" style="margin-left: 10px">Export Upload Count</a>
+                    </div>
                 </div>
             </div>
         </div><!-- /.container-fluid -->
@@ -86,6 +90,7 @@
                                         <th>Purchased Date</th>
                                         <th>Stock</th>
                                         <th>Sales Segment</th>
+                                        <th>Actions</th>
                                     </tr>
                                     </thead>
                                     <tbody>
@@ -100,6 +105,10 @@
                                             <td>@asset.PurchaseDate.ToString("dd/MM/yyyy")</td>
                                             <td>@asset.Stock</td>
                                             <td>@asset.SalesSegment</td>
+                                            <td>
+                                                <a target="_blank" class="fa fa-edit text-primary mr-4" asp-action="EditAsset" asp-controller="Assets" asp-route-Id="@asset.Id"></a>
+                                                <a target="_blank" class="fa fa-trash text-danger" asp-controller="Assets" asp-action="DeleteAssetFromId" asp-route-Id="@asset.Id"></a>
+                                            </td>
                                         </tr>
                                     }
                                     </tbody>
@@ -180,6 +189,7 @@
 
 @section Scripts
 {
+   
     <!-- DataTables -->
     <script src="~/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="~/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>

@@ -34,8 +34,30 @@ function initializeUppy() {
         ],
         note: 'Images only',
         doneButtonHandler: () => {
-            window.location.href = "/Images/Upload";
-            // this.reset()
+            // window.location.href = "/Images/Upload";
+            // uppy.reset()
+            // initializeUppy()
+            const divElements = document.getElementsByClassName('uppy-Root');
+
+            // Check if there is at least one div with the specified class name
+            if (divElements.length > 0) {
+                // Remove the first occurrence of the div by targeting the first element in the NodeList
+                // Check if the parentDiv exists
+                let parentDiv = divElements[0]
+                if (parentDiv) {
+                    // Remove all the child div elements
+                    while (parentDiv.firstChild) {
+                        parentDiv.removeChild(parentDiv.firstChild);
+                    }
+
+                    // Remove the parentDiv itself from its parent node (if it has one)
+                    const parentContainer = parentDiv.parentNode;
+                    if (parentContainer) {
+                        parentContainer.removeChild(parentDiv);
+                    }
+                }
+            }
+            initializeUppy()
         }
 
     })
@@ -90,7 +112,7 @@ function initializeUploadForm() {
             if ($(this).val() !== '') {
                 tagIds.push($(this).val())
             }
-           
+
         })
         const body = {
             tagIds: tagIds.map(id => parseInt(id)),
@@ -100,7 +122,7 @@ function initializeUploadForm() {
             resp.data.data.forEach(tag => {
                 $(`option[value='${tag.id}']`).text(tag.name)
             })
-            
+
         }).catch(err => {
             console.log(err)
         })
