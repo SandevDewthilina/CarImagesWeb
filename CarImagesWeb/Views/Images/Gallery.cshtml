@@ -1,8 +1,10 @@
 ﻿@section Styles
 {
-    <link rel="stylesheet" href="~/lib/lightbox/css/lightbox.min.css">
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" integrity="sha512-H9jrZiiopUdsLpg94A333EfumgUBpO9MdbxStdeITo+KEIMaNfHNvwyjjDJb+ERPaRS6DpyRlKbvPUasNItRyw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+           
     <!-- Toastr -->
     <link rel="stylesheet" href="~/plugins/toastr/toastr.min.css">
+    @* <link rel="stylesheet" href="~/lib/lightbox/css/lightbox.min.css"> *@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.13.1/css/bootstrap-select.css"/>
     <style>
   /*A  gallery with max 5 columns*/
@@ -76,25 +78,24 @@
 }
 
 <div class="container-fluid py-4 px-2" id="app">
-    
+
     @* modal *@
-    <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="imageModalLabel">Image Modal</h5>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <img id="modalImage" src="" alt="Modal Image" />
-          </div>
-        </div>
-      </div>
-    </div>
-
-
+    @* <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true"> *@
+    @*   <div class="modal-dialog modal-dialog-centered" role="document"> *@
+    @*     <div class="modal-content"> *@
+    @*       <div class="modal-header"> *@
+    @*         <h5 class="modal-title" id="imageModalLabel">Image Modal</h5> *@
+    @*         <button type="button" class="close" data-dismiss="modal" aria-label="Close"> *@
+    @*           <span aria-hidden="true">&times;</span> *@
+    @*         </button> *@
+    @*       </div> *@
+    @*       <div class="modal-body"> *@
+    @*         <img id="modalImage" src="" alt="Modal Image" /> *@
+    @*       </div> *@
+    @*     </div> *@
+    @*   </div> *@
+    @* </div> *@
+    
     <div class="card card-outline card-primary">
         <div class="card-header">
             <h1 class="card-title">Images Gallery</h1>
@@ -215,11 +216,10 @@
                                     <label v-bind:for="image.uploadId + '-img-'+index"></label>
                                 </div>
                                 <div class="image border">
-                                    <button class="btn bg-transparent p-0 m-0" v-on:click="moreInfo(image.uploadId)">
-                                 <img id="previewimg" v-bind:src="image.url" alt="">
-                                    </button>
+                                    <a data-fancybox="gallery" :href="image.url" title="" data-rel="colorbox" data-lightbox="group1">
+                                        <img id="previewimg" :src="image.url" alt="">
+                                    </a>
                                 </div>
-
                             </div>
                             <div class="card-footer p-2">
                                 <div class="image-info d-flex pr-3">
@@ -285,22 +285,15 @@
         })
     })
     </script>
-    <script src="~/lib/lightbox/js/lightbox.js"></script>
-    <script defer="defer">
-    lightbox.option({
-      albumLabel: 'Image %1 of %2',
-      alwaysShowNavOnTouchDevices: false,
-      fadeDuration: 600,
-      fitImagesInViewport: true,
-      imageFadeDuration: 600,
-      maxWidth: 800,
-      maxHeight: 600,
-      positionFromTop: 50,
-      resizeDuration: 700,
-      showImageNumberLabel: true,
-      wrapAround: false, // If true, when a user reaches the last image in a set, the right navigation arrow will appear and they will be to continue moving forward which will take them back to the first image in the set.
     
-      sanitizeTitle: false
-    })
-    </script>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js" integrity="sha512-uURl+ZXMBrF4AwGaWmEetzrd+J5/8NRkWAvJx5sbPSSuOb0bZLqf+tOzniObO00BjHa/dD7gub9oCGMLPQHtQA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+       @* <script> *@
+       @*      $(document).ready(function(){ *@
+       @*          $(".fancybox").fancybox({ *@
+       @*              openEffect  : 'elastic', *@
+       @*              closeEffect : 'elastic' *@
+       @*          }); *@
+       @*      }); *@
+       @*  </script> *@
+
 }

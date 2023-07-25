@@ -186,29 +186,53 @@ namespace CarImagesWeb.Controllers
             var assetList = await _assetRepository.GetAllAsync();
             var imageUploads = await _imagesRepository.GetAllAsync();
 
+            
+
+            var imageUploadDictionary = new Dictionary<string, int>();
+            foreach (var imageUpload in imageUploads)
+            {
+                var key = imageUpload.Asset.Code + "#" + imageUpload.Tag.Code;
+                if (imageUploadDictionary.ContainsKey(key))
+                {
+                    // var tempValue = imageUploadDictionary[key];
+                    // imageUploadDictionary.Remove(key);
+                    // imageUploadDictionary.Add(key, tempValue + 1);
+                    imageUploadDictionary[key] += 1;
+                }
+                else
+                {
+                    imageUploadDictionary.Add(key, 1);
+                }
+            }
+            
             foreach (var asset in assetList)
             {
-                var tempDic = tagList.ToDictionary(tag => tag.Code, tag => imageUploads.Count(u => u.AssetId == asset.Id && u.TagId == tag.Id));
+                var tempDic = tagList.ToDictionary(tag => tag.Code, tag => imageUploadDictionary.ContainsKey(asset.Code + "#" + tag.Code) ? imageUploadDictionary[asset.Code + "#" + tag.Code] : 0);
                 dictionary.Add(asset.Code,tempDic);
             }
             
             csvWriter.WriteField("");
-
+            // var outStirng = " ";
             foreach (var tag in tagList)
             {
                 csvWriter.WriteField(tag.Code);
+                // outStirng += "," + tag.Code;
             }
             await csvWriter.NextRecordAsync();
+            // outStirng += "\n";
             
             foreach (var row in dictionary)
             {
                 csvWriter.WriteField(row.Key);
+                // outStirng += row.Key;
                 foreach (var cell in row.Value)
                 {
                     csvWriter.WriteField(cell.Value);
+                    // outStirng += "," + cell.Value;
                 }
-            
+
                 await csvWriter.NextRecordAsync();
+                // outStirng += "\n";
             }
             
             
@@ -221,6 +245,7 @@ namespace CarImagesWeb.Controllers
 
             // Return the CSV file as a FileStreamResult
             return File(memoryStream, "text/csv", "data.csv");
+            // return Json(outStirng);
         }
 
         public async Task<IActionResult> DeleteAssetFromId(int Id)
