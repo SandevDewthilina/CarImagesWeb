@@ -1,8 +1,9 @@
 class Image {
-    constructor(uploadId, url, downloadUrl, imageData) {
+    constructor(uploadId, url, downloadUrl, imageData, originalUrl) {
         this.uploadId = uploadId
         this.isSelected = false;
         this.url = url;
+        this.originalUrl = originalUrl;
         this.country = imageData.country;
         this.asset = imageData.asset;
         this.tag = imageData.tag;
@@ -144,7 +145,7 @@ app = Vue.createApp({
                     this._images = [];
                     // TODO: update Image class to include assetType, asset, country , tags and imageUrl as well
                     data.forEach(obj => {
-                        this._images.push(new Image(obj.uploadId, obj.url, obj.downloadUrl, obj.imageData));
+                        this._images.push(new Image(obj.uploadId, obj.url, obj.downloadUrl, obj.imageData, obj.originalUrl));
                     });
                 }).finally(() => {
                     this.setSearching(false)

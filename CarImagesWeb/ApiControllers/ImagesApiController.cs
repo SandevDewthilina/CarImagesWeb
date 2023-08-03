@@ -117,10 +117,12 @@ namespace CarImagesWeb.ApiControllers
             foreach (var imageUpload in imageUploads)
             {
                 var thumbnail = _imagesHandler.GetImageThumbnailUrl(imageUpload);
+                var originalUrl = _imagesHandler.GetImageUrlFromThumbnail(thumbnail);
                 data.Add(new
                 {
                     uploadId = imageUpload.Id,
                     url = thumbnail,
+                    originalUrl = originalUrl,
                     imageData = new
                     {
                         country = imageUpload.Country.Name,
